@@ -1,0 +1,54 @@
+import SwiftUI
+
+struct WelcomeView: View {
+    var body: some View {
+        VStack(spacing: 40) {
+            Spacer()
+
+            VStack(spacing: 10) {
+                Text("Mantra")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+
+                Text("Daily mantras powered by mindful reflection.")
+                    .font(.subheadline)
+                    .multilineTextAlignment(.center)
+                    .foregroundColor(.gray)
+            }
+
+            VStack(spacing: 16) {
+                Button(action: {
+                    // Navigate to AuthView (placeholder for now)
+                }) {
+                    Text("Log In")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.purple.opacity(0.8))
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                }
+
+                Button(action: {
+                    // Navigate to AuthView (placeholder for now)
+                }) {
+                    Text("Sign Up")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.purple.opacity(0.2))
+                        .foregroundColor(.purple)
+                        .cornerRadius(10)
+                }
+            }
+            .padding(.horizontal)
+
+            Spacer()
+        }
+        .padding()
+    }
+}
+
+struct WelcomeView_Previews: PreviewProvider {
+    static var previews: some View {
+        WelcomeView()
+    }
+}

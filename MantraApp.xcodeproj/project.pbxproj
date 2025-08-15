@@ -1,0 +1,1020 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		FB2CA78F2DD67067006C687D /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB2CA78E2DD67067006C687D /* WelcomeView.swift */; };
+		FB2CA7952DD68C29006C687D /* NewMantraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB2CA7942DD68C29006C687D /* NewMantraView.swift */; };
+		FB2CA7972DD68C4A006C687D /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB2CA7962DD68C4A006C687D /* HistoryView.swift */; };
+		FB2CA7992DD6970D006C687D /* MantraDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB2CA7982DD6970D006C687D /* MantraDetailView.swift */; };
+		FB2CA79B2DDD20A0006C687D /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB2CA79A2DDD20A0006C687D /* Color+Hex.swift */; };
+		FB2CA79D2DDD4A62006C687D /* Prompt1View.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB2CA79C2DDD4A62006C687D /* Prompt1View.swift */; };
+		FB2CA79F2DDD57CC006C687D /* Prompt2View.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB2CA79E2DDD57CC006C687D /* Prompt2View.swift */; };
+		FB2CA7A12DDD59B2006C687D /* Prompt3View.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB2CA7A02DDD59B2006C687D /* Prompt3View.swift */; };
+		FB2CA7A32DDE2AD1006C687D /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB2CA7A22DDE2AD1006C687D /* LoadingView.swift */; };
+		FB2CA7A52DDE370F006C687D /* MantraSummaryView .swift in Sources */ = {isa = PBXBuildFile; fileRef = FB2CA7A42DDE370F006C687D /* MantraSummaryView .swift */; };
+		FB2CA7A82DDE988C006C687D /* PromptQuestions .swift in Sources */ = {isa = PBXBuildFile; fileRef = FB2CA7A72DDE988C006C687D /* PromptQuestions .swift */; };
+		FB2CA7AD2DDF8440006C687D /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = FB2CA7AC2DDF8440006C687D /* FirebaseAuth */; };
+		FB2CA7AF2DDF8440006C687D /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = FB2CA7AE2DDF8440006C687D /* FirebaseCore */; };
+		FB2CA7B12DDF8440006C687D /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = FB2CA7B02DDF8440006C687D /* FirebaseFirestore */; };
+		FB2CA7B52DDF8D40006C687D /* LoginView .swift in Sources */ = {isa = PBXBuildFile; fileRef = FB2CA7B42DDF8D40006C687D /* LoginView .swift */; };
+		FB2CA7B72DDF8E31006C687D /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB2CA7B62DDF8E31006C687D /* SignUpView.swift */; };
+		FB2CA7B92DDF9561006C687D /* AuthViewModel.swift .swift in Sources */ = {isa = PBXBuildFile; fileRef = FB2CA7B82DDF9561006C687D /* AuthViewModel.swift .swift */; };
+		FB2CA7BD2DDFC56F006C687D /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB2CA7BC2DDFC56F006C687D /* RootView.swift */; };
+		FB2CA7BF2DE29503006C687D /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB2CA7BE2DE29503006C687D /* SettingsView.swift */; };
+		FB5AC72E2E29835C00F6C9EF /* UIColor+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB5AC72D2E29835800F6C9EF /* UIColor+Hex.swift */; };
+		FB5AC7382E29D2B300F6C9EF /* MantraGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB5AC7372E29D2B300F6C9EF /* MantraGenerator.swift */; };
+		FB5AC74F2E2AEA6300F6C9EF /* SplashScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB5AC74E2E2AEA5D00F6C9EF /* SplashScreenView.swift */; };
+		FB5AC7512E2AEA9300F6C9EF /* OnboardingCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB5AC7502E2AEA9300F6C9EF /* OnboardingCoordinator.swift */; };
+		FB5AC7572E2AEB9C00F6C9EF /* OnboardingPage2.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB5AC7562E2AEB9C00F6C9EF /* OnboardingPage2.swift */; };
+		FB5AC7592E2AEBBD00F6C9EF /* OnboardingPage3.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB5AC7582E2AEBBD00F6C9EF /* OnboardingPage3.swift */; };
+		FB5AC75B2E2AEBD800F6C9EF /* OnboardingPage1.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB5AC75A2E2AEBD800F6C9EF /* OnboardingPage1.swift */; };
+		FB5AC75E2E2AFC5900F6C9EF /* GoogleAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB5AC75D2E2AFC5900F6C9EF /* GoogleAuthManager.swift */; };
+		FB5AC7602E2AFCD400F6C9EF /* AppleAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB5AC75F2E2AFCD400F6C9EF /* AppleAuthManager.swift */; };
+		FB5AC7622E2B090E00F6C9EF /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = FB5AC7612E2B090E00F6C9EF /* GoogleSignIn */; };
+		FB5AC7642E2B090E00F6C9EF /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = FB5AC7632E2B090E00F6C9EF /* GoogleSignInSwift */; };
+		FB5AC7682E2B175B00F6C9EF /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB5AC7672E2B175B00F6C9EF /* AuthManager.swift */; };
+		FB63CA212DE7BDCD002EED53 /* JournalEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB63CA202DE7BDCD002EED53 /* JournalEntry.swift */; };
+		FB63CA232DE7BE09002EED53 /* JournalManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB63CA222DE7BE09002EED53 /* JournalManager.swift */; };
+		FB63CA252DE7EF5D002EED53 /* MoodColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB63CA242DE7EF5D002EED53 /* MoodColor.swift */; };
+		FB7FFBCE2DF64503001DEF3D /* ImageShareHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB7FFBCD2DF64503001DEF3D /* ImageShareHelper.swift */; };
+		FB7FFBD02DF64550001DEF3D /* MantraCardGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB7FFBCF2DF64550001DEF3D /* MantraCardGenerator.swift */; };
+		FB7FFBE32DF72047001DEF3D /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB7FFBE22DF72047001DEF3D /* WidgetKit.framework */; };
+		FB7FFBE52DF72047001DEF3D /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB7FFBE42DF72047001DEF3D /* SwiftUI.framework */; };
+		FB7FFBF02DF72048001DEF3D /* MantraWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = FB7FFBE02DF72047001DEF3D /* MantraWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		FB820DBD2E31623300BCEE2F /* HapticHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB820DBC2E31623300BCEE2F /* HapticHelper.swift */; };
+		FB8861B82E4E50F10050BD95 /* Secrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB8861B72E4E50F10050BD95 /* Secrets.swift */; };
+		FB8861BA2E4F8B720050BD95 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = FB8861B92E4F8B6D0050BD95 /* .gitignore */; };
+		FBD3F6852E32A87900A3BDEF /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = FBD3F6842E32A87900A3BDEF /* GoogleService-Info.plist */; };
+		FBD43C2F2DF0AA5100C100D5 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD43C2E2DF0AA5100C100D5 /* Theme.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		FB2CA7712DD3C64E006C687D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FB2CA75A2DD3C64E006C687D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FB2CA7612DD3C64E006C687D;
+			remoteInfo = MantraApp;
+		};
+		FB2CA77B2DD3C64E006C687D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FB2CA75A2DD3C64E006C687D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FB2CA7612DD3C64E006C687D;
+			remoteInfo = MantraApp;
+		};
+		FB7FFBEE2DF72048001DEF3D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FB2CA75A2DD3C64E006C687D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FB7FFBDF2DF72047001DEF3D;
+			remoteInfo = MantraWidgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		FB7FFBF12DF72048001DEF3D /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				FB7FFBF02DF72048001DEF3D /* MantraWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		FB2CA7622DD3C64E006C687D /* Mantra.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mantra.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		FB2CA7702DD3C64E006C687D /* MantraAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MantraAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		FB2CA77A2DD3C64E006C687D /* MantraAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MantraAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		FB2CA78E2DD67067006C687D /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
+		FB2CA7942DD68C29006C687D /* NewMantraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMantraView.swift; sourceTree = "<group>"; };
+		FB2CA7962DD68C4A006C687D /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
+		FB2CA7982DD6970D006C687D /* MantraDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MantraDetailView.swift; sourceTree = "<group>"; };
+		FB2CA79A2DDD20A0006C687D /* Color+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Hex.swift"; sourceTree = "<group>"; };
+		FB2CA79C2DDD4A62006C687D /* Prompt1View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Prompt1View.swift; sourceTree = "<group>"; };
+		FB2CA79E2DDD57CC006C687D /* Prompt2View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Prompt2View.swift; sourceTree = "<group>"; };
+		FB2CA7A02DDD59B2006C687D /* Prompt3View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Prompt3View.swift; sourceTree = "<group>"; };
+		FB2CA7A22DDE2AD1006C687D /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
+		FB2CA7A42DDE370F006C687D /* MantraSummaryView .swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MantraSummaryView .swift"; sourceTree = "<group>"; };
+		FB2CA7A72DDE988C006C687D /* PromptQuestions .swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PromptQuestions .swift"; sourceTree = "<group>"; };
+		FB2CA7B42DDF8D40006C687D /* LoginView .swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LoginView .swift"; sourceTree = "<group>"; };
+		FB2CA7B62DDF8E31006C687D /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
+		FB2CA7B82DDF9561006C687D /* AuthViewModel.swift .swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AuthViewModel.swift .swift"; sourceTree = "<group>"; };
+		FB2CA7BC2DDFC56F006C687D /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		FB2CA7BE2DE29503006C687D /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		FB5AC72D2E29835800F6C9EF /* UIColor+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Hex.swift"; sourceTree = "<group>"; };
+		FB5AC7372E29D2B300F6C9EF /* MantraGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MantraGenerator.swift; sourceTree = "<group>"; };
+		FB5AC74E2E2AEA5D00F6C9EF /* SplashScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreenView.swift; sourceTree = "<group>"; };
+		FB5AC7502E2AEA9300F6C9EF /* OnboardingCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingCoordinator.swift; sourceTree = "<group>"; };
+		FB5AC7562E2AEB9C00F6C9EF /* OnboardingPage2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingPage2.swift; sourceTree = "<group>"; };
+		FB5AC7582E2AEBBD00F6C9EF /* OnboardingPage3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingPage3.swift; sourceTree = "<group>"; };
+		FB5AC75A2E2AEBD800F6C9EF /* OnboardingPage1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingPage1.swift; sourceTree = "<group>"; };
+		FB5AC75D2E2AFC5900F6C9EF /* GoogleAuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleAuthManager.swift; sourceTree = "<group>"; };
+		FB5AC75F2E2AFCD400F6C9EF /* AppleAuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleAuthManager.swift; sourceTree = "<group>"; };
+		FB5AC7672E2B175B00F6C9EF /* AuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
+		FB63CA202DE7BDCD002EED53 /* JournalEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalEntry.swift; sourceTree = "<group>"; };
+		FB63CA222DE7BE09002EED53 /* JournalManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalManager.swift; sourceTree = "<group>"; };
+		FB63CA242DE7EF5D002EED53 /* MoodColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodColor.swift; sourceTree = "<group>"; };
+		FB7FFBCD2DF64503001DEF3D /* ImageShareHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageShareHelper.swift; sourceTree = "<group>"; };
+		FB7FFBCF2DF64550001DEF3D /* MantraCardGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MantraCardGenerator.swift; sourceTree = "<group>"; };
+		FB7FFBE02DF72047001DEF3D /* MantraWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MantraWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		FB7FFBE22DF72047001DEF3D /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		FB7FFBE42DF72047001DEF3D /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		FB7FFBF62DF7383C001DEF3D /* MantraWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MantraWidgetExtension.entitlements; sourceTree = "<group>"; };
+		FB820DBC2E31623300BCEE2F /* HapticHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticHelper.swift; sourceTree = "<group>"; };
+		FB8861B72E4E50F10050BD95 /* Secrets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Secrets.swift; sourceTree = "<group>"; };
+		FB8861B92E4F8B6D0050BD95 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		FBD3F6842E32A87900A3BDEF /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		FBD43C2E2DF0AA5100C100D5 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		FB7FFBF42DF72048001DEF3D /* Exceptions for "MantraWidget" folder in "MantraWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = FB7FFBDF2DF72047001DEF3D /* MantraWidgetExtension */;
+		};
+		FBDB58D72E1454610022B336 /* Exceptions for "MantraApp" folder in "MantraWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Assets.xcassets,
+			);
+			target = FB7FFBDF2DF72047001DEF3D /* MantraWidgetExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		FB2CA7642DD3C64E006C687D /* MantraApp */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				FBDB58D72E1454610022B336 /* Exceptions for "MantraApp" folder in "MantraWidgetExtension" target */,
+			);
+			path = MantraApp;
+			sourceTree = "<group>";
+		};
+		FB2CA7732DD3C64E006C687D /* MantraAppTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = MantraAppTests;
+			sourceTree = "<group>";
+		};
+		FB2CA77D2DD3C64E006C687D /* MantraAppUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = MantraAppUITests;
+			sourceTree = "<group>";
+		};
+		FB7FFBE62DF72047001DEF3D /* MantraWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				FB7FFBF42DF72048001DEF3D /* Exceptions for "MantraWidget" folder in "MantraWidgetExtension" target */,
+			);
+			path = MantraWidget;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		FB2CA75F2DD3C64E006C687D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FB5AC7642E2B090E00F6C9EF /* GoogleSignInSwift in Frameworks */,
+				FB2CA7AF2DDF8440006C687D /* FirebaseCore in Frameworks */,
+				FB5AC7622E2B090E00F6C9EF /* GoogleSignIn in Frameworks */,
+				FB2CA7AD2DDF8440006C687D /* FirebaseAuth in Frameworks */,
+				FB2CA7B12DDF8440006C687D /* FirebaseFirestore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FB2CA76D2DD3C64E006C687D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FB2CA7772DD3C64E006C687D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FB7FFBDD2DF72047001DEF3D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FB7FFBE52DF72047001DEF3D /* SwiftUI.framework in Frameworks */,
+				FB7FFBE32DF72047001DEF3D /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		FB2CA7592DD3C64E006C687D = {
+			isa = PBXGroup;
+			children = (
+				FB8861B92E4F8B6D0050BD95 /* .gitignore */,
+				FB8861B72E4E50F10050BD95 /* Secrets.swift */,
+				FB5AC7672E2B175B00F6C9EF /* AuthManager.swift */,
+				FB5AC75F2E2AFCD400F6C9EF /* AppleAuthManager.swift */,
+				FB5AC75D2E2AFC5900F6C9EF /* GoogleAuthManager.swift */,
+				FB5AC75A2E2AEBD800F6C9EF /* OnboardingPage1.swift */,
+				FB5AC7562E2AEB9C00F6C9EF /* OnboardingPage2.swift */,
+				FB5AC7582E2AEBBD00F6C9EF /* OnboardingPage3.swift */,
+				FB5AC7502E2AEA9300F6C9EF /* OnboardingCoordinator.swift */,
+				FB5AC74E2E2AEA5D00F6C9EF /* SplashScreenView.swift */,
+				FB5AC7372E29D2B300F6C9EF /* MantraGenerator.swift */,
+				FB5AC72D2E29835800F6C9EF /* UIColor+Hex.swift */,
+				FB7FFBF62DF7383C001DEF3D /* MantraWidgetExtension.entitlements */,
+				FB7FFBCF2DF64550001DEF3D /* MantraCardGenerator.swift */,
+				FB7FFBCD2DF64503001DEF3D /* ImageShareHelper.swift */,
+				FBD43C2E2DF0AA5100C100D5 /* Theme.swift */,
+				FB63CA242DE7EF5D002EED53 /* MoodColor.swift */,
+				FB2CA7BE2DE29503006C687D /* SettingsView.swift */,
+				FB2CA7BC2DDFC56F006C687D /* RootView.swift */,
+				FB2CA79A2DDD20A0006C687D /* Color+Hex.swift */,
+				FB820DBC2E31623300BCEE2F /* HapticHelper.swift */,
+				FB2CA7B82DDF9561006C687D /* AuthViewModel.swift .swift */,
+				FBD3F6842E32A87900A3BDEF /* GoogleService-Info.plist */,
+				FB2CA7A62DDE9842006C687D /* Data */,
+				FB2CA78D2DD66E64006C687D /* Screens */,
+				FB2CA7642DD3C64E006C687D /* MantraApp */,
+				FB2CA7732DD3C64E006C687D /* MantraAppTests */,
+				FB2CA77D2DD3C64E006C687D /* MantraAppUITests */,
+				FB7FFBE62DF72047001DEF3D /* MantraWidget */,
+				FB7FFBE12DF72047001DEF3D /* Frameworks */,
+				FB2CA7632DD3C64E006C687D /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		FB2CA7632DD3C64E006C687D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FB2CA7622DD3C64E006C687D /* Mantra.app */,
+				FB2CA7702DD3C64E006C687D /* MantraAppTests.xctest */,
+				FB2CA77A2DD3C64E006C687D /* MantraAppUITests.xctest */,
+				FB7FFBE02DF72047001DEF3D /* MantraWidgetExtension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FB2CA78D2DD66E64006C687D /* Screens */ = {
+			isa = PBXGroup;
+			children = (
+				FB2CA78E2DD67067006C687D /* WelcomeView.swift */,
+				FB2CA7942DD68C29006C687D /* NewMantraView.swift */,
+				FB2CA7962DD68C4A006C687D /* HistoryView.swift */,
+				FB2CA7982DD6970D006C687D /* MantraDetailView.swift */,
+				FB2CA79C2DDD4A62006C687D /* Prompt1View.swift */,
+				FB2CA79E2DDD57CC006C687D /* Prompt2View.swift */,
+				FB2CA7A02DDD59B2006C687D /* Prompt3View.swift */,
+				FB2CA7A22DDE2AD1006C687D /* LoadingView.swift */,
+				FB2CA7A42DDE370F006C687D /* MantraSummaryView .swift */,
+				FB2CA7B42DDF8D40006C687D /* LoginView .swift */,
+				FB2CA7B62DDF8E31006C687D /* SignUpView.swift */,
+			);
+			path = Screens;
+			sourceTree = "<group>";
+		};
+		FB2CA7A62DDE9842006C687D /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				FB2CA7A72DDE988C006C687D /* PromptQuestions .swift */,
+				FB63CA202DE7BDCD002EED53 /* JournalEntry.swift */,
+				FB63CA222DE7BE09002EED53 /* JournalManager.swift */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
+		FB7FFBE12DF72047001DEF3D /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				FB7FFBE22DF72047001DEF3D /* WidgetKit.framework */,
+				FB7FFBE42DF72047001DEF3D /* SwiftUI.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		FB2CA7612DD3C64E006C687D /* MantraApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FB2CA7842DD3C64E006C687D /* Build configuration list for PBXNativeTarget "MantraApp" */;
+			buildPhases = (
+				FB2CA75E2DD3C64E006C687D /* Sources */,
+				FB2CA75F2DD3C64E006C687D /* Frameworks */,
+				FB2CA7602DD3C64E006C687D /* Resources */,
+				FB7FFBF12DF72048001DEF3D /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FB7FFBEF2DF72048001DEF3D /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				FB2CA7642DD3C64E006C687D /* MantraApp */,
+			);
+			name = MantraApp;
+			packageProductDependencies = (
+				FB2CA7AC2DDF8440006C687D /* FirebaseAuth */,
+				FB2CA7AE2DDF8440006C687D /* FirebaseCore */,
+				FB2CA7B02DDF8440006C687D /* FirebaseFirestore */,
+				FB5AC7612E2B090E00F6C9EF /* GoogleSignIn */,
+				FB5AC7632E2B090E00F6C9EF /* GoogleSignInSwift */,
+			);
+			productName = MantraApp;
+			productReference = FB2CA7622DD3C64E006C687D /* Mantra.app */;
+			productType = "com.apple.product-type.application";
+		};
+		FB2CA76F2DD3C64E006C687D /* MantraAppTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FB2CA7872DD3C64E006C687D /* Build configuration list for PBXNativeTarget "MantraAppTests" */;
+			buildPhases = (
+				FB2CA76C2DD3C64E006C687D /* Sources */,
+				FB2CA76D2DD3C64E006C687D /* Frameworks */,
+				FB2CA76E2DD3C64E006C687D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FB2CA7722DD3C64E006C687D /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				FB2CA7732DD3C64E006C687D /* MantraAppTests */,
+			);
+			name = MantraAppTests;
+			packageProductDependencies = (
+			);
+			productName = MantraAppTests;
+			productReference = FB2CA7702DD3C64E006C687D /* MantraAppTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		FB2CA7792DD3C64E006C687D /* MantraAppUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FB2CA78A2DD3C64E006C687D /* Build configuration list for PBXNativeTarget "MantraAppUITests" */;
+			buildPhases = (
+				FB2CA7762DD3C64E006C687D /* Sources */,
+				FB2CA7772DD3C64E006C687D /* Frameworks */,
+				FB2CA7782DD3C64E006C687D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FB2CA77C2DD3C64E006C687D /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				FB2CA77D2DD3C64E006C687D /* MantraAppUITests */,
+			);
+			name = MantraAppUITests;
+			packageProductDependencies = (
+			);
+			productName = MantraAppUITests;
+			productReference = FB2CA77A2DD3C64E006C687D /* MantraAppUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		FB7FFBDF2DF72047001DEF3D /* MantraWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FB7FFBF52DF72048001DEF3D /* Build configuration list for PBXNativeTarget "MantraWidgetExtension" */;
+			buildPhases = (
+				FB7FFBDC2DF72047001DEF3D /* Sources */,
+				FB7FFBDD2DF72047001DEF3D /* Frameworks */,
+				FB7FFBDE2DF72047001DEF3D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				FB7FFBE62DF72047001DEF3D /* MantraWidget */,
+			);
+			name = MantraWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = MantraWidgetExtension;
+			productReference = FB7FFBE02DF72047001DEF3D /* MantraWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		FB2CA75A2DD3C64E006C687D /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1630;
+				LastUpgradeCheck = 1630;
+				TargetAttributes = {
+					FB2CA7612DD3C64E006C687D = {
+						CreatedOnToolsVersion = 16.3;
+						LastSwiftMigration = 1630;
+					};
+					FB2CA76F2DD3C64E006C687D = {
+						CreatedOnToolsVersion = 16.3;
+						TestTargetID = FB2CA7612DD3C64E006C687D;
+					};
+					FB2CA7792DD3C64E006C687D = {
+						CreatedOnToolsVersion = 16.3;
+						TestTargetID = FB2CA7612DD3C64E006C687D;
+					};
+					FB7FFBDF2DF72047001DEF3D = {
+						CreatedOnToolsVersion = 16.3;
+					};
+				};
+			};
+			buildConfigurationList = FB2CA75D2DD3C64E006C687D /* Build configuration list for PBXProject "MantraApp" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = FB2CA7592DD3C64E006C687D;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				FB2CA7AB2DDF8440006C687D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				FB5AC75C2E2AF4D000F6C9EF /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = FB2CA7632DD3C64E006C687D /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				FB2CA7612DD3C64E006C687D /* MantraApp */,
+				FB2CA76F2DD3C64E006C687D /* MantraAppTests */,
+				FB2CA7792DD3C64E006C687D /* MantraAppUITests */,
+				FB7FFBDF2DF72047001DEF3D /* MantraWidgetExtension */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		FB2CA7602DD3C64E006C687D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FB8861BA2E4F8B720050BD95 /* .gitignore in Resources */,
+				FBD3F6852E32A87900A3BDEF /* GoogleService-Info.plist in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FB2CA76E2DD3C64E006C687D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FB2CA7782DD3C64E006C687D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FB7FFBDE2DF72047001DEF3D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		FB2CA75E2DD3C64E006C687D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FB2CA7B72DDF8E31006C687D /* SignUpView.swift in Sources */,
+				FB5AC75B2E2AEBD800F6C9EF /* OnboardingPage1.swift in Sources */,
+				FB7FFBCE2DF64503001DEF3D /* ImageShareHelper.swift in Sources */,
+				FB63CA252DE7EF5D002EED53 /* MoodColor.swift in Sources */,
+				FBD43C2F2DF0AA5100C100D5 /* Theme.swift in Sources */,
+				FB5AC7572E2AEB9C00F6C9EF /* OnboardingPage2.swift in Sources */,
+				FB5AC7682E2B175B00F6C9EF /* AuthManager.swift in Sources */,
+				FB63CA212DE7BDCD002EED53 /* JournalEntry.swift in Sources */,
+				FB2CA79D2DDD4A62006C687D /* Prompt1View.swift in Sources */,
+				FB2CA7A82DDE988C006C687D /* PromptQuestions .swift in Sources */,
+				FB2CA7972DD68C4A006C687D /* HistoryView.swift in Sources */,
+				FB5AC72E2E29835C00F6C9EF /* UIColor+Hex.swift in Sources */,
+				FB5AC7602E2AFCD400F6C9EF /* AppleAuthManager.swift in Sources */,
+				FB5AC7592E2AEBBD00F6C9EF /* OnboardingPage3.swift in Sources */,
+				FB2CA7A32DDE2AD1006C687D /* LoadingView.swift in Sources */,
+				FB2CA79F2DDD57CC006C687D /* Prompt2View.swift in Sources */,
+				FB8861B82E4E50F10050BD95 /* Secrets.swift in Sources */,
+				FB2CA7B52DDF8D40006C687D /* LoginView .swift in Sources */,
+				FB7FFBD02DF64550001DEF3D /* MantraCardGenerator.swift in Sources */,
+				FB2CA7992DD6970D006C687D /* MantraDetailView.swift in Sources */,
+				FB2CA78F2DD67067006C687D /* WelcomeView.swift in Sources */,
+				FB5AC7512E2AEA9300F6C9EF /* OnboardingCoordinator.swift in Sources */,
+				FB2CA7A12DDD59B2006C687D /* Prompt3View.swift in Sources */,
+				FB2CA7952DD68C29006C687D /* NewMantraView.swift in Sources */,
+				FB2CA7BD2DDFC56F006C687D /* RootView.swift in Sources */,
+				FB5AC74F2E2AEA6300F6C9EF /* SplashScreenView.swift in Sources */,
+				FB2CA7A52DDE370F006C687D /* MantraSummaryView .swift in Sources */,
+				FB2CA7B92DDF9561006C687D /* AuthViewModel.swift .swift in Sources */,
+				FB5AC7382E29D2B300F6C9EF /* MantraGenerator.swift in Sources */,
+				FB5AC75E2E2AFC5900F6C9EF /* GoogleAuthManager.swift in Sources */,
+				FB2CA79B2DDD20A0006C687D /* Color+Hex.swift in Sources */,
+				FB820DBD2E31623300BCEE2F /* HapticHelper.swift in Sources */,
+				FB2CA7BF2DE29503006C687D /* SettingsView.swift in Sources */,
+				FB63CA232DE7BE09002EED53 /* JournalManager.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FB2CA76C2DD3C64E006C687D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FB2CA7762DD3C64E006C687D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FB7FFBDC2DF72047001DEF3D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		FB2CA7722DD3C64E006C687D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FB2CA7612DD3C64E006C687D /* MantraApp */;
+			targetProxy = FB2CA7712DD3C64E006C687D /* PBXContainerItemProxy */;
+		};
+		FB2CA77C2DD3C64E006C687D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FB2CA7612DD3C64E006C687D /* MantraApp */;
+			targetProxy = FB2CA77B2DD3C64E006C687D /* PBXContainerItemProxy */;
+		};
+		FB7FFBEF2DF72048001DEF3D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FB7FFBDF2DF72047001DEF3D /* MantraWidgetExtension */;
+			targetProxy = FB7FFBEE2DF72048001DEF3D /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		FB2CA7822DD3C64E006C687D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		FB2CA7832DD3C64E006C687D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		FB2CA7852DD3C64E006C687D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = MantraApp/MantraAppDebug.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 553FMLS63Z;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 15.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mantraapp.MantraApp;
+				PRODUCT_NAME = Mantra;
+				REGISTER_APP_GROUPS = YES;
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				XROS_DEPLOYMENT_TARGET = 2.4;
+			};
+			name = Debug;
+		};
+		FB2CA7862DD3C64E006C687D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = MantraApp/MantraApp.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 553FMLS63Z;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 15.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mantraapp.MantraApp;
+				PRODUCT_NAME = Mantra;
+				REGISTER_APP_GROUPS = YES;
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				XROS_DEPLOYMENT_TARGET = 2.4;
+			};
+			name = Release;
+		};
+		FB2CA7882DD3C64E006C687D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 553FMLS63Z;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				MACOSX_DEPLOYMENT_TARGET = 15.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mantraapp.MantraAppTests;
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = com.mantraapp.MantraApp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MantraApp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MantraApp";
+				XROS_DEPLOYMENT_TARGET = 2.4;
+			};
+			name = Debug;
+		};
+		FB2CA7892DD3C64E006C687D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				MACOSX_DEPLOYMENT_TARGET = 15.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mantraapp.MantraAppTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MantraApp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MantraApp";
+				XROS_DEPLOYMENT_TARGET = 2.4;
+			};
+			name = Release;
+		};
+		FB2CA78B2DD3C64E006C687D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				MACOSX_DEPLOYMENT_TARGET = 15.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mantraapp.MantraAppUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TEST_TARGET_NAME = MantraApp;
+				XROS_DEPLOYMENT_TARGET = 2.4;
+			};
+			name = Debug;
+		};
+		FB2CA78C2DD3C64E006C687D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				MACOSX_DEPLOYMENT_TARGET = 15.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mantraapp.MantraAppUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TEST_TARGET_NAME = MantraApp;
+				XROS_DEPLOYMENT_TARGET = 2.4;
+			};
+			name = Release;
+		};
+		FB7FFBF22DF72048001DEF3D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = MantraWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 553FMLS63Z;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MantraWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = MantraWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mantraapp.MantraApp.MantraWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		FB7FFBF32DF72048001DEF3D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = MantraWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 553FMLS63Z;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MantraWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = MantraWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mantraapp.MantraApp.MantraWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		FB2CA75D2DD3C64E006C687D /* Build configuration list for PBXProject "MantraApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FB2CA7822DD3C64E006C687D /* Debug */,
+				FB2CA7832DD3C64E006C687D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FB2CA7842DD3C64E006C687D /* Build configuration list for PBXNativeTarget "MantraApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FB2CA7852DD3C64E006C687D /* Debug */,
+				FB2CA7862DD3C64E006C687D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FB2CA7872DD3C64E006C687D /* Build configuration list for PBXNativeTarget "MantraAppTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FB2CA7882DD3C64E006C687D /* Debug */,
+				FB2CA7892DD3C64E006C687D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FB2CA78A2DD3C64E006C687D /* Build configuration list for PBXNativeTarget "MantraAppUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FB2CA78B2DD3C64E006C687D /* Debug */,
+				FB2CA78C2DD3C64E006C687D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FB7FFBF52DF72048001DEF3D /* Build configuration list for PBXNativeTarget "MantraWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FB7FFBF22DF72048001DEF3D /* Debug */,
+				FB7FFBF32DF72048001DEF3D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		FB2CA7AB2DDF8440006C687D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.13.0;
+			};
+		};
+		FB5AC75C2E2AF4D000F6C9EF /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		FB2CA7AC2DDF8440006C687D /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FB2CA7AB2DDF8440006C687D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		FB2CA7AE2DDF8440006C687D /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FB2CA7AB2DDF8440006C687D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		FB2CA7B02DDF8440006C687D /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FB2CA7AB2DDF8440006C687D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+		FB5AC7612E2B090E00F6C9EF /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FB5AC75C2E2AF4D000F6C9EF /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		FB5AC7632E2B090E00F6C9EF /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FB5AC75C2E2AF4D000F6C9EF /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = FB2CA75A2DD3C64E006C687D /* Project object */;
+}
