@@ -12,10 +12,18 @@ struct Provider: TimelineProvider {
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<SimpleEntry>) -> ()) {
-        // Get mantra from App Group UserDefaults
-        let sharedDefaults = UserDefaults(suiteName: "group.com.mantra.app")
+        // Get mantra from App Group UserDefaults - Updated for Studio Eight LLC
+        let sharedDefaults = UserDefaults(suiteName: "group.com.studioeight.mantra")
         let mantra = sharedDefaults?.string(forKey: "latestMantra") ?? "How are you feeling today?"
         let mood = sharedDefaults?.string(forKey: "latestMood") ?? "calm"
+        let lastUpdated = sharedDefaults?.object(forKey: "lastUpdated") as? Date
+        
+        // Debug logging
+        print("📱 Widget Timeline Request:")
+        print("   App Group: group.com.studioeight.mantra")
+        print("   Mantra: \(mantra)")
+        print("   Mood: \(mood)")
+        print("   Last Updated: \(lastUpdated?.formatted() ?? "never")")
         
         let currentDate = Date()
         let entry = SimpleEntry(date: currentDate, mantra: mantra, mood: mood)
@@ -77,9 +85,6 @@ struct MantraWidgetEntryView: View {
         case .accessoryInline:
             // Simple inline widget - text only
             HStack(spacing: 4) {
-                Text("✨")
-                    .font(.system(size: 10))
-                
                 Text("mantra:")
                     .font(.system(size: 12, weight: .medium, design: .serif))
                 
@@ -99,7 +104,7 @@ struct MantraWidgetEntryView: View {
         case "happy", "joyful", "excited": return "😊"
         case "calm", "peaceful", "relaxed": return "😌"
         case "anxious", "stressed", "overwhelmed": return "😰"
-        case "sad", "lonely", "down": return "😔"
+        case "sad", "lonely", "down": return "😢"
         case "angry", "frustrated", "irritated": return "😤"
         case "grateful", "blessed": return "🙏"
         case "motivated", "determined": return "💪"
@@ -262,7 +267,7 @@ struct MantraLargeWidget: View {
                 
                 // Subtle decorative line in your soft purple
                 Rectangle()
-                    .fill(Color(hex: "#A6B8FA"))
+                    .fill(Color(hex: "#A6B4FF"))
                     .frame(width: 50, height: 2)
                     .cornerRadius(1)
             }
@@ -306,7 +311,7 @@ struct MantraWidget: Widget {
     }
 }
 
-// Color extension for hex colors
+// Color extension for hex colors - matching your existing Color+Hex.swift
 extension Color {
     init(hex: String) {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)

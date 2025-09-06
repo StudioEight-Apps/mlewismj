@@ -45,13 +45,17 @@ struct LoginView: View {
                 .padding(.horizontal, 16)
                 .padding(.top, 50)
                 
-                // Logo - proper spacing from back button
+                // Logo - IMPROVED: More prominent
                 Text("mantra")
-                    .font(.system(size: 36, weight: .semibold, design: .serif))
+                    .font(.system(size: 56, weight: .semibold, design: .serif)) // Increased from 48 to 56
                     .foregroundColor(Color(hex: "#2A2A2A"))
-                    .padding(.top, 10)
+                    .padding(.top, 20) // Slightly more space after back button
                 
-                // Form Fields - 48px from logo
+                // IMPROVED: Added spacer to push form fields much lower
+                Spacer()
+                    .frame(height: 100) // Reduced from 140 to 100 to balance
+                
+                // Form Fields - Now positioned much lower
                 VStack(spacing: 16) {
                     // Email Field
                     TextField("Email", text: $email)
@@ -88,7 +92,6 @@ struct LoginView: View {
                         .autocapitalization(.none)
                         .disableAutocorrection(true)
                 }
-                .padding(.top, 48)
                 .padding(.horizontal, 24)
                 
                 // Log In Button - 32px from fields
@@ -179,7 +182,11 @@ struct LoginView: View {
                 .padding(.top, 24)
                 .padding(.horizontal, 24)
                 
-                // Sign Up Link - 32px from last button
+                // IMPROVED: Better spacing before sign up link
+                Spacer()
+                    .frame(height: 40)
+                
+                // Sign Up Link - Better positioned at bottom
                 NavigationLink(destination: SignUpView()) {
                     HStack(spacing: 4) {
                         Text("Don't have an account?")
@@ -195,8 +202,7 @@ struct LoginView: View {
                 }
                 .buttonStyle(PlainButtonStyle())
                 .shadow(radius: 0)
-                .padding(.top, 32)
-                .padding(.bottom, 40)
+                .padding(.bottom, 50) // Increased bottom padding
             }
         }
         .background(Color(hex: "#FFFCF5"))
@@ -254,7 +260,9 @@ struct LoginView: View {
                 // Success handled by AuthViewModel
                 break
             case .failure(let error):
-                self.errorMessage = error.localizedDescription
+                // Make error messages more user-friendly
+                let userFriendlyMessage = self.getUserFriendlyErrorMessage(error)
+                self.errorMessage = userFriendlyMessage
                 self.showingError = true
             }
         }
@@ -268,9 +276,27 @@ struct LoginView: View {
                 // Success handled by AuthViewModel
                 break
             case .failure(let error):
-                self.errorMessage = error.localizedDescription
+                // Make error messages more user-friendly
+                let userFriendlyMessage = self.getUserFriendlyErrorMessage(error)
+                self.errorMessage = userFriendlyMessage
                 self.showingError = true
             }
+        }
+    }
+    
+    // MARK: - Helper Functions
+    
+    private func getUserFriendlyErrorMessage(_ error: Error) -> String {
+        let errorMessage = error.localizedDescription.lowercased()
+        
+        if errorMessage.contains("canceled") || errorMessage.contains("cancelled") {
+            return "Sign in was cancelled. Please try again if you'd like to continue."
+        } else if errorMessage.contains("network") {
+            return "Please check your internet connection and try again."
+        } else if errorMessage.contains("invalid") {
+            return "There was an issue with your account. Please try a different sign-in method."
+        } else {
+            return "Something went wrong. Please try again."
         }
     }
 }

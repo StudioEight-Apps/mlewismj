@@ -34,11 +34,11 @@ struct MantraSummaryView: View {
                 // Enhanced Mantra Card
                 VStack(spacing: 24) {
                     Text("Your Mantra for Today")
-                        .font(.system(size: 18, weight: .semibold, design: .serif)) // ✅ System serif
+                        .font(.system(size: 18, weight: .semibold, design: .serif))
                         .foregroundColor(Color(red: 0.17, green: 0.16, blue: 0.2))
                     
                     Text(mantra)
-                        .font(.system(size: 24, weight: .semibold, design: .serif)) // ✅ System serif
+                        .font(.system(size: 24, weight: .semibold, design: .serif))
                         .multilineTextAlignment(.center)
                         .foregroundColor(Color(red: 0.17, green: 0.16, blue: 0.2))
                         .lineLimit(nil)
@@ -66,7 +66,7 @@ struct MantraSummaryView: View {
                             Image(systemName: "pin.circle.fill")
                                 .font(.system(size: 16, weight: .medium))
                             Text("Pin to Widget")
-                                .font(.system(size: 16, weight: .semibold)) // ✅ System sans-serif
+                                .font(.system(size: 16, weight: .semibold))
                         }
                         .foregroundColor(Color(red: 0.17, green: 0.16, blue: 0.2))
                         .padding(.horizontal, 20)
@@ -85,7 +85,7 @@ struct MantraSummaryView: View {
                             Image(systemName: "square.and.arrow.up.fill")
                                 .font(.system(size: 16, weight: .medium))
                             Text("Share")
-                                .font(.system(size: 16, weight: .semibold)) // ✅ System sans-serif
+                                .font(.system(size: 16, weight: .semibold))
                         }
                         .foregroundColor(Color(red: 0.17, green: 0.16, blue: 0.2))
                         .padding(.horizontal, 20)
@@ -101,7 +101,7 @@ struct MantraSummaryView: View {
                 Spacer()
             }
             
-            // Enhanced floating completion button - FIXED
+            // Enhanced floating completion button
             VStack {
                 Spacer()
                 HStack {
@@ -115,8 +115,8 @@ struct MantraSummaryView: View {
                             .frame(width: 64, height: 64)
                             .background(
                                 Circle()
-                                    .fill(Color(hex: "#A6B4FF")) // ✅ Fixed to use consistent hex color
-                                    .shadow(color: Color(hex: "#A6B4FF").opacity(0.4), radius: 12, x: 0, y: 6) // ✅ Fixed shadow color
+                                    .fill(Color(hex: "#A6B4FF"))
+                                    .shadow(color: Color(hex: "#A6B4FF").opacity(0.4), radius: 12, x: 0, y: 6)
                                     .shadow(color: Color.black.opacity(0.1), radius: 8, x: 0, y: 4)
                             )
                     }
@@ -145,15 +145,18 @@ struct MantraSummaryView: View {
     }
     
     private func updateWidget() {
-        if let sharedDefaults = UserDefaults(suiteName: "group.com.mantra.app") {
+        // Updated to use the correct App Group for Studio Eight LLC
+        if let sharedDefaults = UserDefaults(suiteName: "group.com.studioeight.mantra") {
             sharedDefaults.set(mantra, forKey: "latestMantra")
             sharedDefaults.set(mood, forKey: "latestMood")
             sharedDefaults.set(Date(), forKey: "lastUpdated")
             sharedDefaults.synchronize()
             
+            // Reload widget timelines
             WidgetCenter.shared.reloadAllTimelines()
             WidgetCenter.shared.reloadTimelines(ofKind: "MantraWidget")
             
+            // Additional reload after delay to ensure update
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 WidgetCenter.shared.reloadTimelines(ofKind: "MantraWidget")
             }
@@ -161,6 +164,10 @@ struct MantraSummaryView: View {
             // Haptic feedback for success
             let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
             impactFeedback.impactOccurred()
+            
+            print("✅ Widget updated with mantra: \(mantra)")
+        } else {
+            print("❌ Failed to access App Group: group.com.studioeight.mantra")
         }
     }
     
@@ -169,7 +176,7 @@ struct MantraSummaryView: View {
         let cardImage = MantraCardGenerator.createMantraCard(mantra: mantra, mood: mood)
         
         // Include both image and text for better sharing options
-        let shareText = "✨ Today's Mantra: \"\(mantra)\""
+        let shareText = "Today's Mantra: \"\(mantra)\""
         
         let shareSheet = UIActivityViewController(
             activityItems: [shareText, cardImage],

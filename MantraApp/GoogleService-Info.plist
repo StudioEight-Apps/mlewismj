@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>360646162392-r7i4ov7d10ghe2o91u3jeqilcs9kt3ds.apps.googleusercontent.com</string>
+	<string>360646162392-ipful04618q4il2p1hbu03jh1gbnqp75.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.360646162392-r7i4ov7d10ghe2o91u3jeqilcs9kt3ds</string>
+	<string>com.googleusercontent.apps.360646162392-ipful04618q4il2p1hbu03jh1gbnqp75</string>
 	<key>API_KEY</key>
 	<string>AIzaSyD8_6WKh9EI-sJiF1Y5xF750r0etOZvPuI</string>
 	<key>GCM_SENDER_ID</key>
@@ -13,7 +13,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.mantraapp.MantraApp</string>
+	<string>com.studioeight.mantra</string>
 	<key>PROJECT_ID</key>
 	<string>mantraapp-30e06</string>
 	<key>STORAGE_BUCKET</key>
@@ -29,6 +29,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:360646162392:ios:c2ce68c46627e9a839a4ad</string>
+	<string>1:360646162392:ios:5373d945162de38639a4ad</string>
 </dict>
 </plist>

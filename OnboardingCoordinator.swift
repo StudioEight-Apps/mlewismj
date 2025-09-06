@@ -47,13 +47,13 @@ struct OnboardingCoordinator: View {
                             .cornerRadius(26)
                     }
                     .buttonStyle(PlainButtonStyle())
-                    .padding(.bottom, 60) // ✅ Increased bottom padding since no skip button
+                    .padding(.bottom, 60)
                 }
             }
         }
         .navigationBarHidden(true)
         .fullScreenCover(isPresented: $navigateToAuth) {
-            // Navigate to your existing auth flow
+            // Navigate directly to auth (signup/login) - paywall comes after auth
             NavigationView {
                 SignUpView()
             }
@@ -64,7 +64,7 @@ struct OnboardingCoordinator: View {
         // Mark onboarding as completed
         UserDefaults.standard.set(true, forKey: "hasSeenOnboarding")
         
-        // Add a small delay for smooth transition
+        // Navigate to authentication
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             navigateToAuth = true
         }
