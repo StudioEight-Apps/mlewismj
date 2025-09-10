@@ -4,14 +4,14 @@ struct NewMantraView: View {
     @State private var selectedMood: String? = nil
     @State private var navigateToPrompt = false
 
-    // Exactly 24 moods
+    // Exactly 24 moods - now in alphabetical order
     let moods: [String] = [
-        "Anxious", "Happy", "Angry", "Reflective",
-        "Tired", "Grateful", "Lost", "Excited",
-        "Sad", "Calm", "Frustrated", "Motivated",
-        "Fine", "Stressed", "Empty", "Lonely",
-        "Peaceful", "Inspired", "Energized", "Insecure",
-        "Nervous", "Drained", "Hopeful", "Content"
+        "Angry", "Anxious", "Calm", "Content",
+        "Drained", "Empty", "Energized", "Excited",
+        "Fine", "Frustrated", "Grateful", "Happy",
+        "Hopeful", "Inspired", "Insecure", "Lonely",
+        "Lost", "Motivated", "Nervous", "Peaceful",
+        "Reflective", "Sad", "Stressed", "Tired"
     ]
     
     // 4-column grid

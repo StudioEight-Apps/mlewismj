@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		FB04CC062E6CD6CF00280A6B /* OnboardingPage4.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB04CC052E6CD6CF00280A6B /* OnboardingPage4.swift */; };
 		FB2CA78F2DD67067006C687D /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB2CA78E2DD67067006C687D /* WelcomeView.swift */; };
 		FB2CA7952DD68C29006C687D /* NewMantraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB2CA7942DD68C29006C687D /* NewMantraView.swift */; };
 		FB2CA7972DD68C4A006C687D /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB2CA7962DD68C4A006C687D /* HistoryView.swift */; };
@@ -95,6 +96,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		FB04CC052E6CD6CF00280A6B /* OnboardingPage4.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingPage4.swift; sourceTree = "<group>"; };
 		FB2CA7622DD3C64E006C687D /* Mantra.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mantra.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB2CA7702DD3C64E006C687D /* MantraAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MantraAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB2CA77A2DD3C64E006C687D /* MantraAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MantraAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -244,11 +246,13 @@
 				FBDE1DAC2E5DFA1A00AE17A3 /* SubscriptionManager.swift */,
 				FB6D648D2E5A8D060025D416 /* MantraAPI.swift */,
 				FB5AC7672E2B175B00F6C9EF /* AuthManager.swift */,
+				FB2CA7B82DDF9561006C687D /* AuthViewModel.swift .swift */,
 				FB5AC75F2E2AFCD400F6C9EF /* AppleAuthManager.swift */,
 				FB5AC75D2E2AFC5900F6C9EF /* GoogleAuthManager.swift */,
 				FB5AC75A2E2AEBD800F6C9EF /* OnboardingPage1.swift */,
 				FB5AC7562E2AEB9C00F6C9EF /* OnboardingPage2.swift */,
 				FB5AC7582E2AEBBD00F6C9EF /* OnboardingPage3.swift */,
+				FB04CC052E6CD6CF00280A6B /* OnboardingPage4.swift */,
 				FB5AC7502E2AEA9300F6C9EF /* OnboardingCoordinator.swift */,
 				FB5AC74E2E2AEA5D00F6C9EF /* SplashScreenView.swift */,
 				FB6D64932E5D126B0025D416 /* SecureAPIManager.swift */,
@@ -262,7 +266,6 @@
 				FB2CA7BC2DDFC56F006C687D /* RootView.swift */,
 				FB2CA79A2DDD20A0006C687D /* Color+Hex.swift */,
 				FB820DBC2E31623300BCEE2F /* HapticHelper.swift */,
-				FB2CA7B82DDF9561006C687D /* AuthViewModel.swift .swift */,
 				FB2CA7A62DDE9842006C687D /* Data */,
 				FB2CA78D2DD66E64006C687D /* Screens */,
 				FB2CA7642DD3C64E006C687D /* MantraApp */,
@@ -533,6 +536,7 @@
 				FB5AC7592E2AEBBD00F6C9EF /* OnboardingPage3.swift in Sources */,
 				FB2CA7A32DDE2AD1006C687D /* LoadingView.swift in Sources */,
 				FB6D648E2E5A8D060025D416 /* MantraAPI.swift in Sources */,
+				FB04CC062E6CD6CF00280A6B /* OnboardingPage4.swift in Sources */,
 				FB2CA79F2DDD57CC006C687D /* Prompt2View.swift in Sources */,
 				FB2CA7B52DDF8D40006C687D /* LoginView .swift in Sources */,
 				FBDE1DAD2E5DFA1A00AE17A3 /* SubscriptionManager.swift in Sources */,

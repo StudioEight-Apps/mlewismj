@@ -3,54 +3,75 @@ import SwiftUI
 struct OnboardingPage2: View {
     var body: some View {
         GeometryReader { geometry in
+            let safeArea = geometry.safeAreaInsets
+            let availableHeight = geometry.size.height - safeArea.top - safeArea.bottom
+            
             VStack(spacing: 0) {
-                // Top spacer - reduced to move graphic up 10-20%
+                // Fixed high positioning - moved up 75%
                 Spacer()
-                    .frame(height: geometry.size.height * 0.18)
+                    .frame(height: (min(safeArea.top + 5, 60)) * 0.25) // 75% higher positioning
                 
-                // Phone graphic - professional DALL-E asset
-                Image("phone-graphic")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: geometry.size.width * 0.3)
-                    .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
-                    .shadow(color: Color.black.opacity(0.04), radius: 4, x: 0, y: 2)
+                // Logo positioned high and consistently across all devices
+                Text("mantra")
+                    .font(.system(size: 25.92, weight: .semibold, design: .serif))
+                    .foregroundColor(Color(hex: "#2A2A2A"))
                 
-                // Gap to maintain clear hierarchy - slightly reduced to move text up
+                // Icon starts below logo with more space (matching page 1)
                 Spacer()
-                    .frame(height: geometry.size.height * 0.11)
+                    .frame(height: availableHeight * 0.14) // Increased from 0.08 to match page 1
                 
-                // Text content - positioned in bottom third
-                VStack(spacing: 20) {
-                    // Title - slightly larger font, clear hierarchy with bold weight
-                    VStack(spacing: 4) {
-                        Text("Watch your inner voice")
-                            .font(.title)
-                            .fontWeight(.bold)
-                            .foregroundColor(Color(hex: "#2A2A2A"))
-                        Text("get kinder")
-                            .font(.title)
-                            .fontWeight(.bold)
-                            .foregroundColor(Color(hex: "#2A2A2A"))
-                    }
-                    .multilineTextAlignment(.center)
-                    
-                    // Body - clear hierarchy separation
-                    Text("See positive advice, personalized to your journaling, each time you pick up your phone.")
-                        .font(.callout)
-                        .fontWeight(.regular)
-                        .foregroundColor(Color(hex: "#7A7A7A"))
-                        .multilineTextAlignment(.center)
-                        .lineLimit(nil)
-                        .lineSpacing(4)
-                        .padding(.horizontal, 24)
+                HStack {
+                    Spacer()
+                    Image("onboarding_icon_s2")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(height: availableHeight * 0.24) // Increased by 20% to match page 1
+                        .frame(maxWidth: geometry.size.width * 0.80)
+                    Spacer()
                 }
                 
-                // Bottom spacer - ensure text stays in bottom third
+                // Gap: Icon to title - 5%
                 Spacer()
-                    .frame(height: geometry.size.height * 0.15)
+                    .frame(height: availableHeight * 0.05)
+                
+                // Title - single line, shrink font to fit
+                HStack {
+                    Spacer()
+                    Text("Buried emotions drain you")
+                        .font(.system(size: 28, weight: .bold))
+                        .foregroundColor(Color(hex: "#2A2A2A"))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
+                        .frame(maxWidth: geometry.size.width * 0.70)
+                    Spacer()
+                }
+                
+                // Gap: Title to body - 3%
+                Spacer()
+                    .frame(height: availableHeight * 0.03)
+                
+                // Body - 2-3 lines target
+                HStack {
+                    Spacer()
+                    Text("When emotions stay buried they quietly fuel stress and burnout. Mantra helps you reflect daily easing pressure and restoring your energy.")
+                        .font(.system(size: 15, weight: .regular)) // Reduced from 16 to 15
+                        .foregroundColor(Color(hex: "#7A7A7A"))
+                        .multilineTextAlignment(.center)
+                        .lineLimit(4) // Increased from 3 to 4 lines
+                        .lineSpacing(3) // Reduced line spacing from 4 to 3
+                        .frame(maxWidth: geometry.size.width * 0.80) // Increased from 0.75 to 0.80
+                    Spacer()
+                }
+                
+                // Fill remaining space
+                Spacer()
+                
+                // Bottom safe area
+                Spacer()
+                    .frame(height: safeArea.bottom)
             }
         }
         .background(Color(hex: "#FFFCF5"))
+        .ignoresSafeArea(.all, edges: .all)
     }
 }

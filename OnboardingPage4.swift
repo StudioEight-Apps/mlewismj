@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct OnboardingPage1: View {
+struct OnboardingPage4: View {
     var body: some View {
         GeometryReader { geometry in
             let safeArea = geometry.safeAreaInsets
@@ -16,16 +16,16 @@ struct OnboardingPage1: View {
                     .font(.system(size: 25.92, weight: .semibold, design: .serif))
                     .foregroundColor(Color(hex: "#2A2A2A"))
                 
-                // Icon starts below logo with more space (slightly increased to compensate)
+                // Icon starts below logo with more space (matching page 1)
                 Spacer()
-                    .frame(height: availableHeight * 0.14) // Increased from 0.12 to maintain proportions
+                    .frame(height: availableHeight * 0.14) // Increased from 0.08 to match page 1
                 
                 HStack {
                     Spacer()
-                    Image("onboarding_icon_s1")
+                    Image("onboarding_icon_s4")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .frame(height: availableHeight * 0.24) // Increased by 20% (was 0.20, now 0.24)
+                        .frame(height: availableHeight * 0.24) // Increased by 20% to match page 1
                         .frame(maxWidth: geometry.size.width * 0.80)
                     Spacer()
                 }
@@ -37,7 +37,7 @@ struct OnboardingPage1: View {
                 // Title - single line, shrink font to fit
                 HStack {
                     Spacer()
-                    Text("Your mind feels heavy")
+                    Text("Guidance through reflection")
                         .font(.system(size: 28, weight: .bold))
                         .foregroundColor(Color(hex: "#2A2A2A"))
                         .lineLimit(1)
@@ -53,7 +53,7 @@ struct OnboardingPage1: View {
                 // Body - 2-3 lines target
                 HStack {
                     Spacer()
-                    Text("Deep journaling gives your thoughts space to breathe and release. Mantra never judges and each session gives reassurance to lighten the load.")
+                    Text("Mantra learns from your reflections and gives thoughtful reminders. The words you share turn into advice you will see throughout the day.")
                         .font(.system(size: 15, weight: .regular)) // Reduced from 16 to 15
                         .foregroundColor(Color(hex: "#7A7A7A"))
                         .multilineTextAlignment(.center)

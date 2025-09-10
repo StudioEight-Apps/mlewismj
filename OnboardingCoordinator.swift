@@ -20,6 +20,9 @@ struct OnboardingCoordinator: View {
                     
                     OnboardingPage3()
                         .tag(2)
+                    
+                    OnboardingPage4()
+                        .tag(3)
                 }
                 .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
                 .indexViewStyle(PageIndexViewStyle(backgroundDisplayMode: .always))
@@ -30,7 +33,7 @@ struct OnboardingCoordinator: View {
                     
                     // Continue/Get Started Button
                     Button(action: {
-                        if currentPage < 2 {
+                        if currentPage < 3 {
                             withAnimation(.easeInOut(duration: 0.3)) {
                                 currentPage += 1
                             }
@@ -38,7 +41,7 @@ struct OnboardingCoordinator: View {
                             completeOnboarding()
                         }
                     }) {
-                        Text(currentPage == 2 ? "Get Started" : "Continue")
+                        Text(currentPage == 3 ? "Get Started" : "Continue")
                             .font(.system(size: 16, weight: .semibold, design: .default))
                             .foregroundColor(.white)
                             .frame(width: UIScreen.main.bounds.width * 0.8)
@@ -53,7 +56,6 @@ struct OnboardingCoordinator: View {
         }
         .navigationBarHidden(true)
         .fullScreenCover(isPresented: $navigateToAuth) {
-            // Navigate directly to auth (signup/login) - paywall comes after auth
             NavigationView {
                 SignUpView()
             }
@@ -61,10 +63,8 @@ struct OnboardingCoordinator: View {
     }
     
     private func completeOnboarding() {
-        // Mark onboarding as completed
         UserDefaults.standard.set(true, forKey: "hasSeenOnboarding")
         
-        // Navigate to authentication
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             navigateToAuth = true
         }

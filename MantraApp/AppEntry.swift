@@ -7,13 +7,10 @@ struct MantraApp: App {
     // Inject Firebase AppDelegate properly
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
 
-    // Shared auth view model
-    @StateObject var authViewModel = AuthViewModel()
-
     var body: some Scene {
         WindowGroup {
             RootView()
-                .environmentObject(authViewModel)
+                .environmentObject(AuthViewModel.shared)
                 .preferredColorScheme(.light)  // Forces light mode app-wide
         }
     }

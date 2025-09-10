@@ -32,7 +32,7 @@ struct LoadingView: View {
                         .progressViewStyle(CircularProgressViewStyle(tint: Color(hex: "#A6B8FA")))
                         .scaleEffect(1.5)
 
-                    Text("Generating your mantra...")
+                    Text("Finding the right words...")
                         .font(.headline)
                         .foregroundColor(Color(hex: "#2B2834"))
                 }

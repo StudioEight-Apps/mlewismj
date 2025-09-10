@@ -218,34 +218,34 @@ struct LoginView: View {
     // MARK: - Actions
     
     func handleLogin() {
-        print("🔥 LOGIN BUTTON TAPPED ON DEVICE")
-        print("🔥 AuthViewModel.isSignedIn BEFORE: \(authViewModel.isSignedIn)")
-        print("🔥 Email: \(email)")
-        print("🔥 Password length: \(password.count)")
+        print("ðŸ”¥ LOGIN BUTTON TAPPED ON DEVICE")
+        print("ðŸ”¥ AuthViewModel.isSignedIn BEFORE: \(authViewModel.isSignedIn)")
+        print("ðŸ”¥ Email: \(email)")
+        print("ðŸ”¥ Password length: \(password.count)")
         
         guard !email.isEmpty && !password.isEmpty else {
-            print("🔥 GUARD FAILED - Empty fields")
+            print("ðŸ”¥ GUARD FAILED - Empty fields")
             errorMessage = "Please fill in all fields"
             showingError = true
             return
         }
         
-        print("🔥 CALLING authViewModel.signIn")
+        print("ðŸ”¥ CALLING authViewModel.signIn")
         authViewModel.signIn(
             email: email.trimmingCharacters(in: .whitespacesAndNewlines),
             password: password
         ) { result in
-            print("🔥 AUTH CALLBACK RECEIVED")
-            print("🔥 AuthViewModel.isSignedIn AFTER: \(self.authViewModel.isSignedIn)")
-            // ✅ FIXED: Removed DispatchQueue.main.async wrapper
+            print("ðŸ”¥ AUTH CALLBACK RECEIVED")
+            print("ðŸ”¥ AuthViewModel.isSignedIn AFTER: \(self.authViewModel.isSignedIn)")
+            // âœ… FIXED: Removed DispatchQueue.main.async wrapper
             // AuthViewModel already handles main thread updates
             switch result {
             case .success:
-                print("🔥 AUTH SUCCESS")
+                print("ðŸ”¥ AUTH SUCCESS")
                 // Success handled by AuthViewModel
                 break
             case .failure(let error):
-                print("🔥 AUTH FAILED: \(error.localizedDescription)")
+                print("ðŸ”¥ AUTH FAILED: \(error.localizedDescription)")
                 self.errorMessage = error.localizedDescription
                 self.showingError = true
             }
@@ -254,7 +254,7 @@ struct LoginView: View {
     
     func handleGoogleSignIn() {
         authViewModel.signInWithGoogle { result in
-            // ✅ FIXED: Removed DispatchQueue.main.async wrapper
+            // âœ… FIXED: Removed DispatchQueue.main.async wrapper
             switch result {
             case .success:
                 // Success handled by AuthViewModel
@@ -270,7 +270,7 @@ struct LoginView: View {
     
     func handleAppleSignIn() {
         authViewModel.signInWithApple { result in
-            // ✅ FIXED: Removed DispatchQueue.main.async wrapper
+            // âœ… FIXED: Removed DispatchQueue.main.async wrapper
             switch result {
             case .success:
                 // Success handled by AuthViewModel
