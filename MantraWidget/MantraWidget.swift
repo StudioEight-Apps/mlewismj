@@ -3,7 +3,7 @@ import SwiftUI
 
 struct Provider: TimelineProvider {
     func placeholder(in context: Context) -> SimpleEntry {
-        SimpleEntry(date: Date(), mantra: "Your daily mantra will appear here", mood: "calm")
+        SimpleEntry(date: Date(), mantra: "Your daily whisper will appear here", mood: "calm")
     }
 
     func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> ()) {
@@ -12,14 +12,12 @@ struct Provider: TimelineProvider {
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<SimpleEntry>) -> ()) {
-        // Get mantra from App Group UserDefaults - Updated for Studio Eight LLC
         let sharedDefaults = UserDefaults(suiteName: "group.com.studioeight.mantra")
         let mantra = sharedDefaults?.string(forKey: "latestMantra") ?? "How are you feeling today?"
         let mood = sharedDefaults?.string(forKey: "latestMood") ?? "calm"
         let lastUpdated = sharedDefaults?.object(forKey: "lastUpdated") as? Date
         
-        // Debug logging
-        print("📱 Widget Timeline Request:")
+        print("🔄 Widget Timeline Request:")
         print("   App Group: group.com.studioeight.mantra")
         print("   Mantra: \(mantra)")
         print("   Mood: \(mood)")
@@ -28,7 +26,6 @@ struct Provider: TimelineProvider {
         let currentDate = Date()
         let entry = SimpleEntry(date: currentDate, mantra: mantra, mood: mood)
         
-        // Update every hour
         let nextUpdate = Calendar.current.date(byAdding: .hour, value: 1, to: currentDate)!
         let timeline = Timeline(entries: [entry], policy: .after(nextUpdate))
         
@@ -49,19 +46,18 @@ struct MantraWidgetEntryView: View {
     var body: some View {
         switch family {
         case .accessoryRectangular:
-            // Lock screen rectangular widget - adaptive sizing
-            VStack(spacing: adaptiveSpacing(for: entry.mantra)) {
-                // Smaller "mantra" text to save space
-                Text("mantra")
-                    .font(.system(size: 10, weight: .semibold, design: .serif))
+            // Lock screen - text only for reliability
+            VStack(spacing: 2) {
+                Text("whisper")
+                    .font(.system(size: 10, weight: .medium, design: .serif))
+                    .italic()
+                    .foregroundColor(.primary)
                 
-                // Mantra text with adaptive sizing based on length
                 Text(entry.mantra)
-                    .font(.system(size: adaptiveFontSize(for: entry.mantra), weight: .regular))
-                    .lineLimit(adaptiveLineLimit(for: entry.mantra))
+                    .font(.system(size: 11, weight: .regular))
+                    .lineLimit(2)
                     .minimumScaleFactor(0.7)
-                    .multilineTextAlignment(adaptiveAlignment(for: entry.mantra))
-                    .fixedSize(horizontal: false, vertical: true)
+                    .multilineTextAlignment(.center)
             }
             .padding(.horizontal, 6)
             .padding(.vertical, 4)
@@ -70,12 +66,11 @@ struct MantraWidgetEntryView: View {
             }
             
         case .accessoryCircular:
-            // Simple circular widget
             VStack(spacing: 1) {
-                Text("M")
+                Text("W")
                     .font(.system(size: 20, weight: .bold, design: .serif))
-                
-                Text("mantra")
+                    .italic()
+                Text("whisper")
                     .font(.system(size: 6, weight: .medium))
             }
             .containerBackground(for: .widget) {
@@ -83,86 +78,22 @@ struct MantraWidgetEntryView: View {
             }
             
         case .accessoryInline:
-            // Simple inline widget - text only
             HStack(spacing: 4) {
-                Text("mantra:")
+                Text("whisper:")
                     .font(.system(size: 12, weight: .medium, design: .serif))
-                
+                    .italic()
                 Text(entry.mantra.prefix(30) + (entry.mantra.count > 30 ? "..." : ""))
                     .font(.system(size: 12, weight: .regular))
                     .lineLimit(1)
             }
             
         default:
-            // Home screen widgets with your exact brand colors
+            // Home screen widgets - back to beige background
             HomeScreenWidget(entry: entry, family: family)
         }
     }
-    
-    private func getMoodEmoji(_ mood: String) -> String {
-        switch mood.lowercased() {
-        case "happy", "joyful", "excited": return "😊"
-        case "calm", "peaceful", "relaxed": return "😌"
-        case "anxious", "stressed", "overwhelmed": return "😰"
-        case "sad", "lonely", "down": return "😢"
-        case "angry", "frustrated", "irritated": return "😤"
-        case "grateful", "blessed": return "🙏"
-        case "motivated", "determined": return "💪"
-        case "confused", "uncertain": return "🤔"
-        case "hopeful": return "🌟"
-        case "content": return "☺️"
-        case "reflective": return "🤔"
-        case "tired": return "😴"
-        case "insecure": return "😟"
-        case "fine": return "😐"
-        default: return "✨"
-        }
-    }
-    
-    // MARK: - Adaptive Sizing Functions for Lock Screen
-    private func adaptiveFontSize(for mantra: String) -> CGFloat {
-        let charCount = mantra.count
-        switch charCount {
-        case 0...40:
-            return 13  // Large font for short mantras
-        case 41...80:
-            return 11  // Medium font for medium mantras
-        default:
-            return 10  // Small font for long mantras
-        }
-    }
-    
-    private func adaptiveLineLimit(for mantra: String) -> Int {
-        let charCount = mantra.count
-        switch charCount {
-        case 0...40:
-            return 2   // Short mantras don't need many lines
-        case 41...80:
-            return 2   // Medium mantras get 2 lines
-        default:
-            return 3   // Long mantras get maximum lines
-        }
-    }
-    
-    private func adaptiveSpacing(for mantra: String) -> CGFloat {
-        let charCount = mantra.count
-        switch charCount {
-        case 0...40:
-            return 3   // More spacing for short mantras (more breathing room)
-        case 41...80:
-            return 2   // Medium spacing
-        default:
-            return 1   // Tight spacing for long mantras
-        }
-    }
-    
-    private func adaptiveAlignment(for mantra: String) -> TextAlignment {
-        let charCount = mantra.count
-        return charCount <= 40 ? .center : .leading
-    }
 }
 
-// MARK: - Home Screen Widgets (Your Exact Brand Colors)
 struct HomeScreenWidget: View {
     let entry: SimpleEntry
     let family: WidgetFamily
@@ -170,124 +101,204 @@ struct HomeScreenWidget: View {
     var body: some View {
         switch family {
         case .systemSmall:
-            MantraSmallWidget(entry: entry)
+            WhisperSmallWidget(entry: entry)
         case .systemMedium:
-            MantraMediumWidget(entry: entry)
+            WhisperMediumWidget(entry: entry)
         case .systemLarge:
-            MantraLargeWidget(entry: entry)
+            WhisperLargeWidget(entry: entry)
         default:
-            MantraSmallWidget(entry: entry)
+            WhisperSmallWidget(entry: entry)
         }
     }
 }
 
-struct MantraSmallWidget: View {
+struct WhisperSmallWidget: View {
     let entry: SimpleEntry
     
     var body: some View {
-        VStack(spacing: 12) {
-            // Centered "mantra" text logo at top - matching your app exactly
-            Text("mantra")
-                .font(.system(size: 18, weight: .semibold, design: .serif))
-                .foregroundColor(Color(hex: "#2A2A2A"))
+        VStack(spacing: 8) {
+            // Use your actual logo assets
+            Group {
+                if Bundle.main.url(forResource: "Whisper App Tranny Logo", withExtension: "png") != nil {
+                    Image("Whisper App Tranny Logo")
+                        .resizable()
+                        .renderingMode(.template)
+                        .foregroundColor(.black)
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 55, height: 18)
+                } else if Bundle.main.url(forResource: "WhisperLogo_Beige", withExtension: "png") != nil {
+                    Image("WhisperLogo_Beige")
+                        .resizable()
+                        .renderingMode(.template)
+                        .foregroundColor(.black)
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 55, height: 18)
+                } else {
+                    Text("whisper")
+                        .font(.system(size: 14, weight: .medium, design: .serif))
+                        .italic()
+                        .foregroundColor(.black)
+                        .frame(height: 18)
+                }
+            }
             
-            // Mantra text - let it expand naturally
             Text(entry.mantra)
-                .font(.system(size: 11, weight: .regular))
-                .foregroundColor(Color(hex: "#2A2A2A"))
+                .font(.system(size: 10, weight: .regular))
+                .foregroundColor(.black)
                 .multilineTextAlignment(.center)
-                .fixedSize(horizontal: false, vertical: true)
-                .lineLimit(nil)
+                .lineLimit(5) // Conservative
+                .minimumScaleFactor(0.7)
+                .frame(maxHeight: 65) // Prevent overflow
             
             Spacer(minLength: 0)
+            
+            HStack {
+                Text(entry.date.formatted(date: .omitted, time: .shortened))
+                    .font(.system(size: 8, weight: .medium))
+                    .foregroundColor(.black)
+                    .opacity(0.6)
+                    .lineLimit(1)
+                
+                Spacer()
+                
+                Text(entry.mood.uppercased())
+                    .font(.system(size: 8, weight: .medium))
+                    .foregroundColor(.black)
+                    .opacity(0.6)
+                    .lineLimit(1)
+            }
+            .frame(height: 12)
         }
-        .padding(14)
+        .padding(10)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(hex: "#FFFCF5"))
-        .containerBackground(Color(hex: "#FFFCF5"), for: .widget)
-        .widgetURL(URL(string: "mantra://daily"))
+        .background(
+            Color(hex: "#F6EFE6")
+                .ignoresSafeArea(.all) // Ensure full coverage
+        )
+        .containerBackground(Color(hex: "#F6EFE6"), for: .widget)
+        .widgetURL(URL(string: "whisper://daily"))
     }
 }
 
-struct MantraMediumWidget: View {
+struct WhisperMediumWidget: View {
+    let entry: SimpleEntry
+    
+    var body: some View {
+        VStack(spacing: 10) {
+            // Logo with conservative sizing
+            Group {
+                if Bundle.main.url(forResource: "WhisperLogo_Black", withExtension: "png") != nil {
+                    Image("WhisperLogo_Black")
+                        .resizable()
+                        .renderingMode(.template)
+                        .foregroundColor(.black)
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 70, height: 22) // Fixed dimensions
+                } else {
+                    Text("whisper")
+                        .font(.system(size: 18, weight: .medium, design: .serif))
+                        .italic()
+                        .foregroundColor(.black)
+                        .frame(height: 22)
+                }
+            }
+            
+            Text(entry.mantra)
+                .font(.system(size: 11, weight: .regular))
+                .foregroundColor(.black)
+                .multilineTextAlignment(.center)
+                .lineLimit(5) // Conservative for medium
+                .minimumScaleFactor(0.7)
+                .frame(maxHeight: 75)
+            
+            Spacer(minLength: 0)
+            
+            HStack {
+                Text(entry.date.formatted(date: .omitted, time: .shortened))
+                    .font(.system(size: 9, weight: .medium))
+                    .foregroundColor(.black)
+                    .opacity(0.6)
+                    .lineLimit(1)
+                
+                Spacer()
+                
+                Text(entry.mood.uppercased())
+                    .font(.system(size: 9, weight: .medium))
+                    .foregroundColor(.black)
+                    .opacity(0.6)
+                    .lineLimit(1)
+            }
+            .frame(height: 14)
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(
+            Color(hex: "#F6EFE6")
+                .ignoresSafeArea(.all)
+        )
+        .containerBackground(Color(hex: "#F6EFE6"), for: .widget)
+        .widgetURL(URL(string: "whisper://daily"))
+    }
+}
+
+struct WhisperLargeWidget: View {
     let entry: SimpleEntry
     
     var body: some View {
         VStack(spacing: 16) {
-            // Centered "mantra" text logo at top - matching your app exactly
-            Text("mantra")
-                .font(.system(size: 22, weight: .semibold, design: .serif))
-                .foregroundColor(Color(hex: "#2A2A2A"))
+            // Logo with conservative sizing
+            Group {
+                if Bundle.main.url(forResource: "WhisperLogo_Black", withExtension: "png") != nil {
+                    Image("WhisperLogo_Black")
+                        .resizable()
+                        .renderingMode(.template)
+                        .foregroundColor(.black)
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 85, height: 28) // Fixed for large
+                } else {
+                    Text("whisper")
+                        .font(.system(size: 22, weight: .medium, design: .serif))
+                        .italic()
+                        .foregroundColor(.black)
+                        .frame(height: 28)
+                }
+            }
             
-            // Mantra text - let it expand naturally in available space
             Text(entry.mantra)
-                .font(.system(size: 13, weight: .regular))
-                .foregroundColor(Color(hex: "#2A2A2A"))
+                .font(.system(size: 14, weight: .regular))
+                .foregroundColor(.black)
                 .multilineTextAlignment(.center)
-                .fixedSize(horizontal: false, vertical: true)
-                .lineLimit(nil)
+                .lineLimit(10) // More room in large widget
+                .minimumScaleFactor(0.7)
+                .frame(maxHeight: 140)
             
             Spacer(minLength: 0)
             
-            // Time indicator in bottom right
             HStack {
-                Spacer()
                 Text(entry.date.formatted(date: .omitted, time: .shortened))
-                    .font(.system(size: 9, weight: .medium))
-                    .foregroundColor(Color(hex: "#2A2A2A"))
-                    .opacity(0.4)
+                    .font(.system(size: 10, weight: .medium))
+                    .foregroundColor(.black)
+                    .opacity(0.6)
+                    .lineLimit(1)
+                
+                Spacer()
+                
+                Text(entry.mood.uppercased())
+                    .font(.system(size: 10, weight: .medium))
+                    .foregroundColor(.black)
+                    .opacity(0.6)
+                    .lineLimit(1)
             }
+            .frame(height: 16)
         }
         .padding(16)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(hex: "#FFFCF5"))
-        .containerBackground(Color(hex: "#FFFCF5"), for: .widget)
-        .widgetURL(URL(string: "mantra://daily"))
-    }
-}
-
-struct MantraLargeWidget: View {
-    let entry: SimpleEntry
-    
-    var body: some View {
-        VStack(spacing: 20) {
-            // Centered "mantra" text logo at top - matching your app exactly
-            Text("mantra")
-                .font(.system(size: 28, weight: .semibold, design: .serif))
-                .foregroundColor(Color(hex: "#2A2A2A"))
-            
-            // Main mantra text underneath, centered - plenty of lines
-            VStack(spacing: 16) {
-                Text(entry.mantra)
-                    .font(.system(size: 16, weight: .regular))
-                    .foregroundColor(Color(hex: "#2A2A2A"))
-                    .multilineTextAlignment(.center)
-                    .lineLimit(15)
-                    .minimumScaleFactor(0.8)
-                
-                // Subtle decorative line in your soft purple
-                Rectangle()
-                    .fill(Color(hex: "#A6B4FF"))
-                    .frame(width: 50, height: 2)
-                    .cornerRadius(1)
-            }
-            
-            Spacer()
-            
-            // Bottom section with date - minimal
-            HStack {
-                Spacer()
-                Text(entry.date.formatted(date: .abbreviated, time: .omitted))
-                    .font(.system(size: 10, weight: .regular))
-                    .foregroundColor(Color(hex: "#2A2A2A"))
-                    .opacity(0.4)
-            }
-        }
-        .padding(24)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(hex: "#FFFCF5"))
-        .containerBackground(Color(hex: "#FFFCF5"), for: .widget)
-        .widgetURL(URL(string: "mantra://daily"))
+        .background(
+            Color(hex: "#F6EFE6")
+                .ignoresSafeArea(.all)
+        )
+        .containerBackground(Color(hex: "#F6EFE6"), for: .widget)
+        .widgetURL(URL(string: "whisper://daily"))
     }
 }
 
@@ -298,8 +309,8 @@ struct MantraWidget: Widget {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
             MantraWidgetEntryView(entry: entry)
         }
-        .configurationDisplayName("Daily Mantra")
-        .description("Your personalized daily mantra from your journal reflections.")
+        .configurationDisplayName("Whisper")
+        .description("Your personalized whisper from your journal reflections.")
         .supportedFamilies([
             .systemSmall,
             .systemMedium,
@@ -311,7 +322,6 @@ struct MantraWidget: Widget {
     }
 }
 
-// Color extension for hex colors - matching your existing Color+Hex.swift
 extension Color {
     init(hex: String) {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
@@ -327,12 +337,17 @@ extension Color {
 #Preview(as: .systemSmall) {
     MantraWidget()
 } timeline: {
-    SimpleEntry(date: .now, mantra: "In stillness, find your strength and let wisdom guide your way.", mood: "calm")
+    SimpleEntry(date: .now, mantra: "Create space for your feelings, then choose peace for your heart.", mood: "calm")
+}
+
+#Preview(as: .systemMedium) {
+    MantraWidget()
+} timeline: {
     SimpleEntry(date: .now, mantra: "Every breath is a new beginning, every moment a chance to grow.", mood: "hopeful")
 }
 
-#Preview(as: .accessoryRectangular) {
+#Preview(as: .systemLarge) {
     MantraWidget()
 } timeline: {
-    SimpleEntry(date: .now, mantra: "Breathe deeply and trust your journey through life's beautiful moments", mood: "calm")
+    SimpleEntry(date: .now, mantra: "Breathe deeply and trust your journey through life's beautiful moments and challenges that shape who you become.", mood: "reflective")
 }

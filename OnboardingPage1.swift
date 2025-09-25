@@ -11,8 +11,8 @@ struct OnboardingPage1: View {
                 Spacer()
                     .frame(height: (min(safeArea.top + 5, 60)) * 0.25) // 75% higher positioning
                 
-                // Logo positioned high and consistently across all devices
-                Text("mantra")
+                // Whisper logo positioned high and consistently across all devices
+                Text("whisper")
                     .font(.system(size: 25.92, weight: .semibold, design: .serif))
                     .foregroundColor(Color(hex: "#2A2A2A"))
                 
@@ -53,13 +53,13 @@ struct OnboardingPage1: View {
                 // Body - 2-3 lines target
                 HStack {
                     Spacer()
-                    Text("Deep journaling gives your thoughts space to breathe and release. Mantra never judges and each session gives reassurance to lighten the load.")
-                        .font(.system(size: 15, weight: .regular)) // Reduced from 16 to 15
+                    Text("Deep journaling gives your thoughts space to breathe and release. Whisper never judges and each session gives reassurance to lighten the load.")
+                        .font(.system(size: 15, weight: .regular))
                         .foregroundColor(Color(hex: "#7A7A7A"))
                         .multilineTextAlignment(.center)
-                        .lineLimit(4) // Increased from 3 to 4 lines
-                        .lineSpacing(3) // Reduced line spacing from 4 to 3
-                        .frame(maxWidth: geometry.size.width * 0.80) // Increased from 0.75 to 0.80
+                        .lineLimit(4)
+                        .lineSpacing(3)
+                        .frame(maxWidth: geometry.size.width * 0.80)
                     Spacer()
                 }
                 

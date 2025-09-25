@@ -26,7 +26,6 @@ struct LoginView: View {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                             backPressed = false
                         }
-                        // Navigate back to SignUpView
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                             dismiss()
                         }
@@ -45,17 +44,15 @@ struct LoginView: View {
                 .padding(.horizontal, 16)
                 .padding(.top, 50)
                 
-                // Logo - IMPROVED: More prominent
-                Text("mantra")
-                    .font(.system(size: 56, weight: .semibold, design: .serif)) // Increased from 48 to 56
+                // Whisper Logo Image - 20% larger
+                Image("whisper-logo")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(height: 48)
                     .foregroundColor(Color(hex: "#2A2A2A"))
-                    .padding(.top, 20) // Slightly more space after back button
+                    .padding(.top, 40)
                 
-                // IMPROVED: Added spacer to push form fields much lower
-                Spacer()
-                    .frame(height: 100) // Reduced from 140 to 100 to balance
-                
-                // Form Fields - Now positioned much lower
+                // Form Fields - moved down more
                 VStack(spacing: 16) {
                     // Email Field
                     TextField("Email", text: $email)
@@ -92,6 +89,7 @@ struct LoginView: View {
                         .autocapitalization(.none)
                         .disableAutocorrection(true)
                 }
+                .padding(.top, 100)
                 .padding(.horizontal, 24)
                 
                 // Log In Button - 32px from fields
@@ -182,11 +180,7 @@ struct LoginView: View {
                 .padding(.top, 24)
                 .padding(.horizontal, 24)
                 
-                // IMPROVED: Better spacing before sign up link
-                Spacer()
-                    .frame(height: 40)
-                
-                // Sign Up Link - Better positioned at bottom
+                // Sign Up Link - 32px from last button
                 NavigationLink(destination: SignUpView()) {
                     HStack(spacing: 4) {
                         Text("Don't have an account?")
@@ -202,7 +196,8 @@ struct LoginView: View {
                 }
                 .buttonStyle(PlainButtonStyle())
                 .shadow(radius: 0)
-                .padding(.bottom, 50) // Increased bottom padding
+                .padding(.top, 32)
+                .padding(.bottom, 40)
             }
         }
         .background(Color(hex: "#FFFCF5"))
@@ -218,34 +213,20 @@ struct LoginView: View {
     // MARK: - Actions
     
     func handleLogin() {
-        print("ðŸ”¥ LOGIN BUTTON TAPPED ON DEVICE")
-        print("ðŸ”¥ AuthViewModel.isSignedIn BEFORE: \(authViewModel.isSignedIn)")
-        print("ðŸ”¥ Email: \(email)")
-        print("ðŸ”¥ Password length: \(password.count)")
-        
         guard !email.isEmpty && !password.isEmpty else {
-            print("ðŸ”¥ GUARD FAILED - Empty fields")
             errorMessage = "Please fill in all fields"
             showingError = true
             return
         }
         
-        print("ðŸ”¥ CALLING authViewModel.signIn")
         authViewModel.signIn(
             email: email.trimmingCharacters(in: .whitespacesAndNewlines),
             password: password
         ) { result in
-            print("ðŸ”¥ AUTH CALLBACK RECEIVED")
-            print("ðŸ”¥ AuthViewModel.isSignedIn AFTER: \(self.authViewModel.isSignedIn)")
-            // âœ… FIXED: Removed DispatchQueue.main.async wrapper
-            // AuthViewModel already handles main thread updates
             switch result {
             case .success:
-                print("ðŸ”¥ AUTH SUCCESS")
-                // Success handled by AuthViewModel
                 break
             case .failure(let error):
-                print("ðŸ”¥ AUTH FAILED: \(error.localizedDescription)")
                 self.errorMessage = error.localizedDescription
                 self.showingError = true
             }
@@ -254,15 +235,11 @@ struct LoginView: View {
     
     func handleGoogleSignIn() {
         authViewModel.signInWithGoogle { result in
-            // âœ… FIXED: Removed DispatchQueue.main.async wrapper
             switch result {
             case .success:
-                // Success handled by AuthViewModel
                 break
             case .failure(let error):
-                // Make error messages more user-friendly
-                let userFriendlyMessage = self.getUserFriendlyErrorMessage(error)
-                self.errorMessage = userFriendlyMessage
+                self.errorMessage = error.localizedDescription
                 self.showingError = true
             }
         }
@@ -270,33 +247,13 @@ struct LoginView: View {
     
     func handleAppleSignIn() {
         authViewModel.signInWithApple { result in
-            // âœ… FIXED: Removed DispatchQueue.main.async wrapper
             switch result {
             case .success:
-                // Success handled by AuthViewModel
                 break
             case .failure(let error):
-                // Make error messages more user-friendly
-                let userFriendlyMessage = self.getUserFriendlyErrorMessage(error)
-                self.errorMessage = userFriendlyMessage
+                self.errorMessage = error.localizedDescription
                 self.showingError = true
             }
-        }
-    }
-    
-    // MARK: - Helper Functions
-    
-    private func getUserFriendlyErrorMessage(_ error: Error) -> String {
-        let errorMessage = error.localizedDescription.lowercased()
-        
-        if errorMessage.contains("canceled") || errorMessage.contains("cancelled") {
-            return "Sign in was cancelled. Please try again if you'd like to continue."
-        } else if errorMessage.contains("network") {
-            return "Please check your internet connection and try again."
-        } else if errorMessage.contains("invalid") {
-            return "There was an issue with your account. Please try a different sign-in method."
-        } else {
-            return "Something went wrong. Please try again."
         }
     }
 }

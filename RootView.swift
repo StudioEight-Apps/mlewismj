@@ -86,6 +86,12 @@ struct RootView: View {
         .onChange(of: authViewModel.isSignedIn) { oldValue, newValue in
             print("RootView - authViewModel.isSignedIn CHANGED from \(oldValue) to: \(newValue)")
             if newValue {
+                // Reset onboarding state when user signs in during onboarding flow
+                if shouldShowOnboarding {
+                    print("RootView - User signed in during onboarding, resetting shouldShowOnboarding")
+                    shouldShowOnboarding = false
+                    UserDefaults.standard.set(true, forKey: "hasSeenOnboarding")
+                }
                 Task {
                     await initializeStoreKit()
                 }

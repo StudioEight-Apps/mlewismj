@@ -102,17 +102,21 @@ struct WelcomeView: View {
    }
    
    var logoSection: some View {
-       Text("mantra")
-           .font(.system(size: 64, weight: .medium, design: .serif))
-           .foregroundColor(Color(hex: "#2A2A2A"))
-           .padding(.bottom, 30)
+       Image("whisper-logo")
+           .resizable()
+           .scaledToFit()
+           .frame(maxWidth: 135)
+           .accessibilityLabel("Whisper")
+           .background(Color.clear)
+           .padding(.top, 5)
+           .padding(.bottom, 25)
    }
    
    var greetingSection: some View {
        Text("\(greeting), \(userName)")
            .font(.system(size: 21, weight: .medium, design: .default))
            .foregroundColor(Color(hex: "#222222"))
-           .padding(.bottom, 45)
+           .padding(.bottom, 30)
            .onAppear {
                loadUserName()
                updateGreeting()
@@ -164,8 +168,8 @@ struct WelcomeView: View {
    
    var mantraCard: some View {
        VStack(spacing: 16) {
-           Text("Mantra of the Day")
-               .font(.system(size: 18, weight: .semibold, design: .serif))
+           Text("Today's Thought")
+               .font(.system(size: 18, weight: .semibold, design: .default))
                .foregroundColor(Color(hex: "#333333"))
            
            mantraContent
@@ -177,7 +181,7 @@ struct WelcomeView: View {
        .background(Color(hex: "#F5F0E8"))
        .cornerRadius(18)
        .shadow(color: Color.black.opacity(0.12), radius: 12, x: 0, y: 4)
-       .padding(.bottom, 40)
+       .padding(.bottom, 50)
    }
    
    var mantraContent: some View {
@@ -206,7 +210,7 @@ struct WelcomeView: View {
    var buttonStack: some View {
        VStack(spacing: 12) {
            NavigationLink(destination: NewMantraView()) {
-               Text("Start New Mantra")
+               Text("Start Journaling")
                    .font(.system(size: 16, weight: .semibold, design: .default))
                    .foregroundColor(.white)
                    .frame(width: UIScreen.main.bounds.width * 0.9)
@@ -429,81 +433,91 @@ struct CalendarDayBubble: View {
 }
 
 struct DailyMantraGenerator {
-   static func generateDailyMantra(for date: Date, completion: @escaping (String?) -> Void) {
-       SecureAPIManager.shared.getOpenAIAPIKey { apiKey in
-           guard let apiKey = apiKey else {
-               completion(nil)
-               return
-           }
-           
-           guard let url = URL(string: "https://api.openai.com/v1/chat/completions") else {
-               completion(nil)
-               return
-           }
-           
-           let systemPrompt = """
-           You are Steady Friend. Write one short morning mantra that sets the tone to begin the day with purpose and clarity.
-           Orientation: motivate, maximize potential, start strong. Tone: grounded, modern, gender-neutral; wise guide energy, not macho. 
-           Form: exactly one complete sentence, 12 words or fewer. 
-           Punctuation allowed: periods, commas, semicolons only. Never: dashes, ellipses, quotes, exclamation points, question marks. 
-           Standards: never suggest quitting or lowering standards; emphasize agency, discipline, clarity, focus. 
-           Language: concrete and actionable; avoid clichés, abstractions, therapy jargon, and poetic imagery. 
-           Time rule: never mention weekdays or calendar dates; "today" is allowed. 
-           Banned words: gentle, soothe, comfort, grace, manifest, universe, vibes, journey. 
-           Anchors to match in tone: 
-           - Start today with focus; your effort defines the outcome.
-           - Clarity grows from consistent action; take the first step.
-           Output: return exactly one line that obeys every rule above.
-           """
-           
-           let userPrompt = "Write one morning mantra. Return one line only."
-           
-           let requestBody: [String: Any] = [
-               "model": "gpt-4o",
-               "messages": [
-                   ["role": "system", "content": systemPrompt],
-                   ["role": "user", "content": userPrompt]
-               ],
-               "temperature": 0.6,
-               "max_tokens": 25
-           ]
+    static func generateDailyMantra(for date: Date, completion: @escaping (String?) -> Void) {
+        SecureAPIManager.shared.getOpenAIAPIKey { apiKey in
+            guard let apiKey = apiKey else {
+                completion(nil)
+                return
+            }
+            
+            guard let url = URL(string: "https://api.openai.com/v1/chat/completions") else {
+                completion(nil)
+                return
+            }
+            
+            let dailyMantraPrompt = """
+            You write daily mantras for a modern journaling app.
+            Tone: warm, current, supportive – like a caring friend who keeps it real.
+            Style: short, clear, screenshot-worthy; gentle but true, never fluffy or abstract.
+            Form: one sentence only, 12 words or fewer. Two short rhythmic lines are allowed.
+            Voice: conversational and relatable; phrasing should feel modern and save-worthy.
+            Punctuation: periods, commas, semicolons only. No dashes, ellipses, quotes, exclamation points, or question marks. (Contractions are fine.)
+            Anchors to match in tone and rhythm (do not copy):
+            • You've returned to yourself before. You can do it again.
+            • Believe their actions.
+            • You still have time.
+            • You deserve all the good coming your way.
+            • You deserve to think highly of yourself.
+            • For your sanity, let people think what they want.
+            • Let it end. Let it change. Let it hurt. Let it heal.
+            • You gotta let go of what let go of you.
+            • Remind yourself that rest is not wasted time.
+            • Water your dreams, don't feed doubt.
+            Guidance:
+            • Keep it universal and day-friendly; no therapy jargon or heavy specifics.
+            • Favor everyday words and ideas people would screenshot and share.
+            • Aim for calm confidence, soft boundaries, and gentle encouragement.
+            Output: return exactly one mantra that follows all rules above.
+            """
+            
+            let userPrompt = "Write one daily mantra. Return one line only."
+            
+            let requestBody: [String: Any] = [
+                "model": "gpt-4o",
+                "messages": [
+                    ["role": "system", "content": dailyMantraPrompt],
+                    ["role": "user", "content": userPrompt]
+                ],
+                "temperature": 0.6,
+                "max_tokens": 25
+            ]
 
-           var request = URLRequest(url: url)
-           request.httpMethod = "POST"
-           request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
-           request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
-           do {
-               request.httpBody = try JSONSerialization.data(withJSONObject: requestBody, options: [])
-           } catch {
-               completion(nil)
-               return
-           }
+            do {
+                request.httpBody = try JSONSerialization.data(withJSONObject: requestBody, options: [])
+            } catch {
+                completion(nil)
+                return
+            }
 
-           URLSession.shared.dataTask(with: request) { data, response, error in
-               if let error = error {
-                   completion(nil)
-                   return
-               }
+            URLSession.shared.dataTask(with: request) { data, response, error in
+                if let error = error {
+                    completion(nil)
+                    return
+                }
 
-               guard let data = data else {
-                   completion(nil)
-                   return
-               }
+                guard let data = data else {
+                    completion(nil)
+                    return
+                }
 
-               do {
-                   if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-                      let choices = json["choices"] as? [[String: Any]],
-                      let message = choices.first?["message"] as? [String: Any],
-                      let content = message["content"] as? String {
-                       completion(content.trimmingCharacters(in: .whitespacesAndNewlines))
-                   } else {
-                       completion(nil)
-                   }
-               } catch {
-                   completion(nil)
-               }
-           }.resume()
-       }
-   }
+                do {
+                    if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+                       let choices = json["choices"] as? [[String: Any]],
+                       let message = choices.first?["message"] as? [String: Any],
+                       let content = message["content"] as? String {
+                        completion(content.trimmingCharacters(in: .whitespacesAndNewlines))
+                    } else {
+                        completion(nil)
+                    }
+                } catch {
+                    completion(nil)
+                }
+            }.resume()
+        }
+    }
 }

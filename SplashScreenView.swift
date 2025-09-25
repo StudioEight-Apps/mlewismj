@@ -9,11 +9,13 @@ struct SplashScreenView: View {
             Color(hex: "#FFFCF5")
                 .ignoresSafeArea()
             
-            VStack(spacing: 20) {
-                // Logo - using your existing style
-                Text("mantra")
-                    .font(.system(size: 72, weight: .medium, design: .serif))
-                    .foregroundColor(Color(hex: "#2A2A2A"))
+            VStack(spacing: 16) {
+                // Whisper logo - properly sized for splash
+                Image("whisper-logo")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: 180)
+                    .accessibilityLabel("Whisper")
                     .scaleEffect(isAnimating ? 1.0 : 0.8)
                     .opacity(isAnimating ? 1.0 : 0.3)
                 

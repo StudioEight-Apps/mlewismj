@@ -31,10 +31,13 @@ struct MantraSummaryView: View {
             VStack(spacing: 0) {
                 Spacer()
                 
-                // Enhanced Mantra Card
+                // Enhanced Whisper Card
                 VStack(spacing: 24) {
-                    Text("Your Mantra for Today")
-                        .font(.system(size: 18, weight: .semibold, design: .serif))
+                    // Whisper logo centered at top of card
+                    Image("whisper-logo")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(height: 32) // Adjust height as needed
                         .foregroundColor(Color(red: 0.17, green: 0.16, blue: 0.2))
                     
                     Text(mantra)
@@ -176,7 +179,7 @@ struct MantraSummaryView: View {
         let cardImage = MantraCardGenerator.createMantraCard(mantra: mantra, mood: mood)
         
         // Include both image and text for better sharing options
-        let shareText = "Today's Mantra: \"\(mantra)\""
+        let shareText = "Today's Whisper: \"\(mantra)\""
         
         let shareSheet = UIActivityViewController(
             activityItems: [shareText, cardImage],
@@ -234,8 +237,8 @@ struct MantraSummaryView: View {
     
     func resetToWelcomeView() {
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let window = windowScene.windows.first,
-           let rootViewController = window.rootViewController {
+               let window = windowScene.windows.first,
+               let rootViewController = window.rootViewController {
             
             if let navController = findNavigationController(in: rootViewController) {
                 DispatchQueue.main.async {
@@ -273,5 +276,5 @@ struct ShareSheet: UIViewControllerRepresentable {
         return controller
     }
     
-    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) -> Void {}
 }

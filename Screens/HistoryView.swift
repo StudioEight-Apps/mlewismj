@@ -28,12 +28,12 @@ struct HistoryView: View {
                         .font(.system(size: 60))
                         .foregroundColor(Color(hex: "#5B5564"))
 
-                    Text(filterByDate != nil ? "No mantras for this date" : "No mantras yet")
+                    Text(filterByDate != nil ? "No thoughts for this date" : "No thoughts yet")
                         .font(.title2)
                         .fontWeight(.medium)
                         .foregroundColor(Color(hex: "#2B2834"))
 
-                    Text(filterByDate != nil ? "Try selecting a different date" : "Create your first mantra to see it here")
+                    Text(filterByDate != nil ? "Try selecting a different date" : "Create your first thought to see it here")
                         .font(.body)
                         .foregroundColor(Color(hex: "#5B5564"))
                         .multilineTextAlignment(.center)
@@ -143,9 +143,11 @@ struct HistoryView: View {
         .navigationBarBackButtonHidden(false)
         .toolbar {
             ToolbarItem(placement: .principal) {
-                Text("mantra")
-                    .font(.system(size: 28, weight: .semibold, design: .serif))
-                    .foregroundColor(Color(hex: "#2A2A2A"))
+                Image("whisper-logo")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 32)
+                    .accessibilityLabel("Whisper")
             }
             
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -529,7 +531,7 @@ struct HistoryCardView: View {
                     Spacer()
                 }
 
-                Text(entry.text.isEmpty ? "Your personalized mantra will appear here once AI integration is complete." : entry.text)
+                Text(entry.text.isEmpty ? "Your personalized thought will appear here once complete." : entry.text)
                     .font(.system(size: 18, weight: .semibold))
                     .foregroundColor(Color(hex: "#2B2834"))
                     .multilineTextAlignment(.leading)

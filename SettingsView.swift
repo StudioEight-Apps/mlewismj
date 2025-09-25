@@ -115,13 +115,13 @@ struct SettingsView: View {
     }
     
     private func openSupportEmail() {
-        let subject = "Mantra App Support"
-        let body = "Hi Mantra team,\n\nI need help with:\n\n"
+        let subject = "Whisper App Support"
+        let body = "Hi Whisper team,\n\nI need help with:\n\n"
         
         // Try with encoded parameters first
         if let encodedSubject = subject.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
            let encodedBody = body.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
-           let url = URL(string: "mailto:support@mantra-app.com?subject=\(encodedSubject)&body=\(encodedBody)") {
+           let url = URL(string: "mailto:support@whisper-app.com?subject=\(encodedSubject)&body=\(encodedBody)") {
             
             if UIApplication.shared.canOpenURL(url) {
                 UIApplication.shared.open(url)
@@ -130,7 +130,7 @@ struct SettingsView: View {
         }
         
         // Fallback to simple mailto
-        if let simpleURL = URL(string: "mailto:support@mantra-app.com") {
+        if let simpleURL = URL(string: "mailto:support@whisper-app.com") {
             if UIApplication.shared.canOpenURL(simpleURL) {
                 UIApplication.shared.open(simpleURL)
                 return
@@ -366,7 +366,7 @@ struct PrivacyPolicyView: View {
                         }
                         
                         VStack(alignment: .leading, spacing: 20) {
-                            privacySection(title: "Welcome", content: "Welcome to Mantra. This Privacy Policy explains how we collect, use, and protect your information when you use our mobile application.")
+                            privacySection(title: "Welcome", content: "Welcome to Whisper. This Privacy Policy explains how we collect, use, and protect your information when you use our mobile application.")
                             
                             privacySection(title: "Information We Collect", content: """
                             • Account information (name, email address)
@@ -387,7 +387,7 @@ struct PrivacyPolicyView: View {
                             privacySection(title: "Your Rights", content: "You have the right to access, update, or delete your personal information at any time through the app settings. You can also export your journal data or request account deletion.")
                             
                             privacySection(title: "Terms of Service", content: """
-                            By using Mantra, you agree to:
+                            By using Whisper, you agree to:
                             • Use the app for personal journaling purposes
                             • Not share your account with others
                             • Respect our intellectual property
@@ -396,7 +396,7 @@ struct PrivacyPolicyView: View {
                             
                             privacySection(title: "Subscription Terms", content: "Subscription payments are processed through the App Store. You can manage or cancel your subscription through your App Store account settings. Subscriptions auto-renew unless cancelled.")
                             
-                            privacySection(title: "Contact Us", content: "If you have any questions about this Privacy Policy or our Terms of Service, please contact us at support@mantra-app.com")
+                            privacySection(title: "Contact Us", content: "If you have any questions about this Privacy Policy or our Terms of Service, please contact us at support@whisper-app.com")
                         }
                     }
                     .padding(.horizontal, 20)
