@@ -49,8 +49,7 @@ struct MantraWidgetEntryView: View {
             // Lock screen - text only for reliability
             VStack(spacing: 2) {
                 Text("whisper")
-                    .font(.system(size: 10, weight: .medium, design: .serif))
-                    .italic()
+                    .font(.system(size: 10, weight: .medium))
                     .foregroundColor(.primary)
                 
                 Text(entry.mantra)
@@ -68,8 +67,7 @@ struct MantraWidgetEntryView: View {
         case .accessoryCircular:
             VStack(spacing: 1) {
                 Text("W")
-                    .font(.system(size: 20, weight: .bold, design: .serif))
-                    .italic()
+                    .font(.system(size: 20, weight: .semibold))
                 Text("whisper")
                     .font(.system(size: 6, weight: .medium))
             }
@@ -80,15 +78,14 @@ struct MantraWidgetEntryView: View {
         case .accessoryInline:
             HStack(spacing: 4) {
                 Text("whisper:")
-                    .font(.system(size: 12, weight: .medium, design: .serif))
-                    .italic()
+                    .font(.system(size: 12, weight: .medium))
                 Text(entry.mantra.prefix(30) + (entry.mantra.count > 30 ? "..." : ""))
                     .font(.system(size: 12, weight: .regular))
                     .lineLimit(1)
             }
             
         default:
-            // Home screen widgets - back to beige background
+            // Home screen widgets - Co—Star inspired dark design
             HomeScreenWidget(entry: entry, family: family)
         }
     }
@@ -116,66 +113,56 @@ struct WhisperSmallWidget: View {
     let entry: SimpleEntry
     
     var body: some View {
-        VStack(spacing: 8) {
-            // Use your actual logo assets
-            Group {
-                if Bundle.main.url(forResource: "Whisper App Tranny Logo", withExtension: "png") != nil {
-                    Image("Whisper App Tranny Logo")
-                        .resizable()
-                        .renderingMode(.template)
-                        .foregroundColor(.black)
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 55, height: 18)
-                } else if Bundle.main.url(forResource: "WhisperLogo_Beige", withExtension: "png") != nil {
-                    Image("WhisperLogo_Beige")
-                        .resizable()
-                        .renderingMode(.template)
-                        .foregroundColor(.black)
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 55, height: 18)
-                } else {
-                    Text("whisper")
-                        .font(.system(size: 14, weight: .medium, design: .serif))
-                        .italic()
-                        .foregroundColor(.black)
-                        .frame(height: 18)
-                }
-            }
-            
-            Text(entry.mantra)
-                .font(.system(size: 10, weight: .regular))
-                .foregroundColor(.black)
-                .multilineTextAlignment(.center)
-                .lineLimit(5) // Conservative
-                .minimumScaleFactor(0.7)
-                .frame(maxHeight: 65) // Prevent overflow
-            
-            Spacer(minLength: 0)
-            
+        VStack(spacing: 0) {
+            // Top section with logo
             HStack {
-                Text(entry.date.formatted(date: .omitted, time: .shortened))
-                    .font(.system(size: 8, weight: .medium))
-                    .foregroundColor(.black)
-                    .opacity(0.6)
-                    .lineLimit(1)
+                Spacer()
+                Image("whisper_logo_light")
+                    .renderingMode(.original)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 14)
+                    .accessibilityLabel("Whisper")
+                Spacer()
+            }
+            .padding(.top, 12)
+            .padding(.bottom, 8)
+            
+            // Main content area
+            VStack(spacing: 0) {
+                Spacer()
+                
+                Text(entry.mantra)
+                    .font(.system(size: 13, weight: .regular))
+                    .foregroundColor(Color(hex: "#F4E6D1"))
+                    .multilineTextAlignment(.center)
+                    .lineLimit(6)
+                    .minimumScaleFactor(0.8)
+                    .padding(.horizontal, 4)
                 
                 Spacer()
                 
-                Text(entry.mood.uppercased())
-                    .font(.system(size: 8, weight: .medium))
-                    .foregroundColor(.black)
-                    .opacity(0.6)
-                    .lineLimit(1)
+                // Bottom metadata
+                HStack {
+                    Text(entry.date.formatted(date: .omitted, time: .shortened))
+                        .font(.system(size: 9, weight: .medium))
+                        .foregroundColor(Color(hex: "#F4E6D1"))
+                        .opacity(0.6)
+                    
+                    Spacer()
+                    
+                    Text(entry.mood.uppercased())
+                        .font(.system(size: 9, weight: .medium))
+                        .foregroundColor(Color(hex: "#F4E6D1"))
+                        .opacity(0.6)
+                }
+                .padding(.bottom, 12)
+                .padding(.horizontal, 12)
             }
-            .frame(height: 12)
         }
-        .padding(10)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(
-            Color(hex: "#F6EFE6")
-                .ignoresSafeArea(.all) // Ensure full coverage
-        )
-        .containerBackground(Color(hex: "#F6EFE6"), for: .widget)
+        .background(Color(hex: "#1C1C1E"))
+        .containerBackground(Color(hex: "#1C1C1E"), for: .widget)
         .widgetURL(URL(string: "whisper://daily"))
     }
 }
@@ -184,59 +171,56 @@ struct WhisperMediumWidget: View {
     let entry: SimpleEntry
     
     var body: some View {
-        VStack(spacing: 10) {
-            // Logo with conservative sizing
-            Group {
-                if Bundle.main.url(forResource: "WhisperLogo_Black", withExtension: "png") != nil {
-                    Image("WhisperLogo_Black")
-                        .resizable()
-                        .renderingMode(.template)
-                        .foregroundColor(.black)
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 70, height: 22) // Fixed dimensions
-                } else {
-                    Text("whisper")
-                        .font(.system(size: 18, weight: .medium, design: .serif))
-                        .italic()
-                        .foregroundColor(.black)
-                        .frame(height: 22)
-                }
-            }
-            
-            Text(entry.mantra)
-                .font(.system(size: 11, weight: .regular))
-                .foregroundColor(.black)
-                .multilineTextAlignment(.center)
-                .lineLimit(5) // Conservative for medium
-                .minimumScaleFactor(0.7)
-                .frame(maxHeight: 75)
-            
-            Spacer(minLength: 0)
-            
+        VStack(spacing: 0) {
+            // Top section with logo
             HStack {
-                Text(entry.date.formatted(date: .omitted, time: .shortened))
-                    .font(.system(size: 9, weight: .medium))
-                    .foregroundColor(.black)
-                    .opacity(0.6)
-                    .lineLimit(1)
+                Spacer()
+                Image("whisper_logo_light")
+                    .renderingMode(.original)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 16)
+                    .accessibilityLabel("Whisper")
+                Spacer()
+            }
+            .padding(.top, 16)
+            .padding(.bottom, 12)
+            
+            // Main content area
+            VStack(spacing: 0) {
+                Spacer()
+                
+                Text(entry.mantra)
+                    .font(.system(size: 15, weight: .regular))
+                    .foregroundColor(Color(hex: "#F4E6D1"))
+                    .multilineTextAlignment(.center)
+                    .lineLimit(5)
+                    .minimumScaleFactor(0.8)
+                    .padding(.horizontal, 8)
                 
                 Spacer()
                 
-                Text(entry.mood.uppercased())
-                    .font(.system(size: 9, weight: .medium))
-                    .foregroundColor(.black)
-                    .opacity(0.6)
-                    .lineLimit(1)
+                // Bottom metadata
+                HStack {
+                    Text(entry.date.formatted(date: .omitted, time: .shortened))
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundColor(Color(hex: "#F4E6D1"))
+                        .opacity(0.6)
+                    
+                    Spacer()
+                    
+                    Text(entry.mood.uppercased())
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundColor(Color(hex: "#F4E6D1"))
+                        .opacity(0.6)
+                }
+                .padding(.bottom, 16)
+                .padding(.horizontal, 16)
             }
-            .frame(height: 14)
         }
-        .padding(12)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(
-            Color(hex: "#F6EFE6")
-                .ignoresSafeArea(.all)
-        )
-        .containerBackground(Color(hex: "#F6EFE6"), for: .widget)
+        .background(Color(hex: "#1C1C1E"))
+        .containerBackground(Color(hex: "#1C1C1E"), for: .widget)
         .widgetURL(URL(string: "whisper://daily"))
     }
 }
@@ -245,59 +229,56 @@ struct WhisperLargeWidget: View {
     let entry: SimpleEntry
     
     var body: some View {
-        VStack(spacing: 16) {
-            // Logo with conservative sizing
-            Group {
-                if Bundle.main.url(forResource: "WhisperLogo_Black", withExtension: "png") != nil {
-                    Image("WhisperLogo_Black")
-                        .resizable()
-                        .renderingMode(.template)
-                        .foregroundColor(.black)
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 85, height: 28) // Fixed for large
-                } else {
-                    Text("whisper")
-                        .font(.system(size: 22, weight: .medium, design: .serif))
-                        .italic()
-                        .foregroundColor(.black)
-                        .frame(height: 28)
-                }
-            }
-            
-            Text(entry.mantra)
-                .font(.system(size: 14, weight: .regular))
-                .foregroundColor(.black)
-                .multilineTextAlignment(.center)
-                .lineLimit(10) // More room in large widget
-                .minimumScaleFactor(0.7)
-                .frame(maxHeight: 140)
-            
-            Spacer(minLength: 0)
-            
+        VStack(spacing: 0) {
+            // Top section with logo
             HStack {
-                Text(entry.date.formatted(date: .omitted, time: .shortened))
-                    .font(.system(size: 10, weight: .medium))
-                    .foregroundColor(.black)
-                    .opacity(0.6)
-                    .lineLimit(1)
+                Spacer()
+                Image("whisper_logo_light")
+                    .renderingMode(.original)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 18)
+                    .accessibilityLabel("Whisper")
+                Spacer()
+            }
+            .padding(.top, 20)
+            .padding(.bottom, 16)
+            
+            // Main content area
+            VStack(spacing: 0) {
+                Spacer()
+                
+                Text(entry.mantra)
+                    .font(.system(size: 17, weight: .regular))
+                    .foregroundColor(Color(hex: "#F4E6D1"))
+                    .multilineTextAlignment(.center)
+                    .lineLimit(8)
+                    .minimumScaleFactor(0.8)
+                    .padding(.horizontal, 12)
                 
                 Spacer()
                 
-                Text(entry.mood.uppercased())
-                    .font(.system(size: 10, weight: .medium))
-                    .foregroundColor(.black)
-                    .opacity(0.6)
-                    .lineLimit(1)
+                // Bottom metadata
+                HStack {
+                    Text(entry.date.formatted(date: .omitted, time: .shortened))
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundColor(Color(hex: "#F4E6D1"))
+                        .opacity(0.6)
+                    
+                    Spacer()
+                    
+                    Text(entry.mood.uppercased())
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundColor(Color(hex: "#F4E6D1"))
+                        .opacity(0.6)
+                }
+                .padding(.bottom, 20)
+                .padding(.horizontal, 20)
             }
-            .frame(height: 16)
         }
-        .padding(16)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(
-            Color(hex: "#F6EFE6")
-                .ignoresSafeArea(.all)
-        )
-        .containerBackground(Color(hex: "#F6EFE6"), for: .widget)
+        .background(Color(hex: "#1C1C1E"))
+        .containerBackground(Color(hex: "#1C1C1E"), for: .widget)
         .widgetURL(URL(string: "whisper://daily"))
     }
 }

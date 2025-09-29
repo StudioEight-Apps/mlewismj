@@ -11,12 +11,9 @@ struct LoadingView: View {
 
     var body: some View {
         ZStack {
-            LinearGradient(
-                gradient: Gradient(colors: [Color(hex: "#FFE683"), Color(hex: "#D8BCF6")]),
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
+            // Clean background matching app
+            Color(hex: "#FFFCF5")
+                .ignoresSafeArea()
 
             if isLoadingComplete {
                 MantraSummaryView(
@@ -27,14 +24,30 @@ struct LoadingView: View {
                     mantra: generatedMantra
                 )
             } else {
-                VStack(spacing: 24) {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: Color(hex: "#A6B8FA")))
-                        .scaleEffect(1.5)
+                VStack(spacing: 0) {
+                    // Whisper logo at absolute top
+                    Image("whisper-logo")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(height: 24)
+                        .foregroundColor(Color(hex: "#2A2A2A"))
+                        .padding(.top, 60)
+                        .padding(.bottom, 40)
+                    
+                    Spacer()
+                    
+                    // Centered loading content
+                    VStack(spacing: 24) {
+                        // Custom three-dot animation
+                        ThreeDotsLoader()
 
-                    Text("Finding the right words...")
-                        .font(.headline)
-                        .foregroundColor(Color(hex: "#2B2834"))
+                        Text("Finding the right words...")
+                            .font(.system(size: 15, weight: .regular))
+                            .foregroundColor(Color(hex: "#2A2A2A"))
+                            .opacity(0.7)
+                    }
+                    
+                    Spacer()
                 }
                 .onAppear {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
@@ -55,7 +68,6 @@ struct LoadingView: View {
         .navigationBarHidden(true)
         .toolbar(.hidden, for: .navigationBar)
         .onAppear {
-            // Force hide navigation bar completely
             if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                let window = windowScene.windows.first,
                let navController = findNavigationController(in: window.rootViewController) {
@@ -65,7 +77,6 @@ struct LoadingView: View {
         .ignoresSafeArea(.all)
     }
     
-    // Helper function to find navigation controller
     private func findNavigationController(in viewController: UIViewController?) -> UINavigationController? {
         guard let viewController = viewController else { return nil }
         
@@ -78,5 +89,34 @@ struct LoadingView: View {
             }
         }
         return nil
+    }
+}
+
+// Custom three-dot loading animation
+struct ThreeDotsLoader: View {
+    @State private var animationIndex = 0
+    
+    var body: some View {
+        HStack(spacing: 8) {
+            ForEach(0..<3) { index in
+                Circle()
+                    .fill(Color(hex: "#A6B4FF"))
+                    .frame(width: 10, height: 10)
+                    .scaleEffect(animationIndex == index ? 1.2 : 0.8)
+                    .opacity(animationIndex == index ? 1.0 : 0.4)
+                    .animation(.easeInOut(duration: 0.6), value: animationIndex)
+            }
+        }
+        .onAppear {
+            startAnimation()
+        }
+    }
+    
+    private func startAnimation() {
+        Timer.scheduledTimer(withTimeInterval: 0.4, repeats: true) { _ in
+            withAnimation {
+                animationIndex = (animationIndex + 1) % 3
+            }
+        }
     }
 }

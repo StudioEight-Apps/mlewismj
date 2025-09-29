@@ -12,55 +12,114 @@ struct MantraSummaryView: View {
     @State private var showingShareSheet = false
     @State private var shareImage: UIImage?
     
+    // Authoritative background → text color mapping
+    private let backgroundPairings: [(background: String, textColor: String, logoDark: Bool)] = [
+        ("bg_black", "#F6EFE6", true),        // Changed to beige
+        ("bg_deepred", "#F6EFE6", true),
+        ("bg_indigo", "#F4F0F5", true),
+        ("bg_orange", "#F6EFE6", false),      // Changed to beige
+        ("bg_purple", "#F6EFE6", true),
+        ("bg_rose", "#F6EFE6", true),
+        ("bg_sage", "#FDFCF9", false),
+        ("bg_olive", "#F6EFE6", true)
+    ]
+    
+    @State private var selectedPairing: (background: String, textColor: String, logoDark: Bool) = ("bg_black", "#F6EFE6", true)
+    
+    // Strip terminal punctuation from mantra
+    private var cleanedMantra: String {
+        let terminalPunctuation = CharacterSet(charactersIn: ".,;:!?…")
+        var cleaned = mantra.trimmingCharacters(in: .whitespacesAndNewlines)
+        while let last = cleaned.last, terminalPunctuation.contains(String(last).unicodeScalars.first!) {
+            cleaned = String(cleaned.dropLast())
+        }
+        return cleaned.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+    
+    // Logo opacity based on background darkness
+    private var logoOpacity: Double {
+        selectedPairing.logoDark ? 0.70 : 0.55
+    }
+    
+    // Logo color - use text color for consistency
+    private var logoColor: Color {
+        Color(hex: selectedPairing.textColor)
+    }
+    
     var body: some View {
         ZStack {
-            // Enhanced gradient background (keeping this intentionally different for special screen)
-            LinearGradient(
-                gradient: Gradient(colors: [
-                    Color(red: 1.0, green: 0.9, blue: 0.51),  // #FFE683
-                    Color(red: 0.96, green: 0.85, blue: 0.51), // #F5D982
-                    Color(red: 0.91, green: 0.78, blue: 0.94), // #E8C8F0
-                    Color(red: 0.85, green: 0.8, blue: 0.96)   // #D8CCF6
-                ]),
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .ignoresSafeArea(.all)
+            // Clean background matching app
+            Color(hex: "#FFFCF5")
+                .ignoresSafeArea(.all)
             
-            // Main content
             VStack(spacing: 0) {
                 Spacer()
                 
-                // Enhanced Whisper Card
-                VStack(spacing: 24) {
-                    // Whisper logo centered at top of card
-                    Image("whisper-logo")
+                // Instagram-style quote card
+                ZStack {
+                    // Background image
+                    Image(selectedPairing.background)
                         .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(height: 32) // Adjust height as needed
-                        .foregroundColor(Color(red: 0.17, green: 0.16, blue: 0.2))
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: UIScreen.main.bounds.width * 0.68, height: UIScreen.main.bounds.width * 0.68)
+                        .clipped()
                     
-                    Text(mantra)
-                        .font(.system(size: 24, weight: .semibold, design: .serif))
-                        .multilineTextAlignment(.center)
-                        .foregroundColor(Color(red: 0.17, green: 0.16, blue: 0.2))
-                        .lineLimit(nil)
-                        .lineSpacing(6)
-                        .fixedSize(horizontal: false, vertical: true)
+                    // Content overlay
+                    VStack(spacing: 0) {
+                        // Logo watermark at top center
+                        Image("whisper-logo")
+                            .resizable()
+                            .renderingMode(.template)
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: UIScreen.main.bounds.width * 0.68 * 0.09)
+                            .foregroundColor(logoColor)
+                            .opacity(logoOpacity)
+                            .padding(.top, 28)
+                            .padding(.bottom, 20)
+                        
+                        Spacer()
+                        
+                        // Hero quote text - cleaned and fitted
+                        Text(cleanedMantra)
+                            .font(.system(size: 26, weight: .bold))
+                            .foregroundColor(Color(hex: selectedPairing.textColor))
+                            .multilineTextAlignment(.center)
+                            .lineLimit(3)
+                            .lineSpacing(4)
+                            .tracking(0.4)
+                            .minimumScaleFactor(0.75)
+                            .allowsTightening(true)
+                            .truncationMode(.tail)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .padding(.horizontal, 28)
+                        
+                        Spacer()
+                        
+                        // Bottom metadata row
+                        HStack {
+                            Text(Date().formatted(date: .omitted, time: .shortened))
+                                .font(.system(size: 11, weight: .regular))
+                                .foregroundColor(Color(hex: selectedPairing.textColor))
+                                .opacity(0.6)
+                            
+                            Spacer()
+                            
+                            Text(mood.uppercased())
+                                .font(.system(size: 11, weight: .regular))
+                                .foregroundColor(Color(hex: selectedPairing.textColor))
+                                .opacity(0.6)
+                        }
+                        .padding(.horizontal, 24)
+                        .padding(.bottom, 20)
+                    }
                 }
-                .padding(.vertical, 48)
-                .padding(.horizontal, 36)
-                .background(
-                    RoundedRectangle(cornerRadius: 24)
-                        .fill(Color.white.opacity(0.95))
-                        .shadow(color: Color.black.opacity(0.08), radius: 20, x: 0, y: 8)
-                        .shadow(color: Color.black.opacity(0.04), radius: 10, x: 0, y: 4)
-                )
-                .padding(.horizontal, 28)
+                .frame(width: UIScreen.main.bounds.width * 0.68, height: UIScreen.main.bounds.width * 0.68)
+                .cornerRadius(24)
+                .shadow(color: Color.black.opacity(0.12), radius: 20, x: 0, y: 10)
                 
                 Spacer().frame(height: 48)
                 
-                // Enhanced action buttons
+                // Action buttons
                 HStack(spacing: 16) {
                     Button(action: {
                         updateWidget()
@@ -69,42 +128,47 @@ struct MantraSummaryView: View {
                             Image(systemName: "pin.circle.fill")
                                 .font(.system(size: 16, weight: .medium))
                             Text("Pin to Widget")
-                                .font(.system(size: 16, weight: .semibold))
+                                .font(.system(size: 17, weight: .semibold))
                         }
-                        .foregroundColor(Color(red: 0.17, green: 0.16, blue: 0.2))
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 14)
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 24)
+                        .padding(.vertical, 16)
                         .background(
-                            RoundedRectangle(cornerRadius: 24)
-                                .fill(Color.white.opacity(0.9))
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color.black)
                         )
                     }
-                    .buttonStyle(PlainButtonStyle())
+                    .buttonStyle(ScaleButtonStyle())
                     
                     Button(action: {
                         shareMantra()
                     }) {
                         HStack(spacing: 8) {
-                            Image(systemName: "square.and.arrow.up.fill")
+                            Image(systemName: "square.and.arrow.up")
                                 .font(.system(size: 16, weight: .medium))
                             Text("Share")
-                                .font(.system(size: 16, weight: .semibold))
+                                .font(.system(size: 17, weight: .semibold))
                         }
-                        .foregroundColor(Color(red: 0.17, green: 0.16, blue: 0.2))
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 14)
+                        .foregroundColor(Color(hex: "#2A2A2A"))
+                        .padding(.horizontal, 24)
+                        .padding(.vertical, 16)
                         .background(
-                            RoundedRectangle(cornerRadius: 24)
-                                .fill(Color.white.opacity(0.9))
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color(hex: "#E5E5E5"), lineWidth: 1)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .fill(Color.white)
+                                )
                         )
                     }
-                    .buttonStyle(PlainButtonStyle())
+                    .buttonStyle(ScaleButtonStyle())
                 }
+                .padding(.horizontal, 28)
                 
                 Spacer()
             }
             
-            // Enhanced floating completion button
+            // Floating completion button
             VStack {
                 Spacer()
                 HStack {
@@ -112,18 +176,17 @@ struct MantraSummaryView: View {
                     Button(action: {
                         completeJournalingSession()
                     }) {
-                        Image(systemName: "checkmark")
+                        Image(systemName: "arrow.right")
                             .font(.system(size: 20, weight: .bold))
                             .foregroundColor(.white)
                             .frame(width: 64, height: 64)
                             .background(
                                 Circle()
-                                    .fill(Color(hex: "#A6B4FF"))
-                                    .shadow(color: Color(hex: "#A6B4FF").opacity(0.4), radius: 12, x: 0, y: 6)
-                                    .shadow(color: Color.black.opacity(0.1), radius: 8, x: 0, y: 4)
+                                    .fill(Color.black)
+                                    .shadow(color: Color.black.opacity(0.3), radius: 8, x: 0, y: 4)
                             )
                     }
-                    .buttonStyle(PlainButtonStyle())
+                    .buttonStyle(ScaleButtonStyle())
                     .padding(.trailing, 32)
                     .padding(.bottom, 48)
                 }
@@ -133,7 +196,11 @@ struct MantraSummaryView: View {
         .navigationBarHidden(true)
         .toolbar(.hidden, for: .navigationBar)
         .onAppear {
-            // Force hide navigation bar completely
+            // Random background selection every time
+            let index = Int.random(in: 0..<backgroundPairings.count)
+            selectedPairing = backgroundPairings[index]
+            
+            // Hide navigation bar
             if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                let window = windowScene.windows.first,
                let navController = findNavigationController(in: window.rootViewController) {
@@ -148,37 +215,28 @@ struct MantraSummaryView: View {
     }
     
     private func updateWidget() {
-        // Updated to use the correct App Group for Studio Eight LLC
         if let sharedDefaults = UserDefaults(suiteName: "group.com.studioeight.mantra") {
             sharedDefaults.set(mantra, forKey: "latestMantra")
             sharedDefaults.set(mood, forKey: "latestMood")
             sharedDefaults.set(Date(), forKey: "lastUpdated")
             sharedDefaults.synchronize()
             
-            // Reload widget timelines
             WidgetCenter.shared.reloadAllTimelines()
             WidgetCenter.shared.reloadTimelines(ofKind: "MantraWidget")
             
-            // Additional reload after delay to ensure update
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 WidgetCenter.shared.reloadTimelines(ofKind: "MantraWidget")
             }
             
-            // Haptic feedback for success
             let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
             impactFeedback.impactOccurred()
             
-            print("✅ Widget updated with mantra: \(mantra)")
-        } else {
-            print("❌ Failed to access App Group: group.com.studioeight.mantra")
+            print("Widget updated with mantra: \(mantra)")
         }
     }
     
     private func shareMantra() {
-        // Create the beautiful mantra card image
         let cardImage = MantraCardGenerator.createMantraCard(mantra: mantra, mood: mood)
-        
-        // Include both image and text for better sharing options
         let shareText = "Today's Whisper: \"\(mantra)\""
         
         let shareSheet = UIActivityViewController(
@@ -252,7 +310,6 @@ struct MantraSummaryView: View {
         }
     }
     
-    // Helper function to find navigation controller
     private func findNavigationController(in viewController: UIViewController?) -> UINavigationController? {
         guard let viewController = viewController else { return nil }
         
@@ -268,6 +325,15 @@ struct MantraSummaryView: View {
     }
 }
 
+// Scale button style for micro-interactions
+struct ScaleButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
+            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: configuration.isPressed)
+    }
+}
+
 struct ShareSheet: UIViewControllerRepresentable {
     let items: [Any]
     
@@ -276,5 +342,5 @@ struct ShareSheet: UIViewControllerRepresentable {
         return controller
     }
     
-    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) -> Void {}
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }

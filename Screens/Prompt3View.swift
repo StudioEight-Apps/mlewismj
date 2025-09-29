@@ -4,6 +4,8 @@ struct Prompt3View: View {
     @State private var responseText: String = ""
     @State private var currentQuestion: String = ""
     @State private var showTextEditor = false
+    @FocusState private var isInputFocused: Bool
+    @State private var isButtonPressed = false
     let mood: String
     let prompt1: String
     let prompt2: String
@@ -12,8 +14,9 @@ struct Prompt3View: View {
         VStack(spacing: 0) {
             // Stack for prompt indicator and question card
             VStack(spacing: 0) {
+                // Prompt Indicator
                 Text("Prompt 3 of 3")
-                    .font(.system(size: 13, weight: .medium))
+                    .font(.system(size: 13, weight: .regular))
                     .foregroundColor(Color(hex: "#6E6E73"))
                     .padding(.horizontal, 16)
                     .padding(.vertical, 5)
@@ -22,38 +25,42 @@ struct Prompt3View: View {
                             .fill(Color(hex: "#F5F5F5"))
                     )
                     .zIndex(1)
-                    .offset(y: 15)
-
+                    .offset(y: 12)
+                
+                // Question Card - NO SERIF, sans-serif only
                 Text(currentQuestion)
-                    .font(.system(size: 18, weight: .medium, design: .serif)) // ✅ System serif like logo
+                    .font(.system(size: 20, weight: .semibold))
                     .foregroundColor(Color(hex: "#1C1C1E"))
                     .multilineTextAlignment(.center)
+                    .lineSpacing(4)
                     .lineLimit(nil)
                     .fixedSize(horizontal: false, vertical: true)
                     .padding(.horizontal, 24)
-                    .padding(.vertical, 32)
+                    .padding(.vertical, 28)
                     .frame(maxWidth: .infinity)
                     .background(
-                        RoundedRectangle(cornerRadius: 18) // ✅ Consistent card radius
+                        RoundedRectangle(cornerRadius: 18)
                             .fill(Color.white)
                             .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 2)
                     )
                     .padding(.horizontal, 24)
             }
-            .padding(.top, 80)
+            .padding(.top, 60)
 
-            // Text Input Preview Box
+            // Text Input Preview Box with improved styling
             Button(action: {
                 showTextEditor = true
             }) {
                 HStack {
                     Text(responseText.isEmpty ? "Write as much or as little as you'd like..." : responseText)
-                        .font(.system(size: 16)) // ✅ System sans-serif for body
-                        .foregroundColor(responseText.isEmpty ? Color(hex: "#B0B3BA") : Color(hex: "#1C1C1E"))
+                        .font(.system(size: 16, weight: .regular))
+                        .italic(responseText.isEmpty)
+                        .foregroundColor(responseText.isEmpty ? Color(hex: "#999999") : Color(hex: "#1C1C1E"))
                         .multilineTextAlignment(.leading)
                         .lineLimit(4)
                         .frame(maxWidth: .infinity, alignment: .leading)
-
+                        .opacity(responseText.isEmpty ? 0.8 : 1.0)
+                    
                     Spacer()
                 }
                 .padding(16)
@@ -61,20 +68,22 @@ struct Prompt3View: View {
                 .frame(maxWidth: .infinity)
                 .background(
                     RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color(hex: "#E9E5F4"), lineWidth: 1)
-                        .background(
+                        .fill(Color.white)
+                        .overlay(
                             RoundedRectangle(cornerRadius: 12)
-                                .fill(Color.white)
+                                .stroke(isInputFocused ? Color(hex: "#A6B4FF").opacity(0.4) : Color(hex: "#E5E5EA"), lineWidth: 1.5)
                         )
+                        .shadow(color: isInputFocused ? Color.black.opacity(0.08) : Color.clear, radius: 8, x: 0, y: 2)
                 )
             }
             .buttonStyle(PlainButtonStyle())
             .padding(.horizontal, 24)
-            .padding(.top, 32)
+            .padding(.top, 24)
+            .animation(.easeOut(duration: 0.25), value: isInputFocused)
 
             Spacer()
 
-            // Continue Button → LoadingView - FIXED: Consistent color and radius
+            // Continue Button with press animation -> Goes to LoadingView
             NavigationLink(destination: LoadingView(
                 mood: mood,
                 response1: prompt1,
@@ -82,22 +91,39 @@ struct Prompt3View: View {
                 response3: responseText
             )) {
                 Text("Continue")
-                    .font(.system(size: 17, weight: .semibold)) // ✅ System sans-serif for buttons
+                    .font(.system(size: 17, weight: .semibold))
                     .foregroundColor(.white)
                     .frame(height: 52)
                     .frame(maxWidth: .infinity)
                     .background(
-                        RoundedRectangle(cornerRadius: 12) // ✅ Consistent button radius
-                            .fill(Color(hex: "#A6B4FF")) // ✅ Consistent primary color
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color(hex: "#A6B4FF"))
+                            .shadow(color: Color(hex: "#A6B4FF").opacity(0.2), radius: 4, x: 0, y: 2)
                     )
+                    .scaleEffect(isButtonPressed ? 0.97 : 1.0)
             }
             .buttonStyle(PlainButtonStyle())
             .disabled(responseText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-            .opacity(responseText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? 0.3 : 1.0)
+            .opacity(responseText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? 0.4 : 1.0)
+            .simultaneousGesture(
+                DragGesture(minimumDistance: 0)
+                    .onChanged { _ in
+                        if !responseText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                            withAnimation(.easeOut(duration: 0.1)) {
+                                isButtonPressed = true
+                            }
+                        }
+                    }
+                    .onEnded { _ in
+                        withAnimation(.easeOut(duration: 0.1)) {
+                            isButtonPressed = false
+                        }
+                    }
+            )
             .padding(.horizontal, 24)
             .padding(.bottom, 40)
         }
-        .background(Color(hex: "#FFFCF5")) // ✅ Consistent background
+        .background(Color(hex: "#FFFCF5"))
         .navigationBarHidden(true)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
@@ -109,6 +135,12 @@ struct Prompt3View: View {
         }
         .sheet(isPresented: $showTextEditor) {
             TextEditorView(text: $responseText, question: currentQuestion)
+                .onDisappear {
+                    isInputFocused = !responseText.isEmpty
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        isInputFocused = false
+                    }
+                }
         }
     }
 }
