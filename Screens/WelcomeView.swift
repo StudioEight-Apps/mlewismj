@@ -11,12 +11,28 @@ struct WelcomeView: View {
    @State private var weekDates: [Date] = []
    @State private var selectedWeekDate = Date()
    @State private var currentStreak: Int = 0
-   @State private var dailyMantra: String = "Loading your daily inspiration..."
-   @State private var isDailyMantraLoading = true
+   @State private var dailyWhisper: String = "Loading your daily whisper..."
+   @State private var isDailyWhisperLoading = true
+   @State private var cardScale: CGFloat = 0.98
+   @State private var whisperOpacity: Double = 0
    
    // Name prompt banner states
    @State private var hasSeenNamePrompt = UserDefaults.standard.bool(forKey: "hasSeenNamePrompt")
    @State private var showNamePrompt = false
+   
+   // Background pairings for share cards with color mapping
+   private let backgroundPairings: [(background: String, textColor: String, borderColor: String)] = [
+       ("whisper_bg_01_bone", "#1E1B19", "#DCD2C4"),
+       ("whisper_bg_02_sand", "#1E1B19", "#DCD2C4"),
+       ("whisper_bg_03_taupe", "#1E1B19", "#DCD2C4"),
+       ("whisper_bg_04_clay", "#EAD8C9", "#3C3630"),
+       ("whisper_bg_05_terracotta", "#F2E2D6", "#3C3630"),
+       ("whisper_bg_06_olive", "#E6EAD9", "#3C3630"),
+       ("whisper_bg_07_sage", "#DDE7DC", "#3C3630"),
+       ("whisper_bg_08_moss", "#DFE7D6", "#3C3630"),
+       ("whisper_bg_09_cacao", "#ECDDC7", "#3C3630"),
+       ("whisper_bg_10_charcoal", "#E8DEC9", "#3C3630")
+   ]
 
    var body: some View {
        NavigationView {
@@ -51,18 +67,17 @@ struct WelcomeView: View {
    var mainContent: some View {
        ScrollView {
            VStack(spacing: 0) {
-               // Name prompt banner - appears at top when needed
                if showNamePrompt {
                    namePromptBanner
                }
                
-               Spacer().frame(height: 20)
+               Spacer().frame(height: 5)
                logoSection
                greetingSection
                calendarScrollView
                streakDisplay
                Spacer().frame(height: 30)
-               mantraCard
+               whisperCard
                buttonStack
            }
        }
@@ -108,23 +123,22 @@ struct WelcomeView: View {
            .frame(maxWidth: 135)
            .accessibilityLabel("Whisper")
            .background(Color.clear)
-           .padding(.top, 5)
-           .padding(.bottom, 25)
+           .padding(.top, 0)
+           .padding(.bottom, 20)
    }
    
    var greetingSection: some View {
        Text("\(greeting), \(userName)")
-           .font(.system(size: 21, weight: .medium, design: .default))
+           .font(.system(size: 21, weight: .medium))
            .foregroundColor(Color(hex: "#222222"))
            .padding(.bottom, 30)
            .onAppear {
                loadUserName()
                updateGreeting()
                generateWeekDates()
-               loadDailyMantra()
+               loadDailyWhisper()
                currentStreak = UserDefaults.standard.integer(forKey: "currentStreak")
                
-               // Check if we should show name prompt
                if userName == "Friend" && !hasSeenNamePrompt {
                    showNamePrompt = true
                }
@@ -150,59 +164,91 @@ struct WelcomeView: View {
    }
    
    var streakDisplay: some View {
-       HStack(spacing: 4) {
+       HStack(spacing: 6) {
            Text("🔥").font(.system(size: 13))
            
            if journalManager.isLoading {
                Text("Loading streak...")
-                   .font(.system(size: 13, weight: .regular, design: .default))
+                   .font(.system(size: 13, weight: .medium))
                    .foregroundColor(Color(hex: "#7A6EFF"))
            } else {
                Text("\(currentStreak)-day streak")
-                   .font(.system(size: 13, weight: .regular, design: .default))
+                   .font(.system(size: 13, weight: .medium))
                    .foregroundColor(Color(hex: "#7A6EFF"))
            }
        }
+       .padding(.horizontal, 12)
+       .padding(.vertical, 6)
+       .background(Color(hex: "#A6B4FF").opacity(0.12))
+       .cornerRadius(20)
        .padding(.bottom, 25)
    }
    
-   var mantraCard: some View {
-       VStack(spacing: 16) {
-           Text("Today's Thought")
-               .font(.system(size: 18, weight: .semibold, design: .default))
-               .foregroundColor(Color(hex: "#333333"))
+   var whisperCard: some View {
+       ZStack(alignment: .bottomTrailing) {
+           VStack(spacing: 0) {
+               Text("Today's Whisper")
+                   .font(.system(size: 12, weight: .medium))
+                   .tracking(0.5)
+                   .foregroundColor(Color(hex: "#6A6A6A"))
+                   .multilineTextAlignment(.center)
+                   .padding(.bottom, 16)
+               
+               whisperContent
+           }
+           .padding(.top, 24)
+           .padding(.horizontal, 24)
+           .padding(.bottom, 28)
+           .frame(width: UIScreen.main.bounds.width * 0.9)
+           .frame(minHeight: 200)
+           .background(Color(hex: "#F5F0E8"))
+           .overlay(
+               RoundedRectangle(cornerRadius: 18)
+                   .stroke(Color(hex: "#E9E2D6"), lineWidth: 1)
+           )
+           .cornerRadius(18)
+           .shadow(color: Color.black.opacity(0.10), radius: 12, x: 0, y: 6)
+           .scaleEffect(cardScale)
            
-           mantraContent
+           WhisperShareButton(
+               isEnabled: !isDailyWhisperLoading && !dailyWhisper.isEmpty,
+               action: shareWhisper
+           )
+           .offset(x: -16, y: -16)
        }
-       .padding(.horizontal, 16)
-       .padding(.vertical, 24)
-       .frame(width: UIScreen.main.bounds.width * 0.9)
-       .frame(minHeight: 220)
-       .background(Color(hex: "#F5F0E8"))
-       .cornerRadius(18)
-       .shadow(color: Color.black.opacity(0.12), radius: 12, x: 0, y: 4)
-       .padding(.bottom, 50)
+       .padding(.bottom, 48)
+       .onAppear {
+           withAnimation(.easeOut(duration: 0.2)) {
+               cardScale = 1.0
+           }
+           withAnimation(.easeOut(duration: 0.18).delay(0.1)) {
+               whisperOpacity = 1.0
+           }
+       }
    }
    
-   var mantraContent: some View {
+   var whisperContent: some View {
        Group {
-           if isDailyMantraLoading {
+           if isDailyWhisperLoading {
                HStack(spacing: 8) {
                    ProgressView().scaleEffect(0.8)
-                   Text("Loading inspiration...")
-                       .font(.system(size: 15, weight: .regular, design: .default))
-                       .foregroundColor(Color(hex: "#333333"))
+                   Text("Loading whisper...")
+                       .font(.system(size: 15, weight: .regular))
+                       .foregroundColor(Color(hex: "#6A6A6A"))
                }
                .frame(minHeight: 80)
            } else {
-               Text(dailyMantra)
-                   .font(.system(size: 16, weight: .regular, design: .default))
-                   .foregroundColor(Color(hex: "#333333"))
+               Text(dailyWhisper)
+                   .font(.system(size: 21, weight: .semibold, design: .serif))
+                   .foregroundColor(Color(hex: "#2B2B2B"))
                    .multilineTextAlignment(.center)
-                   .lineSpacing(8)
-                   .padding(.horizontal, 16)
-                   .padding(.vertical, 20)
+                   .lineSpacing(6)
+                   .tracking(-0.2)
+                   .lineLimit(3)
+                   .padding(.horizontal, 20)
+                   .padding(.bottom, 20)
                    .frame(minHeight: 80)
+                   .opacity(whisperOpacity)
            }
        }
    }
@@ -211,28 +257,97 @@ struct WelcomeView: View {
        VStack(spacing: 12) {
            NavigationLink(destination: NewMantraView()) {
                Text("Start Journaling")
-                   .font(.system(size: 16, weight: .semibold, design: .default))
+                   .font(.system(size: 17, weight: .semibold))
                    .foregroundColor(.white)
                    .frame(width: UIScreen.main.bounds.width * 0.9)
                    .frame(height: 52)
                    .background(Color(hex: "#A6B4FF"))
                    .cornerRadius(18)
+                   .shadow(color: Color.black.opacity(0.10), radius: 10, x: 0, y: 4)
            }
            .buttonStyle(PlainButtonStyle())
 
            NavigationLink(destination: HistoryView()) {
                Text("View History")
-                   .font(.system(size: 16, weight: .semibold, design: .default))
+                   .font(.system(size: 17, weight: .semibold))
                    .foregroundColor(Color(hex: "#222222"))
                    .frame(width: UIScreen.main.bounds.width * 0.9)
                    .frame(height: 52)
                    .background(Color.white)
-                   .overlay(RoundedRectangle(cornerRadius: 18).stroke(Color(hex: "#A6B4FF"), lineWidth: 1))
+                   .overlay(
+                       RoundedRectangle(cornerRadius: 18)
+                           .stroke(Color(hex: "#A6B4FF"), lineWidth: 1)
+                   )
                    .cornerRadius(18)
            }
            .buttonStyle(PlainButtonStyle())
        }
-       .padding(.bottom, 40)
+       .padding(.bottom, 20)
+   }
+   
+   // MARK: - Share Function
+   
+   private func shareWhisper() {
+       Task { @MainActor in
+           let randomPairing = backgroundPairings.randomElement() ?? backgroundPairings[0]
+           
+           var cleanedWhisper = dailyWhisper.trimmingCharacters(in: .whitespacesAndNewlines)
+           if cleanedWhisper.last == "." {
+               cleanedWhisper = String(cleanedWhisper.dropLast())
+           }
+           
+           let shareCard = ZStack {
+               Image(randomPairing.background)
+                   .resizable()
+                   .aspectRatio(contentMode: .fill)
+                   .frame(width: 1080, height: 1350)
+                   .clipped()
+               
+               RoundedRectangle(cornerRadius: 0)
+                   .strokeBorder(Color(hex: randomPairing.borderColor), lineWidth: 2)
+                   .frame(width: 1080, height: 1350)
+               
+               VStack(spacing: 0) {
+                   Spacer()
+                   
+                   VStack(spacing: 22) {
+                       Text(cleanedWhisper)
+                           .font(.system(size: 68, weight: .bold, design: .serif))
+                           .foregroundColor(Color(hex: randomPairing.textColor))
+                           .multilineTextAlignment(.center)
+                           .lineSpacing(6)
+                           .tracking(-0.3)
+                           .lineLimit(4)
+                           .minimumScaleFactor(0.75)
+                           .fixedSize(horizontal: false, vertical: true)
+                           .frame(maxWidth: 820)
+                       
+                       Image("whisper-logo")
+                           .resizable()
+                           .renderingMode(.template)
+                           .aspectRatio(contentMode: .fit)
+                           .frame(width: 160)
+                           .foregroundColor(Color(hex: randomPairing.textColor))
+                           .opacity(0.82)
+                   }
+                   .offset(y: 30)
+                   
+                   Spacer()
+               }
+           }
+           .frame(width: 1080, height: 1350)
+           
+           let image = ShareRenderer.image(
+               for: shareCard,
+               size: CGSize(width: 1080, height: 1350),
+               colorScheme: .light
+           )
+           
+           ShareManager.presentFromTopController(
+               image: image,
+               caption: nil
+           )
+       }
    }
    
    // MARK: - Name Prompt Functions
@@ -292,45 +407,45 @@ struct WelcomeView: View {
        }
    }
    
-   private func loadDailyMantra() {
-       let dateKey = getDailyMantraKey()
+   private func loadDailyWhisper() {
+       let dateKey = getDailyWhisperKey()
        
-       if let cachedMantra = UserDefaults.standard.string(forKey: "dailyMantra_\(dateKey)") {
-           dailyMantra = cachedMantra
-           isDailyMantraLoading = false
+       if let cachedWhisper = UserDefaults.standard.string(forKey: "dailyWhisper_\(dateKey)") {
+           dailyWhisper = cachedWhisper
+           isDailyWhisperLoading = false
            return
        }
        
-       DailyMantraGenerator.generateDailyMantra(for: Date()) { mantra in
+       DailyWhisperGenerator.generateDailyWhisper(for: Date()) { whisper in
            DispatchQueue.main.async {
-               if let mantra = mantra {
-                   self.dailyMantra = mantra
-                   UserDefaults.standard.set(mantra, forKey: "dailyMantra_\(dateKey)")
+               if let whisper = whisper {
+                   self.dailyWhisper = whisper
+                   UserDefaults.standard.set(whisper, forKey: "dailyWhisper_\(dateKey)")
                } else {
-                   self.dailyMantra = self.getFallbackMantra()
+                   self.dailyWhisper = self.getFallbackWhisper()
                }
-               self.isDailyMantraLoading = false
+               self.isDailyWhisperLoading = false
            }
        }
    }
    
-   private func getDailyMantraKey() -> String {
+   private func getDailyWhisperKey() -> String {
        let formatter = DateFormatter()
        formatter.dateFormat = "yyyy-MM-dd"
        return formatter.string(from: Date())
    }
    
-   private func getFallbackMantra() -> String {
-       let fallbackMantras = [
-           "Today is a new opportunity to grow.",
-           "You have everything you need within you.",
-           "Small steps forward are still progress.",
-           "Trust yourself and take it one moment at a time.",
-           "You are capable of more than you realize."
+   private func getFallbackWhisper() -> String {
+       let fallbackWhispers = [
+           "You still have time.",
+           "Believe their actions.",
+           "Stop rehearsing their approval.",
+           "Silence can be louder than proof.",
+           "Don't lose your voice, the world is crowded."
        ]
        
        let dayOfYear = Calendar.current.ordinality(of: .day, in: .year, for: Date()) ?? 1
-       return fallbackMantras[dayOfYear % fallbackMantras.count]
+       return fallbackWhispers[dayOfYear % fallbackWhispers.count]
    }
    
    private func loadUserName() {
@@ -345,7 +460,6 @@ struct WelcomeView: View {
                    let firstName = name.split(separator: " ").first.map(String.init) ?? name
                    self.userName = firstName
                    
-                   // Re-check name prompt after loading user name
                    if self.userName == "Friend" && !self.hasSeenNamePrompt {
                        self.showNamePrompt = true
                    }
@@ -364,6 +478,63 @@ struct WelcomeView: View {
        default: greeting = "Good night"
        }
    }
+}
+
+// MARK: - Whisper Share Button Component
+struct WhisperShareButton: View {
+    let isEnabled: Bool
+    let action: () -> Void
+    @State private var isPressed = false
+    
+    var body: some View {
+        Button(action: {
+            let generator = UIImpactFeedbackGenerator(style: .light)
+            generator.impactOccurred()
+            action()
+        }) {
+            ZStack {
+                Circle()
+                    .fill(Color.white)
+                    .frame(width: 32, height: 32)
+                    .overlay(
+                        Circle()
+                            .stroke(Color(hex: "#E9E2D6"), lineWidth: 1)
+                    )
+                    .shadow(
+                        color: isPressed ? Color.black.opacity(0.12) : (isEnabled ? Color.black.opacity(0.06) : Color.clear),
+                        radius: isPressed ? 10 : 8,
+                        x: 0,
+                        y: 4
+                    )
+                
+                Image(systemName: "square.and.arrow.up")
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundColor(Color(hex: "#7A6EFF"))
+            }
+            .contentShape(Rectangle())
+            .frame(width: 44, height: 44)
+            .scaleEffect(isPressed ? 0.96 : 1.0)
+            .opacity(isEnabled ? 1.0 : 0.5)
+        }
+        .buttonStyle(PlainButtonStyle())
+        .disabled(!isEnabled)
+        .accessibilityLabel("Share today's whisper")
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 0)
+                .onChanged { _ in
+                    if isEnabled {
+                        withAnimation(.easeOut(duration: 0.1)) {
+                            isPressed = true
+                        }
+                    }
+                }
+                .onEnded { _ in
+                    withAnimation(.easeOut(duration: 0.1)) {
+                        isPressed = false
+                    }
+                }
+        )
+    }
 }
 
 struct CalendarDayBubble: View {
@@ -388,7 +559,7 @@ struct CalendarDayBubble: View {
        Button(action: onTap) {
            VStack(spacing: 4) {
                Text(dayName)
-                   .font(.system(size: 12, weight: .regular, design: .default))
+                   .font(.system(size: 12, weight: .regular))
                    .foregroundColor(Color(hex: "#444444"))
                
                ZStack {
@@ -397,7 +568,7 @@ struct CalendarDayBubble: View {
                        .frame(width: 30, height: 30)
                    
                    Text(dayNumber)
-                       .font(.system(size: 13, weight: .medium, design: .default))
+                       .font(.system(size: 13, weight: .medium))
                        .foregroundColor(isSelected ? .white : Color(hex: "#222222"))
                }
                
@@ -432,8 +603,8 @@ struct CalendarDayBubble: View {
    }
 }
 
-struct DailyMantraGenerator {
-    static func generateDailyMantra(for date: Date, completion: @escaping (String?) -> Void) {
+struct DailyWhisperGenerator {
+    static func generateDailyWhisper(for date: Date, completion: @escaping (String?) -> Void) {
         SecureAPIManager.shared.getOpenAIAPIKey { apiKey in
             guard let apiKey = apiKey else {
                 completion(nil)
@@ -445,40 +616,37 @@ struct DailyMantraGenerator {
                 return
             }
             
-            let dailyMantraPrompt = """
-            You write daily mantras for a modern journaling app.
-            Tone: warm, current, supportive – like a caring friend who keeps it real.
-            Style: short, clear, screenshot-worthy; gentle but true, never fluffy or abstract.
-            Form: one sentence only, 12 words or fewer. Two short rhythmic lines are allowed.
-            Voice: conversational and relatable; phrasing should feel modern and save-worthy.
-            Punctuation: periods, commas, semicolons only. No dashes, ellipses, quotes, exclamation points, or question marks. (Contractions are fine.)
-            Anchors to match in tone and rhythm (do not copy):
-            • You've returned to yourself before. You can do it again.
-            • Believe their actions.
-            • You still have time.
-            • You deserve all the good coming your way.
-            • You deserve to think highly of yourself.
-            • For your sanity, let people think what they want.
-            • Let it end. Let it change. Let it hurt. Let it heal.
-            • You gotta let go of what let go of you.
-            • Remind yourself that rest is not wasted time.
-            • Water your dreams, don't feed doubt.
+            let dailyWhisperPrompt = """
+            You write one-line whispers for a modern journaling app.
+            Tone: direct, modern, screenshot-worthy, like a close friend telling you the truth.
+            Style: sharp, concise, scroll-stopping; slightly raw or contrarian when needed.
+            Form: one sentence only, maximum 12 words. Two short rhythmic lines are allowed.
+            Voice: conversational, bold, and memorable.
+            Avoid: cliches, therapy jargon, motivational fluff, or overused words like growth, healing, positivity, journey, strength, hope.
+            Punctuation: periods, commas, semicolons only. No dashes, ellipses, quotes, exclamation points, or question marks. Contractions are fine.
+            Anchors for tone and rhythm (do not copy):
+            - Consume more than you create.
+            - Don't lose your voice, the world is crowded.
+            - Stop rehearsing their approval.
+            - Comfort zones will steal your years.
+            - Silence can be louder than proof.
+            - Be louder in action than in announcement.
             Guidance:
-            • Keep it universal and day-friendly; no therapy jargon or heavy specifics.
-            • Favor everyday words and ideas people would screenshot and share.
-            • Aim for calm confidence, soft boundaries, and gentle encouragement.
-            Output: return exactly one mantra that follows all rules above.
+            - Favor brevity and punch over explanation.
+            - Use everyday words with weight.
+            - Each whisper should feel bold, honest, and save-worthy - something people screenshot to remember.
+            Output: return exactly one whisper that follows all rules above.
             """
             
-            let userPrompt = "Write one daily mantra. Return one line only."
+            let userPrompt = "Write one daily whisper. Return one line only."
             
             let requestBody: [String: Any] = [
                 "model": "gpt-4o",
                 "messages": [
-                    ["role": "system", "content": dailyMantraPrompt],
+                    ["role": "system", "content": dailyWhisperPrompt],
                     ["role": "user", "content": userPrompt]
                 ],
-                "temperature": 0.6,
+                "temperature": 0.7,
                 "max_tokens": 25
             ]
 

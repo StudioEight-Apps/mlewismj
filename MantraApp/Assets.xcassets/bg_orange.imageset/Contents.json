@@ -1,17 +1,15 @@
 {
   "images" : [
     {
-      "filename" : "Whisper App Tranny Logo 2.png",
+      "filename" : "bg_orange.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "Whisper App Tranny Logo.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "Whisper App Tranny Logo 1.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

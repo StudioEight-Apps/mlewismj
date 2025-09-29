@@ -42,6 +42,9 @@
 		FB63CA212DE7BDCD002EED53 /* JournalEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB63CA202DE7BDCD002EED53 /* JournalEntry.swift */; };
 		FB63CA232DE7BE09002EED53 /* JournalManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB63CA222DE7BE09002EED53 /* JournalManager.swift */; };
 		FB63CA252DE7EF5D002EED53 /* MoodColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB63CA242DE7EF5D002EED53 /* MoodColor.swift */; };
+		FB66DB942E8C349200510B66 /* ShareCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB66DB932E8C349200510B66 /* ShareCardView.swift */; };
+		FB66DB962E8C34AF00510B66 /* ShareManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB66DB952E8C34AF00510B66 /* ShareManager.swift */; };
+		FB66DB982E8C34C700510B66 /* ShareRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB66DB972E8C34C700510B66 /* ShareRenderer.swift */; };
 		FB6D648C2E5A87D60025D416 /* FirebaseFunctions in Frameworks */ = {isa = PBXBuildFile; productRef = FB6D648B2E5A87D60025D416 /* FirebaseFunctions */; };
 		FB6D648E2E5A8D060025D416 /* MantraAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6D648D2E5A8D060025D416 /* MantraAPI.swift */; };
 		FB6D64922E5CB70B0025D416 /* FirebaseRemoteConfig in Frameworks */ = {isa = PBXBuildFile; productRef = FB6D64912E5CB70B0025D416 /* FirebaseRemoteConfig */; };
@@ -129,6 +132,9 @@
 		FB63CA202DE7BDCD002EED53 /* JournalEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalEntry.swift; sourceTree = "<group>"; };
 		FB63CA222DE7BE09002EED53 /* JournalManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalManager.swift; sourceTree = "<group>"; };
 		FB63CA242DE7EF5D002EED53 /* MoodColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodColor.swift; sourceTree = "<group>"; };
+		FB66DB932E8C349200510B66 /* ShareCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareCardView.swift; sourceTree = "<group>"; };
+		FB66DB952E8C34AF00510B66 /* ShareManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareManager.swift; sourceTree = "<group>"; };
+		FB66DB972E8C34C700510B66 /* ShareRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareRenderer.swift; sourceTree = "<group>"; };
 		FB6D648D2E5A8D060025D416 /* MantraAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MantraAPI.swift; sourceTree = "<group>"; };
 		FB6D64932E5D126B0025D416 /* SecureAPIManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureAPIManager.swift; sourceTree = "<group>"; };
 		FB7FFBCD2DF64503001DEF3D /* ImageShareHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageShareHelper.swift; sourceTree = "<group>"; };
@@ -242,6 +248,9 @@
 		FB2CA7592DD3C64E006C687D = {
 			isa = PBXGroup;
 			children = (
+				FB66DB972E8C34C700510B66 /* ShareRenderer.swift */,
+				FB66DB952E8C34AF00510B66 /* ShareManager.swift */,
+				FB66DB932E8C349200510B66 /* ShareCardView.swift */,
 				FBDE1DB22E5DFE2B00AE17A3 /* PaywallView.swift */,
 				FBDE1DAC2E5DFA1A00AE17A3 /* SubscriptionManager.swift */,
 				FB6D648D2E5A8D060025D416 /* MantraAPI.swift */,
@@ -530,6 +539,7 @@
 				FB2CA7A82DDE988C006C687D /* PromptQuestions .swift in Sources */,
 				FB6D64942E5D126B0025D416 /* SecureAPIManager.swift in Sources */,
 				FB2CA7972DD68C4A006C687D /* HistoryView.swift in Sources */,
+				FB66DB962E8C34AF00510B66 /* ShareManager.swift in Sources */,
 				FBDE1DB32E5DFE2B00AE17A3 /* PaywallView.swift in Sources */,
 				FB5AC72E2E29835C00F6C9EF /* UIColor+Hex.swift in Sources */,
 				FB5AC7602E2AFCD400F6C9EF /* AppleAuthManager.swift in Sources */,
@@ -542,11 +552,13 @@
 				FBDE1DAD2E5DFA1A00AE17A3 /* SubscriptionManager.swift in Sources */,
 				FB7FFBD02DF64550001DEF3D /* MantraCardGenerator.swift in Sources */,
 				FB2CA7992DD6970D006C687D /* MantraDetailView.swift in Sources */,
+				FB66DB982E8C34C700510B66 /* ShareRenderer.swift in Sources */,
 				FB2CA78F2DD67067006C687D /* WelcomeView.swift in Sources */,
 				FB5AC7512E2AEA9300F6C9EF /* OnboardingCoordinator.swift in Sources */,
 				FB2CA7A12DDD59B2006C687D /* Prompt3View.swift in Sources */,
 				FB2CA7952DD68C29006C687D /* NewMantraView.swift in Sources */,
 				FB2CA7BD2DDFC56F006C687D /* RootView.swift in Sources */,
+				FB66DB942E8C349200510B66 /* ShareCardView.swift in Sources */,
 				FB5AC74F2E2AEA6300F6C9EF /* SplashScreenView.swift in Sources */,
 				FB2CA7A52DDE370F006C687D /* MantraSummaryView .swift in Sources */,
 				FB2CA7B92DDF9561006C687D /* AuthViewModel.swift .swift in Sources */,
@@ -754,12 +766,14 @@
 				PRODUCT_NAME = Mantra;
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,7";
+				TARGETED_DEVICE_FAMILY = 1;
 				XROS_DEPLOYMENT_TARGET = 2.4;
 			};
 			name = Debug;
@@ -803,11 +817,13 @@
 				PRODUCT_NAME = Mantra;
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,7";
+				TARGETED_DEVICE_FAMILY = 1;
 				XROS_DEPLOYMENT_TARGET = 2.4;
 			};
 			name = Release;
