@@ -4,10 +4,18 @@ struct SettingsView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @State private var showingPrivacyPolicy = false
     @State private var showingEditProfile = false
+    
+    // Delete account flow - 3 confirmations
+    @State private var showingFirstConfirmation = false
+    @State private var showingSecondConfirmation = false
+    @State private var showingFinalConfirmation = false
+    @State private var isDeleting = false
+    @State private var showingError = false
+    @State private var errorMessage = ""
 
     var body: some View {
         ZStack {
-            Color(hex: "#FFFCF5") // ✅ Consistent background
+            Color(hex: "#FFFCF5")
                 .ignoresSafeArea()
             
             VStack(spacing: 20) {
@@ -40,28 +48,50 @@ struct SettingsView: View {
                         settingsRow(icon: "questionmark.circle.fill", title: "Help & Support")
                     }
                     .buttonStyle(BounceButtonStyle())
+                    
+                    // Delete Account Button - FIXED: No subtitle, matches other rows
+                    Button(action: {
+                        showingFirstConfirmation = true
+                    }) {
+                        settingsRow(icon: "trash", title: "Delete Account")
+                    }
+                    .buttonStyle(BounceButtonStyle())
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 20)
                 
                 Spacer()
                 
-                // Log Out Button - FIXED: Consistent styling
+                // Log Out Button
                 Button(action: {
                     authViewModel.signOut()
                 }) {
                     Text("Log Out")
-                        .font(.system(size: 16, weight: .semibold)) // ✅ Consistent button font
+                        .font(.system(size: 16, weight: .semibold))
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
-                        .frame(height: 52) // ✅ Consistent button height
-                        .background(Color(hex: "#A6B4FF")) // ✅ Consistent primary color
-                        .cornerRadius(12) // ✅ Consistent button radius
+                        .frame(height: 52)
+                        .background(Color(hex: "#A6B4FF"))
+                        .cornerRadius(12)
                         .shadow(color: Color(hex: "#A6B4FF").opacity(0.3), radius: 6, x: 0, y: 3)
                 }
                 .buttonStyle(BounceButtonStyle())
                 .padding(.horizontal, 20)
                 .padding(.bottom, 40)
+            }
+            
+            // Loading overlay when deleting
+            if isDeleting {
+                Color.black.opacity(0.4)
+                    .ignoresSafeArea()
+                VStack(spacing: 16) {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                        .scaleEffect(1.5)
+                    Text("Deleting account...")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(.white)
+                }
             }
         }
         .navigationTitle("Settings")
@@ -72,6 +102,39 @@ struct SettingsView: View {
         .sheet(isPresented: $showingEditProfile) {
             EditProfileView()
         }
+        // FIRST CONFIRMATION: Are you sure?
+        .alert("Delete Account?", isPresented: $showingFirstConfirmation) {
+            Button("Cancel", role: .cancel) { }
+            Button("I'm Sure", role: .destructive) {
+                showingSecondConfirmation = true
+            }
+        } message: {
+            Text("Are you sure you want to delete your account?")
+        }
+        // SECOND CONFIRMATION: Data warning
+        .alert("Warning", isPresented: $showingSecondConfirmation) {
+            Button("Cancel", role: .cancel) { }
+            Button("I'm Sure", role: .destructive) {
+                showingFinalConfirmation = true
+            }
+        } message: {
+            Text("All of your journal entries will be permanently removed and gone forever.")
+        }
+        // FINAL CONFIRMATION: Click delete
+        .alert("Final Confirmation", isPresented: $showingFinalConfirmation) {
+            Button("Cancel", role: .cancel) { }
+            Button("Delete", role: .destructive) {
+                deleteAccount()
+            }
+        } message: {
+            Text("Click Delete to remove this account forever.")
+        }
+        // Error alert if deletion fails
+        .alert("Error", isPresented: $showingError) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(errorMessage)
+        }
     }
 
     private func settingsRow(icon: String, title: String, subtitle: String? = nil) -> some View {
@@ -79,17 +142,17 @@ struct SettingsView: View {
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
                     Image(systemName: icon)
-                        .foregroundColor(Color(hex: "#A6B4FF")) // ✅ Consistent primary color
+                        .foregroundColor(Color(hex: "#A6B4FF"))
                         .font(.system(size: 18))
                     Text(title)
-                        .font(.system(size: 16, weight: .semibold)) // ✅ System sans-serif
-                        .foregroundColor(Color(hex: "#2A2A2A")) // ✅ Consistent text color
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(Color(hex: "#2A2A2A"))
                 }
 
                 if let subtitle = subtitle {
                     Text(subtitle)
-                        .font(.system(size: 14)) // ✅ System sans-serif
-                        .foregroundColor(Color(hex: "#5B5564")) // ✅ Consistent secondary text
+                        .font(.system(size: 14))
+                        .foregroundColor(Color(hex: "#5B5564"))
                         .lineLimit(2)
                 }
             }
@@ -97,13 +160,13 @@ struct SettingsView: View {
             Spacer()
             
             Image(systemName: "chevron.right")
-                .foregroundColor(Color(hex: "#A6B4FF")) // ✅ Consistent primary color
+                .foregroundColor(Color(hex: "#A6B4FF"))
                 .font(.system(size: 14))
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 16)
         .background(Color.white)
-        .cornerRadius(12) // ✅ Consistent card radius
+        .cornerRadius(12)
         .shadow(color: Color(hex: "#A6B4FF").opacity(0.15), radius: 8, x: 0, y: 4)
         .shadow(color: Color(hex: "#A6B4FF").opacity(0.08), radius: 2, x: 0, y: 1)
     }
@@ -118,7 +181,6 @@ struct SettingsView: View {
         let subject = "Whisper App Support"
         let body = "Hi Whisper team,\n\nI need help with:\n\n"
         
-        // Try with encoded parameters first
         if let encodedSubject = subject.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
            let encodedBody = body.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
            let url = URL(string: "mailto:support@whisper-app.com?subject=\(encodedSubject)&body=\(encodedBody)") {
@@ -129,7 +191,6 @@ struct SettingsView: View {
             }
         }
         
-        // Fallback to simple mailto
         if let simpleURL = URL(string: "mailto:support@whisper-app.com") {
             if UIApplication.shared.canOpenURL(simpleURL) {
                 UIApplication.shared.open(simpleURL)
@@ -137,14 +198,27 @@ struct SettingsView: View {
             }
         }
         
-        // Last resort - try opening Mail app directly
         if let mailURL = URL(string: "message://") {
             UIApplication.shared.open(mailURL)
         }
     }
+    
+    private func deleteAccount() {
+        isDeleting = true
+        
+        authViewModel.deleteAccount { success, error in
+            isDeleting = false
+            
+            if !success {
+                errorMessage = error ?? "Failed to delete account. Please try again."
+                showingError = true
+            }
+            // If success, user is automatically signed out and sent to signup screen
+        }
+    }
 }
 
-// MARK: - Edit Profile View - FIXED: Consistent styling
+// MARK: - Edit Profile View
 struct EditProfileView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var authViewModel: AuthViewModel
@@ -160,24 +234,24 @@ struct EditProfileView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                Color(hex: "#FFFCF5") // ✅ Consistent background
+                Color(hex: "#FFFCF5")
                     .ignoresSafeArea()
                 
                 VStack(spacing: 24) {
                     VStack(spacing: 16) {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("First Name")
-                                .font(.system(size: 16, weight: .medium)) // ✅ System sans-serif
-                                .foregroundColor(Color(hex: "#2A2A2A")) // ✅ Consistent text color
+                                .font(.system(size: 16, weight: .medium))
+                                .foregroundColor(Color(hex: "#2A2A2A"))
                             
                             TextField("Enter your first name", text: $firstName)
-                                .font(.system(size: 16)) // ✅ System sans-serif
+                                .font(.system(size: 16))
                                 .padding(12)
                                 .background(Color.white)
                                 .cornerRadius(12)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 12)
-                                        .stroke(Color(hex: "#A6B4FF").opacity(0.3), lineWidth: 1) // ✅ Consistent primary color
+                                        .stroke(Color(hex: "#A6B4FF").opacity(0.3), lineWidth: 1)
                                 )
                         }
                         
@@ -262,13 +336,13 @@ struct EditProfileView: View {
                     Button("Cancel") {
                         dismiss()
                     }
-                    .foregroundColor(Color(hex: "#5B5564")) // ✅ Consistent secondary text
+                    .foregroundColor(Color(hex: "#5B5564"))
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Save") {
                         saveProfile()
                     }
-                    .foregroundColor(Color(hex: "#A6B4FF")) // ✅ Consistent primary color
+                    .foregroundColor(Color(hex: "#A6B4FF"))
                     .font(.system(size: 16, weight: .semibold))
                     .disabled(isLoading)
                 }
@@ -299,7 +373,6 @@ struct EditProfileView: View {
     private func saveProfile() {
         isLoading = true
         
-        // Validate password match if changing password
         if !newPassword.isEmpty {
             guard newPassword == confirmPassword else {
                 alertMessage = "Passwords do not match"
@@ -316,7 +389,6 @@ struct EditProfileView: View {
             }
         }
         
-        // Update profile
         authViewModel.updateProfile(
             firstName: firstName,
             lastName: lastName,
@@ -334,7 +406,7 @@ struct EditProfileView: View {
     }
 }
 
-// MARK: - Bounce Button Style (unchanged)
+// MARK: - Bounce Button Style
 struct BounceButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
@@ -343,26 +415,26 @@ struct BounceButtonStyle: ButtonStyle {
     }
 }
 
-// MARK: - Privacy Policy View - FIXED: Consistent styling
+// MARK: - Privacy Policy View
 struct PrivacyPolicyView: View {
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
         NavigationView {
             ZStack {
-                Color(hex: "#FFFCF5") // ✅ Consistent background
+                Color(hex: "#FFFCF5")
                     .ignoresSafeArea()
                 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 24) {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Terms & Privacy Policy")
-                                .font(.system(size: 32, weight: .bold, design: .serif)) // ✅ System serif for headers
+                                .font(.system(size: 32, weight: .bold, design: .serif))
                                 .foregroundColor(Color(hex: "#2A2A2A"))
                             
                             Text("Last updated: January 16, 2025")
-                                .font(.system(size: 14)) // ✅ System sans-serif
-                                .foregroundColor(Color(hex: "#5B5564")) // ✅ Consistent secondary text
+                                .font(.system(size: 14))
+                                .foregroundColor(Color(hex: "#5B5564"))
                         }
                         
                         VStack(alignment: .leading, spacing: 20) {
@@ -410,7 +482,7 @@ struct PrivacyPolicyView: View {
                     Button("Done") {
                         dismiss()
                     }
-                    .foregroundColor(Color(hex: "#A6B4FF")) // ✅ Consistent primary color
+                    .foregroundColor(Color(hex: "#A6B4FF"))
                     .font(.system(size: 16, weight: .semibold))
                 }
             }
@@ -420,12 +492,12 @@ struct PrivacyPolicyView: View {
     private func privacySection(title: String, content: String) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title)
-                .font(.system(size: 20, weight: .semibold, design: .serif)) // ✅ System serif for section headers
+                .font(.system(size: 20, weight: .semibold, design: .serif))
                 .foregroundColor(Color(hex: "#2A2A2A"))
             
             Text(content)
-                .font(.system(size: 16)) // ✅ System sans-serif for body
-                .foregroundColor(Color(hex: "#2A2A2A")) // ✅ Consistent text color
+                .font(.system(size: 16))
+                .foregroundColor(Color(hex: "#2A2A2A"))
                 .lineSpacing(4)
         }
     }

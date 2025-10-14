@@ -616,35 +616,11 @@ struct DailyWhisperGenerator {
                 return
             }
             
-            let dailyWhisperPrompt = """
-            You write one-line whispers for a modern journaling app.
-            Tone: direct, modern, screenshot-worthy, like a close friend telling you the truth.
-            Style: sharp, concise, scroll-stopping; slightly raw or contrarian when needed.
-            Form: one sentence only, maximum 12 words. Two short rhythmic lines are allowed.
-            Voice: conversational, bold, and memorable.
-            Avoid: cliches, therapy jargon, motivational fluff, or overused words like growth, healing, positivity, journey, strength, hope.
-            Punctuation: periods, commas, semicolons only. No dashes, ellipses, quotes, exclamation points, or question marks. Contractions are fine.
-            Anchors for tone and rhythm (do not copy):
-            - Consume more than you create.
-            - Don't lose your voice, the world is crowded.
-            - Stop rehearsing their approval.
-            - Comfort zones will steal your years.
-            - Silence can be louder than proof.
-            - Be louder in action than in announcement.
-            Guidance:
-            - Favor brevity and punch over explanation.
-            - Use everyday words with weight.
-            - Each whisper should feel bold, honest, and save-worthy - something people screenshot to remember.
-            Output: return exactly one whisper that follows all rules above.
-            """
-            
-            let userPrompt = "Write one daily whisper. Return one line only."
-            
             let requestBody: [String: Any] = [
                 "model": "gpt-4o",
                 "messages": [
-                    ["role": "system", "content": dailyWhisperPrompt],
-                    ["role": "user", "content": userPrompt]
+                    ["role": "system", "content": WhisperVoice.systemPrompt],
+                    ["role": "user", "content": WhisperVoice.dailyWhisperPrompt()]
                 ],
                 "temperature": 0.7,
                 "max_tokens": 25

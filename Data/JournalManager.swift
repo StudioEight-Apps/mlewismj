@@ -182,6 +182,30 @@ class JournalManager: ObservableObject {
               }
           }
     }
+    
+    // MARK: - Clear All Entries (for account deletion)
+    /// Called when user deletes their account
+    /// Removes all local data, stops listeners, and clears widget data
+    func clearAllEntries() {
+        print("🗑️ JournalManager: Clearing all entries for account deletion")
+        
+        // Stop listening to Firestore
+        listener?.remove()
+        listener = nil
+        
+        // Clear all journal entries from memory
+        entries.removeAll()
+        
+        // Clear widget data
+        sharedDefaults.removeObject(forKey: "latestMantra")
+        sharedDefaults.removeObject(forKey: "latestMood")
+        sharedDefaults.removeObject(forKey: "mantraTimestamp")
+        
+        // Refresh widgets to show empty state
+        WidgetCenter.shared.reloadAllTimelines()
+        
+        print("✅ JournalManager: All data cleared")
+    }
 
     // MARK: - Widget Support
     func saveLatestMantraForWidget(_ mantra: String, mood: String) {

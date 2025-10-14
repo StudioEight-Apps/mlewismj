@@ -12,7 +12,7 @@ struct MantraSummaryView: View {
     @State private var showingShareSheet = false
     @State private var shareImage: UIImage?
     
-    // Authoritative background → text color mapping (using whisper backgrounds)
+    // Authoritative background â†’ text color mapping (using whisper backgrounds)
     private let backgroundPairings: [(background: String, textColor: String, logoDark: Bool)] = [
         ("whisper_bg_01_bone", "#1E1B19", false),
         ("whisper_bg_02_sand", "#1E1B19", false),
@@ -30,7 +30,7 @@ struct MantraSummaryView: View {
     
     // Strip terminal punctuation from mantra
     private var cleanedMantra: String {
-        let terminalPunctuation = CharacterSet(charactersIn: ".,;:!?…")
+        let terminalPunctuation = CharacterSet(charactersIn: ".,;:!?â€¦")
         var cleaned = mantra.trimmingCharacters(in: .whitespacesAndNewlines)
         while let last = cleaned.last, terminalPunctuation.contains(String(last).unicodeScalars.first!) {
             cleaned = String(cleaned.dropLast())
@@ -40,9 +40,16 @@ struct MantraSummaryView: View {
     
     var body: some View {
         ZStack {
-            // Clean background matching app
-            Color(hex: "#FFFCF5")
-                .ignoresSafeArea(.all)
+            // Subtle gradient background
+            LinearGradient(
+                gradient: Gradient(colors: [
+                    Color(hex: "#FFFCF5"),
+                    Color(hex: "#F5EFE6")
+                ]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea(.all)
             
             VStack(spacing: 0) {
                 Spacer()

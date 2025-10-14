@@ -22,45 +22,16 @@ struct MantraGenerator {
                 return
             }
 
-            let systemPrompt = """
-            You write mantras for a modern journaling app.
-            Tone: warm, current, and supportive — like advice from a caring friend. 
-            Style: short, clear, and screenshot-worthy. Gentle but true; never fluffy, never abstract. 
-            Form: one sentence only, 12 words or fewer. Occasionally two short rhythmic lines are allowed. 
-            Voice: conversational and relatable; phrasing should feel modern and save-worthy. 
-            Punctuation: periods, commas, semicolons only. No dashes, ellipses, quotes, exclamation points, or question marks. (Contractions are fine.)
-            Mood rules:
-            • Sad, grieving, heartbroken → validate, soothe, and give permission to rest. 
-            • Anxious, overwhelmed → ground them in calm and remind them of what's controllable. 
-            • Unmotivated, tired, stuck → gently encourage with small, doable next steps. 
-            • Frustrated, angry → center peace, boundaries, and moving forward. 
-            • Hopeful, energized → encourage direction and consistency without pressure. 
-            • Content, reflective → reinforce gratitude, balance, and steady joy. 
-            Anchors for tone and rhythm (do not copy, only match): 
-            • You've returned to yourself before. You can do it again. 
-            • Believe their actions. 
-            • You still have time. 
-            • You deserve all the good coming your way. 
-            • You deserve to think highly of yourself. 
-            • For your sanity, let people think what they want. 
-            • Let it end. Let it change. Let it hurt. Let it heal. 
-            • You gotta let go of what let go of you. 
-            • Remind yourself that rest is not wasted time. 
-            Output: return exactly one mantra that follows all rules above.
-            """
-
-            let userPrompt = """
-            Mood: \(mood)
-            Response 1: \(response1)
-            Response 2: \(response2)
-            Response 3: \(response3)
-            """
-
             let requestBody: [String: Any] = [
                 "model": "gpt-4o",
                 "messages": [
-                    ["role": "system", "content": systemPrompt],
-                    ["role": "user", "content": userPrompt]
+                    ["role": "system", "content": WhisperVoice.systemPrompt],
+                    ["role": "user", "content": WhisperVoice.personalizedMantraPrompt(
+                        mood: mood,
+                        response1: response1,
+                        response2: response2,
+                        response3: response3
+                    )]
                 ],
                 "temperature": 0.8,
                 "max_tokens": 80
