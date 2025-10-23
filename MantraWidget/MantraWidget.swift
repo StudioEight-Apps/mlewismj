@@ -3,11 +3,23 @@ import SwiftUI
 
 struct Provider: TimelineProvider {
     func placeholder(in context: Context) -> SimpleEntry {
-        SimpleEntry(date: Date(), mantra: "Your daily whisper will appear here", mood: "calm")
+        SimpleEntry(
+            date: Date(),
+            mantra: "Your daily whisper will appear here",
+            mood: "calm",
+            backgroundImage: "whisper_bg_cream",
+            textColor: "#C22716"
+        )
     }
 
     func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> ()) {
-        let entry = SimpleEntry(date: Date(), mantra: "Breathe deeply and trust your journey", mood: "calm")
+        let entry = SimpleEntry(
+            date: Date(),
+            mantra: "Breathe deeply and trust your journey",
+            mood: "calm",
+            backgroundImage: "whisper_bg_cream",
+            textColor: "#C22716"
+        )
         completion(entry)
     }
 
@@ -15,16 +27,26 @@ struct Provider: TimelineProvider {
         let sharedDefaults = UserDefaults(suiteName: "group.com.studioeight.mantra")
         let mantra = sharedDefaults?.string(forKey: "latestMantra") ?? "How are you feeling today?"
         let mood = sharedDefaults?.string(forKey: "latestMood") ?? "calm"
+        let backgroundImage = sharedDefaults?.string(forKey: "widgetBackground") ?? "whisper_bg_cream"
+        let textColor = sharedDefaults?.string(forKey: "widgetTextColor") ?? "#C22716"
         let lastUpdated = sharedDefaults?.object(forKey: "lastUpdated") as? Date
         
         print("🔄 Widget Timeline Request:")
         print("   App Group: group.com.studioeight.mantra")
         print("   Mantra: \(mantra)")
         print("   Mood: \(mood)")
+        print("   Background: \(backgroundImage)")
+        print("   Text Color: \(textColor)")
         print("   Last Updated: \(lastUpdated?.formatted() ?? "never")")
         
         let currentDate = Date()
-        let entry = SimpleEntry(date: currentDate, mantra: mantra, mood: mood)
+        let entry = SimpleEntry(
+            date: currentDate,
+            mantra: mantra,
+            mood: mood,
+            backgroundImage: backgroundImage,
+            textColor: textColor
+        )
         
         let nextUpdate = Calendar.current.date(byAdding: .hour, value: 1, to: currentDate)!
         let timeline = Timeline(entries: [entry], policy: .after(nextUpdate))
@@ -37,6 +59,8 @@ struct SimpleEntry: TimelineEntry {
     let date: Date
     let mantra: String
     let mood: String
+    let backgroundImage: String
+    let textColor: String
 }
 
 struct MantraWidgetEntryView: View {
@@ -117,11 +141,12 @@ struct WhisperSmallWidget: View {
             // Top section with logo
             HStack {
                 Spacer()
-                Image("whisper_logo_light")
-                    .renderingMode(.original)
+                Image("whisper-logo")
+                    .renderingMode(.template)
                     .resizable()
                     .scaledToFit()
                     .frame(height: 14)
+                    .foregroundColor(Color(hex: entry.textColor))
                     .accessibilityLabel("Whisper")
                 Spacer()
             }
@@ -134,7 +159,7 @@ struct WhisperSmallWidget: View {
                 
                 Text(entry.mantra)
                     .font(.system(size: 13, weight: .regular))
-                    .foregroundColor(Color(hex: "#F4E6D1"))
+                    .foregroundColor(Color(hex: entry.textColor))
                     .multilineTextAlignment(.center)
                     .lineLimit(6)
                     .minimumScaleFactor(0.8)
@@ -146,23 +171,25 @@ struct WhisperSmallWidget: View {
                 HStack {
                     Text(entry.date.formatted(date: .omitted, time: .shortened))
                         .font(.system(size: 9, weight: .medium))
-                        .foregroundColor(Color(hex: "#F4E6D1"))
+                        .foregroundColor(Color(hex: entry.textColor))
                         .opacity(0.6)
                     
                     Spacer()
                     
                     Text(entry.mood.uppercased())
                         .font(.system(size: 9, weight: .medium))
-                        .foregroundColor(Color(hex: "#F4E6D1"))
+                        .foregroundColor(Color(hex: entry.textColor))
                         .opacity(0.6)
                 }
                 .padding(.bottom, 12)
                 .padding(.horizontal, 12)
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(hex: "#1C1C1E"))
-        .containerBackground(Color(hex: "#1C1C1E"), for: .widget)
+        .containerBackground(for: .widget) {
+            Image(entry.backgroundImage)
+                .resizable()
+                .scaledToFill()
+        }
         .widgetURL(URL(string: "whisper://daily"))
     }
 }
@@ -175,11 +202,12 @@ struct WhisperMediumWidget: View {
             // Top section with logo
             HStack {
                 Spacer()
-                Image("whisper_logo_light")
-                    .renderingMode(.original)
+                Image("whisper-logo")
+                    .renderingMode(.template)
                     .resizable()
                     .scaledToFit()
                     .frame(height: 16)
+                    .foregroundColor(Color(hex: entry.textColor))
                     .accessibilityLabel("Whisper")
                 Spacer()
             }
@@ -192,7 +220,7 @@ struct WhisperMediumWidget: View {
                 
                 Text(entry.mantra)
                     .font(.system(size: 15, weight: .regular))
-                    .foregroundColor(Color(hex: "#F4E6D1"))
+                    .foregroundColor(Color(hex: entry.textColor))
                     .multilineTextAlignment(.center)
                     .lineLimit(5)
                     .minimumScaleFactor(0.8)
@@ -204,23 +232,25 @@ struct WhisperMediumWidget: View {
                 HStack {
                     Text(entry.date.formatted(date: .omitted, time: .shortened))
                         .font(.system(size: 10, weight: .medium))
-                        .foregroundColor(Color(hex: "#F4E6D1"))
+                        .foregroundColor(Color(hex: entry.textColor))
                         .opacity(0.6)
                     
                     Spacer()
                     
                     Text(entry.mood.uppercased())
                         .font(.system(size: 10, weight: .medium))
-                        .foregroundColor(Color(hex: "#F4E6D1"))
+                        .foregroundColor(Color(hex: entry.textColor))
                         .opacity(0.6)
                 }
                 .padding(.bottom, 16)
                 .padding(.horizontal, 16)
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(hex: "#1C1C1E"))
-        .containerBackground(Color(hex: "#1C1C1E"), for: .widget)
+        .containerBackground(for: .widget) {
+            Image(entry.backgroundImage)
+                .resizable()
+                .scaledToFill()
+        }
         .widgetURL(URL(string: "whisper://daily"))
     }
 }
@@ -233,11 +263,12 @@ struct WhisperLargeWidget: View {
             // Top section with logo
             HStack {
                 Spacer()
-                Image("whisper_logo_light")
-                    .renderingMode(.original)
+                Image("whisper-logo")
+                    .renderingMode(.template)
                     .resizable()
                     .scaledToFit()
                     .frame(height: 18)
+                    .foregroundColor(Color(hex: entry.textColor))
                     .accessibilityLabel("Whisper")
                 Spacer()
             }
@@ -250,7 +281,7 @@ struct WhisperLargeWidget: View {
                 
                 Text(entry.mantra)
                     .font(.system(size: 17, weight: .regular))
-                    .foregroundColor(Color(hex: "#F4E6D1"))
+                    .foregroundColor(Color(hex: entry.textColor))
                     .multilineTextAlignment(.center)
                     .lineLimit(8)
                     .minimumScaleFactor(0.8)
@@ -262,23 +293,25 @@ struct WhisperLargeWidget: View {
                 HStack {
                     Text(entry.date.formatted(date: .omitted, time: .shortened))
                         .font(.system(size: 11, weight: .medium))
-                        .foregroundColor(Color(hex: "#F4E6D1"))
+                        .foregroundColor(Color(hex: entry.textColor))
                         .opacity(0.6)
                     
                     Spacer()
                     
                     Text(entry.mood.uppercased())
                         .font(.system(size: 11, weight: .medium))
-                        .foregroundColor(Color(hex: "#F4E6D1"))
+                        .foregroundColor(Color(hex: entry.textColor))
                         .opacity(0.6)
                 }
                 .padding(.bottom, 20)
                 .padding(.horizontal, 20)
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(hex: "#1C1C1E"))
-        .containerBackground(Color(hex: "#1C1C1E"), for: .widget)
+        .containerBackground(for: .widget) {
+            Image(entry.backgroundImage)
+                .resizable()
+                .scaledToFill()
+        }
         .widgetURL(URL(string: "whisper://daily"))
     }
 }
@@ -318,17 +351,35 @@ extension Color {
 #Preview(as: .systemSmall) {
     MantraWidget()
 } timeline: {
-    SimpleEntry(date: .now, mantra: "Create space for your feelings, then choose peace for your heart.", mood: "calm")
+    SimpleEntry(
+        date: .now,
+        mantra: "Create space for your feelings, then choose peace for your heart.",
+        mood: "calm",
+        backgroundImage: "whisper_bg_cream",
+        textColor: "#C22716"
+    )
 }
 
 #Preview(as: .systemMedium) {
     MantraWidget()
 } timeline: {
-    SimpleEntry(date: .now, mantra: "Every breath is a new beginning, every moment a chance to grow.", mood: "hopeful")
+    SimpleEntry(
+        date: .now,
+        mantra: "Every breath is a new beginning, every moment a chance to grow.",
+        mood: "hopeful",
+        backgroundImage: "blue_static",
+        textColor: "#F9C99D"
+    )
 }
 
 #Preview(as: .systemLarge) {
     MantraWidget()
 } timeline: {
-    SimpleEntry(date: .now, mantra: "Breathe deeply and trust your journey through life's beautiful moments and challenges that shape who you become.", mood: "reflective")
+    SimpleEntry(
+        date: .now,
+        mantra: "Breathe deeply and trust your journey through life's beautiful moments and challenges that shape who you become.",
+        mood: "reflective",
+        backgroundImage: "forest_green",
+        textColor: "#C5FFB3"
+    )
 }

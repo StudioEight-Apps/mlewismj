@@ -187,7 +187,7 @@ struct WelcomeView: View {
    var whisperCard: some View {
        ZStack(alignment: .bottomTrailing) {
            VStack(spacing: 0) {
-               Text("Today's Whisper")
+               Text(Date().formatted(.dateTime.month(.twoDigits).day(.twoDigits).year()))
                    .font(.system(size: 12, weight: .medium))
                    .tracking(0.5)
                    .foregroundColor(Color(hex: "#6A6A6A"))

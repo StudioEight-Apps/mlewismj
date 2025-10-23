@@ -9,28 +9,28 @@ struct MantraSummaryView: View {
     var mantra: String
     
     @Environment(\.dismiss) var dismiss
-    @State private var showingShareSheet = false
+    @ObservedObject var journalManager = JournalManager.shared
+    
+    @State private var currentEntry: JournalEntry?
     @State private var shareImage: UIImage?
     
-    // Authoritative background â†’ text color mapping (using whisper backgrounds)
-    private let backgroundPairings: [(background: String, textColor: String, logoDark: Bool)] = [
-        ("whisper_bg_01_bone", "#1E1B19", false),
-        ("whisper_bg_02_sand", "#1E1B19", false),
-        ("whisper_bg_03_taupe", "#1E1B19", false),
-        ("whisper_bg_04_clay", "#EAD8C9", true),
-        ("whisper_bg_05_terracotta", "#F2E2D6", true),
-        ("whisper_bg_06_olive", "#E6EAD9", true),
-        ("whisper_bg_07_sage", "#DDE7DC", true),
-        ("whisper_bg_08_moss", "#DFE7D6", true),
-        ("whisper_bg_09_cacao", "#ECDDC7", true),
-        ("whisper_bg_10_charcoal", "#E8DEC9", true)
-    ]
+    // Animation states
+    @State private var heartScale: CGFloat = 1.0
+    @State private var heartRotation: Double = 0
+    @State private var pinScale: CGFloat = 1.0
+    @State private var pinOffsetY: CGFloat = 0
+    @State private var shareScale: CGFloat = 1.0
+    @State private var shareRotation: Double = 0
     
-    @State private var selectedPairing: (background: String, textColor: String, logoDark: Bool) = ("whisper_bg_01_bone", "#1E1B19", false)
+    // Particle states for heart burst
+    @State private var particles: [HeartParticle] = []
+    
+    // Use centralized BackgroundConfig
+    @State private var selectedBackground: BackgroundConfig = BackgroundConfig.random()
     
     // Strip terminal punctuation from mantra
     private var cleanedMantra: String {
-        let terminalPunctuation = CharacterSet(charactersIn: ".,;:!?â€¦")
+        let terminalPunctuation = CharacterSet(charactersIn: ".,;:!?…")
         var cleaned = mantra.trimmingCharacters(in: .whitespacesAndNewlines)
         while let last = cleaned.last, terminalPunctuation.contains(String(last).unicodeScalars.first!) {
             cleaned = String(cleaned.dropLast())
@@ -56,7 +56,7 @@ struct MantraSummaryView: View {
                 
                 // Instagram-style quote card
                 ZStack {
-                    Image(selectedPairing.background)
+                    Image(selectedBackground.imageName)
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                         .frame(width: UIScreen.main.bounds.width * 0.68, height: UIScreen.main.bounds.width * 0.68)
@@ -65,7 +65,7 @@ struct MantraSummaryView: View {
                     VStack(spacing: 24) {
                         Text(cleanedMantra)
                             .font(.system(size: 26, weight: .bold, design: .serif))
-                            .foregroundColor(Color(hex: selectedPairing.textColor))
+                            .foregroundColor(Color(hex: selectedBackground.textColor))
                             .multilineTextAlignment(.center)
                             .lineLimit(3)
                             .lineSpacing(4)
@@ -79,7 +79,7 @@ struct MantraSummaryView: View {
                             .renderingMode(.template)
                             .aspectRatio(contentMode: .fit)
                             .frame(width: UIScreen.main.bounds.width * 0.68 * 0.13)
-                            .foregroundColor(Color(hex: selectedPairing.textColor))
+                            .foregroundColor(Color(hex: selectedBackground.textColor))
                             .opacity(0.82)
                     }
                 }
@@ -87,53 +87,77 @@ struct MantraSummaryView: View {
                 .cornerRadius(24)
                 .shadow(color: Color.black.opacity(0.12), radius: 20, x: 0, y: 10)
                 
-                Spacer().frame(height: 48)
+                Spacer().frame(height: 24)
                 
-                // Action buttons
-                HStack(spacing: 16) {
-                    Button(action: {
-                        updateWidget()
-                    }) {
-                        HStack(spacing: 8) {
-                            Image(systemName: "pin.circle.fill")
-                                .font(.system(size: 16, weight: .medium))
-                            Text("Pin to Widget")
-                                .font(.system(size: 17, weight: .semibold))
+                // Floating translucent action bar
+                ZStack {
+                    HStack(spacing: 0) {
+                        Spacer()
+                        
+                        // Pin button
+                        Button {
+                            togglePin()
+                        } label: {
+                            Image(systemName: currentEntry?.isPinned == true ? "pin.fill" : "pin")
+                                .font(.system(size: 18, weight: .light))
+                                .foregroundColor(currentEntry?.isPinned == true ? Color(hex: "#A6B4FF") : Color(hex: "#8A8A8A").opacity(0.7))
+                                .frame(width: 44, height: 44)
+                                .scaleEffect(pinScale)
+                                .offset(y: pinOffsetY)
                         }
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 24)
-                        .padding(.vertical, 16)
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(Color.black)
-                        )
-                    }
-                    .buttonStyle(ScaleButtonStyle())
-                    
-                    Button(action: {
-                        shareMantra()
-                    }) {
-                        HStack(spacing: 8) {
-                            Image(systemName: "square.and.arrow.up")
-                                .font(.system(size: 16, weight: .medium))
-                            Text("Share")
-                                .font(.system(size: 17, weight: .semibold))
+                        .buttonStyle(.plain)
+                        
+                        Spacer()
+                        
+                        // Share button
+                        Button {
+                            shareMantra()
+                        } label: {
+                            Image(systemName: "paperplane")
+                                .font(.system(size: 18, weight: .light))
+                                .foregroundColor(Color(hex: "#8A8A8A").opacity(0.7))
+                                .frame(width: 44, height: 44)
+                                .scaleEffect(shareScale)
+                                .rotationEffect(.degrees(shareRotation))
                         }
-                        .foregroundColor(Color(hex: "#2A2A2A"))
-                        .padding(.horizontal, 24)
-                        .padding(.vertical, 16)
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color(hex: "#E5E5E5"), lineWidth: 1)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .fill(Color.white)
-                                )
-                        )
+                        .buttonStyle(.plain)
+                        
+                        Spacer()
+                        
+                        // Favorite button with particles
+                        ZStack {
+                            Button {
+                                toggleFavorite()
+                            } label: {
+                                Image(systemName: currentEntry?.isFavorited == true ? "heart.fill" : "heart")
+                                    .font(.system(size: 20, weight: .light))
+                                    .foregroundColor(currentEntry?.isFavorited == true ? Color(hex: "#A6B4FF") : Color(hex: "#8A8A8A").opacity(0.7))
+                                    .frame(width: 44, height: 44)
+                                    .scaleEffect(heartScale)
+                                    .rotationEffect(.degrees(heartRotation))
+                            }
+                            .buttonStyle(.plain)
+                            
+                            // Particle burst overlay
+                            ForEach(particles) { particle in
+                                Circle()
+                                    .fill(Color(hex: "#A6B4FF"))
+                                    .frame(width: particle.size, height: particle.size)
+                                    .offset(x: particle.x, y: particle.y)
+                                    .opacity(particle.opacity)
+                                    .scaleEffect(particle.scale)
+                            }
+                        }
+                        
+                        Spacer()
                     }
-                    .buttonStyle(ScaleButtonStyle())
+                    .frame(width: UIScreen.main.bounds.width * 0.68)
+                    .frame(height: 60)
+                    .background(
+                        RoundedRectangle(cornerRadius: 30)
+                            .fill(.ultraThinMaterial)
+                    )
                 }
-                .padding(.horizontal, 28)
                 
                 Spacer()
             }
@@ -177,9 +201,11 @@ struct MantraSummaryView: View {
         .navigationBarHidden(true)
         .toolbar(.hidden, for: .navigationBar)
         .onAppear {
-            // Random background selection every time
-            let index = Int.random(in: 0..<backgroundPairings.count)
-            selectedPairing = backgroundPairings[index]
+            // Random background selection using BackgroundConfig
+            selectedBackground = BackgroundConfig.random()
+            
+            // Save entry immediately when view appears
+            saveJournalEntry()
             
             // Hide navigation bar
             Task { @MainActor in
@@ -192,40 +218,126 @@ struct MantraSummaryView: View {
         }
     }
     
-    private func updateWidget() {
-        if let sharedDefaults = UserDefaults(suiteName: "group.com.studioeight.mantra") {
-            sharedDefaults.set(mantra, forKey: "latestMantra")
-            sharedDefaults.set(mood, forKey: "latestMood")
-            sharedDefaults.set(Date(), forKey: "lastUpdated")
-            sharedDefaults.synchronize()
+    private func togglePin() {
+        guard let entry = currentEntry else { return }
+        
+        // Twitter-style bounce animation
+        withAnimation(.interpolatingSpring(stiffness: 300, damping: 15)) {
+            pinScale = 1.3
+            pinOffsetY = -3
+        }
+        
+        withAnimation(.interpolatingSpring(stiffness: 300, damping: 10).delay(0.1)) {
+            pinScale = 1.0
+            pinOffsetY = 0
+        }
+        
+        journalManager.togglePin(entry)
+        
+        // Update local state to reflect the change
+        if let index = journalManager.entries.firstIndex(where: { $0.id == entry.id }) {
+            currentEntry = journalManager.entries[index]
+        }
+        
+        Task { @MainActor in
+            let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+            impactFeedback.impactOccurred()
+        }
+    }
+    
+    private func toggleFavorite() {
+        guard let entry = currentEntry else { return }
+        
+        // Only create particles when favoriting (not unfavoriting)
+        let isFavoriting = !(currentEntry?.isFavorited ?? false)
+        
+        // Twitter heart animation - scale + wiggle
+        withAnimation(.interpolatingSpring(stiffness: 300, damping: 12)) {
+            heartScale = 1.3
+            heartRotation = -8
+        }
+        
+        withAnimation(.interpolatingSpring(stiffness: 300, damping: 10).delay(0.1)) {
+            heartScale = 1.0
+            heartRotation = 0
+        }
+        
+        // Create particle burst
+        if isFavoriting {
+            createParticleBurst()
+        }
+        
+        journalManager.toggleFavorite(entry)
+        
+        // Update local state to reflect the change
+        if let index = journalManager.entries.firstIndex(where: { $0.id == entry.id }) {
+            currentEntry = journalManager.entries[index]
+        }
+        
+        Task { @MainActor in
+            let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+            impactFeedback.impactOccurred()
+        }
+    }
+    
+    private func createParticleBurst() {
+        // Create 6-8 particles in random directions
+        let particleCount = Int.random(in: 6...8)
+        var newParticles: [HeartParticle] = []
+        
+        for i in 0..<particleCount {
+            let angle = (Double(i) / Double(particleCount)) * 360.0 + Double.random(in: -20...20)
+            let distance = Double.random(in: 30...50)
             
-            WidgetCenter.shared.reloadAllTimelines()
-            WidgetCenter.shared.reloadTimelines(ofKind: "MantraWidget")
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                WidgetCenter.shared.reloadTimelines(ofKind: "MantraWidget")
+            let particle = HeartParticle(
+                id: UUID(),
+                x: 0,
+                y: 0,
+                size: CGFloat.random(in: 4...7),
+                opacity: 1.0,
+                scale: 1.0,
+                angle: angle,
+                distance: distance
+            )
+            newParticles.append(particle)
+        }
+        
+        particles = newParticles
+        
+        // Animate particles outward and fade
+        withAnimation(.easeOut(duration: 0.6)) {
+            for i in 0..<particles.count {
+                let angle = particles[i].angle * .pi / 180
+                particles[i].x = cos(angle) * particles[i].distance
+                particles[i].y = sin(angle) * particles[i].distance
+                particles[i].opacity = 0
+                particles[i].scale = 0.3
             }
-            
-            Task { @MainActor in
-                let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
-                impactFeedback.impactOccurred()
-            }
-            
-            print("Widget updated with mantra: \(mantra)")
+        }
+        
+        // Clean up particles after animation
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+            particles.removeAll()
         }
     }
     
     private func shareMantra() {
+        // Twitter-style share animation - scale + rotate
+        withAnimation(.interpolatingSpring(stiffness: 300, damping: 15)) {
+            shareScale = 1.2
+            shareRotation = 10
+        }
+        
+        withAnimation(.interpolatingSpring(stiffness: 300, damping: 10).delay(0.1)) {
+            shareScale = 1.0
+            shareRotation = 0
+        }
+        
         Task { @MainActor in
-            // Use the current selected pairing instead of random
-            let currentPairing = (
-                background: selectedPairing.background,
-                textColor: selectedPairing.textColor
-            )
-            
+            // Use the current selected background
             let cardView = ZStack {
                 // Background image
-                Image(currentPairing.background)
+                Image(selectedBackground.imageName)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 1080, height: 1080)
@@ -235,7 +347,7 @@ struct MantraSummaryView: View {
                     // Hero quote text
                     Text(cleanedMantra)
                         .font(.system(size: 80, weight: .bold, design: .serif))
-                        .foregroundColor(Color(hex: currentPairing.textColor))
+                        .foregroundColor(Color(hex: selectedBackground.textColor))
                         .multilineTextAlignment(.center)
                         .lineLimit(3)
                         .lineSpacing(10)
@@ -250,7 +362,7 @@ struct MantraSummaryView: View {
                         .renderingMode(.template)
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 140)
-                        .foregroundColor(Color(hex: currentPairing.textColor))
+                        .foregroundColor(Color(hex: selectedBackground.textColor))
                         .opacity(0.82)
                 }
             }
@@ -273,8 +385,6 @@ struct MantraSummaryView: View {
     }
     
     private func completeJournalingSession() {
-        saveJournalEntry()
-        
         Task { @MainActor in
             let impactFeedback = UIImpactFeedbackGenerator(style: .light)
             impactFeedback.impactOccurred()
@@ -284,20 +394,32 @@ struct MantraSummaryView: View {
     }
     
     func saveJournalEntry() {
-        let existingEntry = JournalManager.shared.entries.first { entry in
+        // Check if entry already exists
+        let existingEntry = journalManager.entries.first { entry in
             entry.mood == mood &&
             entry.text == mantra &&
             Calendar.current.isDate(entry.date, inSameDayAs: Date())
         }
         
-        if existingEntry == nil {
-            JournalManager.shared.saveEntry(
+        if let existing = existingEntry {
+            currentEntry = existing
+        } else {
+            journalManager.saveEntry(
                 mood: mood,
                 response1: prompt1,
                 response2: prompt2,
                 response3: prompt3,
                 mantra: mantra
             )
+            
+            // Find the newly created entry
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                currentEntry = journalManager.entries.first { entry in
+                    entry.mood == mood &&
+                    entry.text == mantra &&
+                    Calendar.current.isDate(entry.date, inSameDayAs: Date())
+                }
+            }
         }
     }
     
@@ -326,7 +448,7 @@ struct MantraSummaryView: View {
             if let navController = findNavigationController(in: child) {
                 return navController
             }
-            }
+        }
         return nil
     }
 }

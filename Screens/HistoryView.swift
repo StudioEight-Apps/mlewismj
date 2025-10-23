@@ -1,127 +1,48 @@
 import SwiftUI
 
+// MARK: - History View
 struct HistoryView: View {
     @ObservedObject var journalManager = JournalManager.shared
     @State private var showingCalendar = false
     @State private var selectedDate: Date?
     @State private var scrollToDate: Date?
-    @State private var filterByDate: Date? // New: for filtering entries
+    @State private var filterByDate: Date?
+    @State private var selectedTab: HistoryTab = .all
 
-    var filteredEntries: [JournalEntry] {
-        if let filterDate = filterByDate {
-            let calendar = Calendar.current
-            return journalManager.entries.filter { calendar.isDate($0.date, inSameDayAs: filterDate) }
-        } else {
-            // Show ALL entries from ALL time, not just current month
-            return journalManager.entries
-        }
-    }
+    enum HistoryTab { case all, favorites }
 
+    // Keep this tiny so Swift's type checker is happy
     var body: some View {
         ZStack {
-            Color(hex: "#FFFCF5") // ✅ Consistent background
-                .ignoresSafeArea()
+            Color(hex: "#FFFCF5").ignoresSafeArea()
 
-            if filteredEntries.isEmpty {
-                VStack(spacing: 20) {
-                    Image(systemName: "book.closed")
-                        .font(.system(size: 60))
-                        .foregroundColor(Color(hex: "#5B5564"))
+            VStack(spacing: 0) {
+                segmentedControl
 
-                    Text(filterByDate != nil ? "No thoughts for this date" : "No thoughts yet")
-                        .font(.title2)
-                        .fontWeight(.medium)
-                        .foregroundColor(Color(hex: "#2B2834"))
-
-                    Text(filterByDate != nil ? "Try selecting a different date" : "Create your first thought to see it here")
-                        .font(.body)
-                        .foregroundColor(Color(hex: "#5B5564"))
-                        .multilineTextAlignment(.center)
-                    
-                    // Show reset button if filtering by date - FIXED
-                    if filterByDate != nil {
-                        Button("Show All Entries") {
-                            withAnimation {
-                                filterByDate = nil
-                            }
-                        }
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 10)
-                        .background(Color(hex: "#A6B4FF")) // ✅ Fixed color
-                        .cornerRadius(20)
-                        .buttonStyle(PlainButtonStyle())
-                        .shadow(radius: 0)
-                    }
-                }
-                .padding()
-            } else {
-                VStack(spacing: 0) {
-                    // Filter indicator and reset button
-                    if let filterDate = filterByDate {
-                        HStack {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Showing entries for:")
-                                    .font(.system(size: 12, weight: .medium))
-                                    .foregroundColor(Color(hex: "#5B5564"))
-                                
-                                Text(DateFormatter.mediumDate.string(from: filterDate))
-                                    .font(.system(size: 14, weight: .semibold))
-                                    .foregroundColor(Color(hex: "#2A2A2A"))
-                            }
-                            
-                            Spacer()
-                            
-                            Button("Show All") {
-                                withAnimation {
-                                    filterByDate = nil
-                                }
-                            }
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
-                            .background(Color(hex: "#A6B4FF")) // ✅ Fixed color
-                            .cornerRadius(16)
-                            .buttonStyle(PlainButtonStyle())
-                            .shadow(radius: 0)
-                        }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 12)
-                        .background(Color.white.opacity(0.7))
-                        .cornerRadius(12)
+                if filteredEntries.isEmpty {
+                    EmptyStateView(
+                        isFavoritesTab: selectedTab == .favorites,
+                        hasDateFilter: filterByDate != nil,
+                        clearFilter: { withAnimation { filterByDate = nil } }
+                    )
+                    .padding()
+                } else {
+                    if let d = filterByDate {
+                        FilterHeaderView(
+                            date: d,
+                            clearFilter: { withAnimation { filterByDate = nil } }
+                        )
                         .padding(.horizontal, 16)
                         .padding(.top, 8)
                     }
-                    
-                    ScrollViewReader { proxy in
-                        ScrollView {
-                            LazyVStack(spacing: 12) {
-                                ForEach(filteredEntries.sorted(by: { $0.date > $1.date }), id: \.id) { entry in
-                                    HistoryCardView(entry: entry)
-                                        .id(entry.id) // Use entry.id instead of date for unique identification
-                                }
-                            }
-                            .padding(.horizontal, 16)
-                            .padding(.top, 20)
-                            .padding(.bottom, 100)
-                        }
-                        .onChange(of: scrollToDate) { oldValue, newValue in
-                            if let date = newValue {
-                                // Find the first entry for this date to scroll to
-                                if let targetEntry = filteredEntries.first(where: { Calendar.current.isDate($0.date, inSameDayAs: date) }) {
-                                    withAnimation(.easeInOut(duration: 0.8)) {
-                                        proxy.scrollTo(targetEntry.id, anchor: .top)
-                                    }
-                                }
-                            }
-                        }
-                    }
+
+                    EntryListView(
+                        entries: filteredEntries.sorted(by: { $0.date > $1.date }),
+                        scrollToDate: $scrollToDate
+                    )
                 }
             }
-            
-            // Calendar Overlay
+
             if showingCalendar {
                 CalendarPickerView(
                     journalEntries: journalManager.entries,
@@ -149,11 +70,8 @@ struct HistoryView: View {
                     .frame(height: 32)
                     .accessibilityLabel("Whisper")
             }
-            
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: {
-                    showingCalendar = true
-                }) {
+                Button { showingCalendar = true } label: {
                     Image(systemName: "calendar")
                         .font(.system(size: 20, weight: .medium))
                         .foregroundColor(Color(hex: "#2A2A2A"))
@@ -162,79 +80,195 @@ struct HistoryView: View {
             }
         }
     }
+
+    // MARK: - Segmented control
+    private var segmentedControl: some View {
+        Picker("", selection: $selectedTab) {
+            Text("All").tag(HistoryTab.all)
+            Text("Favorites").tag(HistoryTab.favorites)
+        }
+        .pickerStyle(.segmented)
+        .padding(.horizontal, 16)
+        .padding(.top, 12)
+        .padding(.bottom, 8)
+    }
+
+    // MARK: - Filtering
+    private var filteredEntries: [JournalEntry] {
+        let base: [JournalEntry] = (selectedTab == .favorites)
+        ? journalManager.favoritedEntries
+        : journalManager.entries
+
+        if let d = filterByDate {
+            let cal = Calendar.current
+            return base.filter { cal.isDate($0.date, inSameDayAs: d) }
+        }
+        return base
+    }
 }
 
-// MARK: - Calendar Picker View
+// MARK: - Small subviews to keep type-checking fast
+private struct EmptyStateView: View {
+    let isFavoritesTab: Bool
+    let hasDateFilter: Bool
+    let clearFilter: () -> Void
+
+    var body: some View {
+        VStack(spacing: 20) {
+            Spacer()
+
+            Image(systemName: isFavoritesTab ? "heart" : "book.closed")
+                .font(.system(size: 60))
+                .foregroundColor(Color(hex: "#5B5564"))
+
+            Text(isFavoritesTab ? "No favorites yet" : "No thoughts yet")
+                .font(.title2).fontWeight(.medium)
+                .foregroundColor(Color(hex: "#2B2834"))
+
+            Text(isFavoritesTab
+                 ? "Tap the heart on entries you love"
+                 : (hasDateFilter ? "Try selecting a different date" : "Create your first thought to see it here"))
+            .font(.body)
+            .foregroundColor(Color(hex: "#5B5564"))
+            .multilineTextAlignment(.center)
+
+            if hasDateFilter {
+                Button("Show All Entries") { clearFilter() }
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 10)
+                    .background(Color(hex: "#A6B4FF"))
+                    .cornerRadius(20)
+                    .buttonStyle(.plain)
+            }
+
+            Spacer()
+        }
+    }
+}
+
+private struct FilterHeaderView: View {
+    let date: Date
+    let clearFilter: () -> Void
+
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Showing entries for:")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(Color(hex: "#5B5564"))
+
+                Text(DateFormatter.mediumDate.string(from: date))
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(Color(hex: "#2A2A2A"))
+            }
+
+            Spacer()
+
+            Button("Show All") { clearFilter() }
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(.white)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .background(Color(hex: "#A6B4FF"))
+                .cornerRadius(16)
+                .buttonStyle(.plain)
+        }
+        .padding(.vertical, 12)
+        .background(Color.white.opacity(0.7))
+        .cornerRadius(12)
+    }
+}
+
+private struct EntryListView: View {
+    let entries: [JournalEntry]
+    @State private var localScrollToDate: Date?
+    @Binding var scrollToDate: Date?
+
+    var body: some View {
+        ScrollViewReader { proxy in
+            ScrollView {
+                LazyVStack(spacing: 16) {
+                    ForEach(entries, id: \.id) { entry in
+                        HistoryCardView(entry: entry)
+                            .id(entry.id)
+                    }
+                }
+                .padding(.horizontal, 16)
+                .padding(.top, 20)
+                .padding(.bottom, 100)
+            }
+            .onChange(of: scrollToDate) { _, newValue in
+                guard let d = newValue else { return }
+                if let target = entries.first(where: { Calendar.current.isDate($0.date, inSameDayAs: d) }) {
+                    withAnimation(.easeInOut(duration: 0.8)) {
+                        proxy.scrollTo(target.id, anchor: .top)
+                    }
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Calendar Picker (unchanged logic; just tidy)
 struct CalendarPickerView: View {
     let journalEntries: [JournalEntry]
     @Binding var isPresented: Bool
     @Binding var selectedDate: Date?
     let onDateSelected: (Date) -> Void
-    
-    @State private var tempSelectedDate: Date? // Temporary selection until OK is pressed
-    
-    // Start from May 2025 and work backwards/forwards
+
+    @State private var tempSelectedDate: Date?
+
     private var dateRange: (earliest: Date, latest: Date) {
-        let calendar = Calendar.current
-        let may2025 = calendar.date(from: DateComponents(year: 2025, month: 5, day: 1)) ?? Date()
-        let currentDate = Date()
+        let cal = Calendar.current
+        let now = Date()
         
-        // Extend range based on entries if they exist outside May 2025
+        // May 2025 is the absolute earliest date users can scroll to
+        let may2025 = cal.date(from: DateComponents(year: 2025, month: 5, day: 1)) ?? now
+        // Go forward 6 months from now as the default latest date
+        let defaultLatest = cal.date(byAdding: .month, value: 6, to: now) ?? now
+
         if !journalEntries.isEmpty {
-            let entryDates = journalEntries.map { $0.date }
-            let earliestEntry = entryDates.min() ?? may2025
-            let latestEntry = entryDates.max() ?? currentDate
-            
-            let earliest = min(earliestEntry, may2025)
-            let latest = max(latestEntry, calendar.date(byAdding: .month, value: 6, to: currentDate) ?? currentDate)
-            
+            let dates = journalEntries.map { $0.date }
+            // Use May 2025 or earliest entry, whichever is earlier
+            let earliest = min(dates.min() ?? may2025, may2025)
+            let latestContent = dates.max() ?? now
+            let latest = max(latestContent, defaultLatest)
             return (earliest, latest)
         } else {
-            // Default range: May 2025 to 6 months from now
-            let latest = calendar.date(byAdding: .month, value: 6, to: currentDate) ?? currentDate
-            return (may2025, latest)
+            // No entries: still show May 2025 to 6 months from now
+            return (may2025, defaultLatest)
         }
     }
-    
+
     var body: some View {
         ZStack {
-            // Blur background
             Color.black.opacity(0.3)
                 .ignoresSafeArea()
                 .background(.ultraThinMaterial)
-                .onTapGesture {
-                    isPresented = false
-                }
-            
-            // Calendar Card
+                .onTapGesture { isPresented = false }
+
             VStack(spacing: 0) {
-                // Header - better centered alignment
                 HStack {
-                    // Left spacer to balance the X button
-                    Spacer()
-                        .frame(width: 44) // Same width as X button
-                    
+                    Spacer().frame(width: 44)
                     Spacer()
                     Text("Select Date")
                         .font(.system(size: 18, weight: .semibold))
                         .foregroundColor(Color(hex: "#2A2A2A"))
                     Spacer()
-                    
-                    Button(action: {
-                        isPresented = false
-                    }) {
+                    Button { isPresented = false } label: {
                         Image(systemName: "xmark")
                             .font(.system(size: 16, weight: .medium))
                             .foregroundColor(Color(hex: "#2A2A2A"))
                             .frame(width: 44, height: 44)
                     }
-                    .buttonStyle(PlainButtonStyle())
+                    .buttonStyle(.plain)
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 20)
                 .padding(.bottom, 16)
-                
-                // Scrollable Calendar
+
                 ScrollViewReader { proxy in
                     ScrollView(.vertical, showsIndicators: false) {
                         LazyVStack(spacing: 30) {
@@ -243,9 +277,7 @@ struct CalendarPickerView: View {
                                     month: month,
                                     journalEntries: journalEntries,
                                     selectedDate: $tempSelectedDate,
-                                    onDateTapped: { date in
-                                        tempSelectedDate = date
-                                    }
+                                    onDateTapped: { tempSelectedDate = $0 }
                                 )
                                 .id(month)
                             }
@@ -254,31 +286,28 @@ struct CalendarPickerView: View {
                     }
                     .frame(height: 300)
                     .onAppear {
-                        // Scroll to May 2025 on first load
-                        let calendar = Calendar.current
-                        if let may2025 = calendar.date(from: DateComponents(year: 2025, month: 5, day: 1)) {
-                            proxy.scrollTo(may2025, anchor: .center)
+                        let cal = Calendar.current
+                        // Scroll to current month instead of hardcoded date
+                        let now = Date()
+                        if let currentMonthStart = cal.dateInterval(of: .month, for: now)?.start {
+                            proxy.scrollTo(currentMonthStart, anchor: .center)
                         }
                     }
                 }
-                
-                // Continue Button - FIXED
-                Button(action: {
-                    if let selectedDate = tempSelectedDate {
-                        onDateSelected(selectedDate)
-                    }
+
+                Button {
+                    if let d = tempSelectedDate { onDateSelected(d) }
                     isPresented = false
-                }) {
+                } label: {
                     Text("Continue")
                         .font(.system(size: 16, weight: .medium))
                         .foregroundColor(tempSelectedDate != nil ? .white : Color(hex: "#999999"))
                         .frame(maxWidth: .infinity)
                         .frame(height: 50)
-                        .background(tempSelectedDate != nil ? Color(hex: "#A6B4FF") : Color(hex: "#f0f0f0")) // ✅ Fixed color
+                        .background(tempSelectedDate != nil ? Color(hex: "#A6B4FF") : Color(hex: "#f0f0f0"))
                         .cornerRadius(12)
                 }
-                .buttonStyle(PlainButtonStyle())
-                .shadow(radius: 0)
+                .buttonStyle(.plain)
                 .disabled(tempSelectedDate == nil)
                 .padding(.horizontal, 20)
                 .padding(.vertical, 20)
@@ -288,22 +317,21 @@ struct CalendarPickerView: View {
             .cornerRadius(20)
         }
     }
-    
+
     private func generateMonths() -> [Date] {
-        let calendar = Calendar.current
+        let cal = Calendar.current
         let range = dateRange
         var months: [Date] = []
-        
-        var currentMonth = calendar.dateInterval(of: .month, for: range.earliest)?.start ?? range.earliest
-        let endMonth = calendar.dateInterval(of: .month, for: range.latest)?.start ?? range.latest
-        
-        while currentMonth <= endMonth {
-            months.append(currentMonth)
-            guard let nextMonth = calendar.date(byAdding: .month, value: 1, to: currentMonth) else { break }
-            currentMonth = nextMonth
+
+        var current = cal.dateInterval(of: .month, for: range.earliest)?.start ?? range.earliest
+        let end     = cal.dateInterval(of: .month, for: range.latest)?.start   ?? range.latest
+
+        while current <= end {
+            months.append(current)
+            guard let next = cal.date(byAdding: .month, value: 1, to: current) else { break }
+            current = next
         }
-        
-        return months // Chronological order - earliest first (so scroll up = past, scroll down = future)
+        return months
     }
 }
 
@@ -313,17 +341,16 @@ struct MonthCalendarView: View {
     let journalEntries: [JournalEntry]
     @Binding var selectedDate: Date?
     let onDateTapped: (Date) -> Void
-    
+
     private let calendar = Calendar.current
     private let dateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMMM yyyy"
-        return formatter
+        let f = DateFormatter()
+        f.dateFormat = "MMMM yyyy"
+        return f
     }()
-    
+
     var body: some View {
         VStack(spacing: 16) {
-            // Month Header - centered and properly aligned
             HStack {
                 Spacer()
                 Text(dateFormatter.string(from: month))
@@ -331,9 +358,8 @@ struct MonthCalendarView: View {
                     .foregroundColor(Color(hex: "#2A2A2A"))
                 Spacer()
             }
-            
+
             VStack(spacing: 0) {
-                // Weekday Headers - like Airbnb
                 HStack(spacing: 0) {
                     ForEach(["S", "M", "T", "W", "T", "F", "S"], id: \.self) { day in
                         Text(day)
@@ -343,26 +369,23 @@ struct MonthCalendarView: View {
                             .frame(height: 32)
                     }
                 }
-                
-                // Calendar Grid - exactly like Airbnb
+
                 let days = generateDaysInMonth()
                 let weeks = days.chunked(into: 7)
-                
+
                 VStack(spacing: 0) {
-                    ForEach(0..<weeks.count, id: \.self) { weekIndex in
+                    ForEach(0..<weeks.count, id: \.self) { w in
                         HStack(spacing: 0) {
-                            ForEach(0..<7, id: \.self) { dayIndex in
-                                if dayIndex < weeks[weekIndex].count {
+                            ForEach(0..<7, id: \.self) { i in
+                                if i < weeks[w].count {
                                     CalendarDayView(
-                                        dayData: weeks[weekIndex][dayIndex],
+                                        dayData: weeks[w][i],
                                         journalEntries: journalEntries,
                                         selectedDate: selectedDate,
                                         onDateTapped: onDateTapped
                                     )
                                 } else {
-                                    // Empty cell
-                                    Rectangle()
-                                        .fill(Color.clear)
+                                    Rectangle().fill(Color.clear)
                                         .frame(maxWidth: .infinity)
                                         .frame(height: 40)
                                 }
@@ -373,28 +396,25 @@ struct MonthCalendarView: View {
             }
         }
     }
-    
+
     private func generateDaysInMonth() -> [CalendarDayData] {
-        guard let monthRange = calendar.range(of: .day, in: .month, for: month),
-              let firstDayOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: month)) else {
+        guard let range = calendar.range(of: .day, in: .month, for: month),
+              let first = calendar.date(from: calendar.dateComponents([.year, .month], from: month)) else {
             return []
         }
-        
-        let firstWeekday = calendar.component(.weekday, from: firstDayOfMonth)
+
+        let firstWeekday = calendar.component(.weekday, from: first)
         var days: [CalendarDayData] = []
-        
-        // Add empty days for the beginning of the month
+
         for _ in 1..<firstWeekday {
             days.append(CalendarDayData(date: nil, dayNumber: nil))
         }
-        
-        // Add actual days of the month
-        for day in monthRange {
-            if let date = calendar.date(byAdding: .day, value: day - 1, to: firstDayOfMonth) {
+
+        for day in range {
+            if let date = calendar.date(byAdding: .day, value: day - 1, to: first) {
                 days.append(CalendarDayData(date: date, dayNumber: day))
             }
         }
-        
         return days
     }
 }
@@ -405,55 +425,37 @@ struct CalendarDayView: View {
     let journalEntries: [JournalEntry]
     let selectedDate: Date?
     let onDateTapped: (Date) -> Void
-    
+
     private var entriesForDay: [JournalEntry] {
         guard let date = dayData.date else { return [] }
-        let calendar = Calendar.current
-        let entries = journalEntries.filter { calendar.isDate($0.date, inSameDayAs: date) }
-        
-        // Debug logging
-        if !entries.isEmpty {
-            let formatter = DateFormatter()
-            formatter.dateStyle = .short
-            print("📅 Date: \(formatter.string(from: date)) has \(entries.count) entries:")
-            for entry in entries {
-                print("  - \(entry.mood): \(entry.text.prefix(30))...")
-            }
-        }
-        
-        return entries
+        return journalEntries.filter { Calendar.current.isDate($0.date, inSameDayAs: date) }
     }
-    
+
     private var isToday: Bool {
         guard let date = dayData.date else { return false }
         return Calendar.current.isDateInToday(date)
     }
-    
+
     private var isSelected: Bool {
         guard let date = dayData.date, let selected = selectedDate else { return false }
         return Calendar.current.isDate(date, inSameDayAs: selected)
     }
-    
+
     var body: some View {
-        Button(action: {
-            if let date = dayData.date {
-                onDateTapped(date)
-            }
-        }) {
+        Button {
+            if let date = dayData.date { onDateTapped(date) }
+        } label: {
             VStack(spacing: 4) {
-                // Day number - Airbnb style - FIXED
                 Text(dayData.dayNumber?.description ?? "")
                     .font(.system(size: 16, weight: .medium))
                     .foregroundColor(
                         dayData.date == nil ? Color.clear :
-                        isSelected ? .white :
-                        isToday ? Color(hex: "#A6B4FF") : // ✅ Fixed color
-                        Color(hex: "#2A2A2A")
+                        (isSelected ? .white :
+                         (isToday ? Color(hex: "#A6B4FF") : Color(hex: "#2A2A2A")))
                     )
-                
-                // Mood dots - horizontal row like Airbnb
+
                 HStack(spacing: 2) {
-                    ForEach(Array(entriesForDay.prefix(4).enumerated()), id: \.offset) { index, entry in
+                    ForEach(Array(entriesForDay.prefix(4).enumerated()), id: \.offset) { _, entry in
                         Circle()
                             .fill(Color(hex: entry.colorHex))
                             .frame(width: 4, height: 4)
@@ -464,18 +466,17 @@ struct CalendarDayView: View {
             .frame(maxWidth: .infinity)
             .frame(height: 40)
             .background(
-                // Selected state - FIXED
-                isSelected ? Color(hex: "#A6B4FF") : // ✅ Fixed color
-                (entriesForDay.isEmpty ? Color.clear : Color(hex: "#A6B4FF").opacity(0.1)) // ✅ Fixed color
+                isSelected ? Color(hex: "#A6B4FF") :
+                (entriesForDay.isEmpty ? Color.clear : Color(hex: "#A6B4FF").opacity(0.1))
             )
             .cornerRadius(8)
         }
-        .buttonStyle(PlainButtonStyle())
+        .buttonStyle(.plain)
         .disabled(dayData.date == nil)
     }
 }
 
-// MARK: - Supporting Data Structures and Extensions
+// MARK: - Supporting Types / Utils
 struct CalendarDayData {
     let date: Date?
     let dayNumber: Int?
@@ -483,7 +484,7 @@ struct CalendarDayData {
 
 extension Array {
     func chunked(into size: Int) -> [[Element]] {
-        return stride(from: 0, to: count, by: size).map {
+        stride(from: 0, to: count, by: size).map {
             Array(self[$0..<Swift.min($0 + size, count)])
         }
     }
@@ -491,116 +492,336 @@ extension Array {
 
 extension DateFormatter {
     static let mediumDate: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        return formatter
+        let f = DateFormatter()
+        f.dateStyle = .medium
+        return f
     }()
 }
 
-// MARK: - Original History Card View (unchanged)
+// MARK: - History Card (with animations) - POLISHED VERSION
 struct HistoryCardView: View {
+    @ObservedObject var journalManager = JournalManager.shared
     let entry: JournalEntry
     @State private var isExpanded = false
+    
+    // Animation states
+    @State private var heartScale: CGFloat = 1.0
+    @State private var heartRotation: Double = 0
+    @State private var pinScale: CGFloat = 1.0
+    @State private var pinOffsetY: CGFloat = 0
+    @State private var shareScale: CGFloat = 1.0
+    @State private var shareRotation: Double = 0
+    @State private var particles: [HeartParticle] = []
 
-    private var moodColor: Color {
-        Color(hex: entry.colorHex)
-    }
+    private var moodColor: Color { Color(hex: entry.colorHex) }
 
     private var formattedDate: String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        return formatter.string(from: entry.date)
+        let f = DateFormatter()
+        f.dateStyle = .medium
+        return f.string(from: entry.date)
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            VStack(alignment: .leading, spacing: 12) {
+            // MARK: - Header (Date & Mood Badge) - BETTER SPACING
+            HStack(alignment: .center, spacing: 0) {
                 Text(formattedDate)
-                    .font(.system(size: 14))
-                    .foregroundColor(Color(hex: "#5B5564"))
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(Color(hex: "#7C7C7C"))
+                
+                Spacer()
+                
+                Text(entry.mood.capitalized)
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 6)
+                    .background(moodColor)
+                    .clipShape(Capsule())
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 18)
+            .padding(.bottom, 14)
 
-                HStack {
-                    Text(entry.mood)
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 4)
-                        .background(moodColor)
-                        .clipShape(Capsule())
-
-                    Spacer()
-                }
-
+            // MARK: - Mantra Text - COMPACT
+            HStack(alignment: .top) {
                 Text(entry.text.isEmpty ? "Your personalized thought will appear here once complete." : entry.text)
                     .font(.system(size: 18, weight: .semibold))
                     .foregroundColor(Color(hex: "#2B2834"))
+                    .lineSpacing(4)
                     .multilineTextAlignment(.leading)
                     .lineLimit(isExpanded ? nil : 3)
-                    .padding(.bottom, 10)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                
+                Spacer(minLength: 0)
             }
-            .padding(.top, 20)
             .padding(.horizontal, 20)
+            .padding(.bottom, 14)
+            .frame(minHeight: 55, alignment: .top)
 
+            // MARK: - Action Buttons - SOFT & MINIMAL
+            HStack(spacing: 4) {
+                // Pin Button
+                Button {
+                    animatePin()
+                    journalManager.togglePin(entry)
+                } label: {
+                    Image(systemName: entry.isPinned ? "pin.fill" : "pin")
+                        .font(.system(size: 18, weight: .light))
+                        .foregroundColor(entry.isPinned ? Color(hex: "#A6B4FF") : Color(hex: "#9E9E9E"))
+                        .frame(width: 36, height: 36)
+                        .scaleEffect(pinScale)
+                        .offset(y: pinOffsetY)
+                }
+                .buttonStyle(.plain)
+
+                // Share Button
+                Button {
+                    animateShare()
+                    shareWhisper()
+                } label: {
+                    Image(systemName: "paperplane")
+                        .font(.system(size: 17, weight: .light))
+                        .foregroundColor(Color(hex: "#9E9E9E"))
+                        .frame(width: 36, height: 36)
+                        .scaleEffect(shareScale)
+                        .rotationEffect(.degrees(shareRotation))
+                }
+                .buttonStyle(.plain)
+
+                Spacer()
+
+                // Favorite Button with particles
+                Button {
+                    animateFavorite()
+                    journalManager.toggleFavorite(entry)
+                } label: {
+                    ZStack {
+                        Image(systemName: entry.isFavorited ? "heart.fill" : "heart")
+                            .font(.system(size: 19, weight: .light))
+                            .foregroundColor(entry.isFavorited ? Color(hex: "#A6B4FF") : Color(hex: "#9E9E9E"))
+                            .frame(width: 36, height: 36)
+                            .scaleEffect(heartScale)
+                            .rotationEffect(.degrees(heartRotation))
+                        
+                        // Particle burst overlay
+                        ForEach(particles) { particle in
+                            Circle()
+                                .fill(Color(hex: "#A6B4FF"))
+                                .frame(width: particle.size, height: particle.size)
+                                .offset(x: particle.x, y: particle.y)
+                                .opacity(particle.opacity)
+                                .scaleEffect(particle.scale)
+                        }
+                    }
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 12)
+            .padding(.bottom, 14)
+
+            // MARK: - Expandable Reflection Section - SOFT & MINIMAL
             if isExpanded && !entry.prompts.isEmpty {
                 Divider()
-                    .background(Color(hex: "#E4E4E4"))
+                    .background(Color(hex: "#E8E8E8"))
                     .padding(.horizontal, 20)
-
-                VStack(alignment: .leading, spacing: 20) {
+                
+                VStack(alignment: .leading, spacing: 16) {
                     Text("Reflection")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundColor(Color(hex: "#2B2834"))
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundColor(Color(hex: "#7A7A7A"))
 
-                    ForEach(Array(entry.prompts.enumerated()), id: \.offset) { index, answer in
+                    ForEach(Array(entry.prompts.enumerated()), id: \.offset) { i, answer in
                         if !answer.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text(getPromptQuestion(for: index))
-                                    .font(.system(size: 14, weight: .medium))
-                                    .foregroundColor(Color(hex: "#5B5564"))
-
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text(getPromptQuestion(for: i))
+                                    .font(.system(size: 13, weight: .medium))
+                                    .foregroundColor(Color(hex: "#9E9E9E"))
+                                
                                 Text(answer)
                                     .font(.system(size: 15))
                                     .foregroundColor(Color(hex: "#2B2834"))
-                                    .padding(.leading, 6)
+                                    .lineSpacing(4)
                             }
                         }
                     }
                 }
                 .padding(.horizontal, 20)
-                .padding(.bottom, 20)
+                .padding(.top, 16)
+                .padding(.bottom, 14)
+                .transition(.opacity.combined(with: .move(edge: .top)))
             }
 
+            // Show/Hide Reflection Button
             if !entry.prompts.isEmpty {
                 Divider()
-                    .background(Color(hex: "#E4E4E4"))
+                    .background(Color(hex: "#E8E8E8"))
                 
-                HStack {
-                    Spacer()
-                    Button(action: {
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            isExpanded.toggle()
-                        }
-                    }) {
-                        HStack(spacing: 4) {
-                            Text(isExpanded ? "Show less" : "Show reflection")
-                                .font(.system(size: 14, weight: .medium))
-                            Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
-                                .font(.system(size: 12, weight: .medium))
-                        }
-                        .foregroundColor(Color(hex: "#2B2834"))
-                        .padding(.vertical, 12)
-                        .padding(.horizontal, 16)
+                Button {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        isExpanded.toggle()
                     }
-                    .buttonStyle(PlainButtonStyle())
-                    .background(Color.clear)
-                    .shadow(radius: 0)
-                    Spacer()
+                } label: {
+                    HStack(spacing: 6) {
+                        Text(isExpanded ? "Show less" : "Show reflection")
+                            .font(.system(size: 14, weight: .medium))
+                        
+                        Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                            .font(.system(size: 11, weight: .semibold))
+                    }
+                    .foregroundColor(Color(hex: "#7A7A7A"))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
                 }
+                .buttonStyle(.plain)
             }
         }
+        // MARK: - Card Container - SOFT SHADOWS
         .background(Color.white)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
+        .clipShape(RoundedRectangle(cornerRadius: 18))
+        .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 2)
+    }
+    
+    // MARK: - Animation Functions
+    private func animatePin() {
+        withAnimation(.interpolatingSpring(stiffness: 300, damping: 15)) {
+            pinScale = 1.3
+            pinOffsetY = -3
+        }
+        
+        withAnimation(.interpolatingSpring(stiffness: 300, damping: 10).delay(0.1)) {
+            pinScale = 1.0
+            pinOffsetY = 0
+        }
+        
+        Task { @MainActor in
+            let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+            impactFeedback.impactOccurred()
+        }
+    }
+    
+    private func animateFavorite() {
+        let isFavoriting = !entry.isFavorited
+        
+        withAnimation(.interpolatingSpring(stiffness: 300, damping: 12)) {
+            heartScale = 1.3
+            heartRotation = -8
+        }
+        
+        withAnimation(.interpolatingSpring(stiffness: 300, damping: 10).delay(0.1)) {
+            heartScale = 1.0
+            heartRotation = 0
+        }
+        
+        if isFavoriting {
+            createParticleBurst()
+        }
+        
+        Task { @MainActor in
+            let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+            impactFeedback.impactOccurred()
+        }
+    }
+    
+    private func animateShare() {
+        withAnimation(.interpolatingSpring(stiffness: 300, damping: 15)) {
+            shareScale = 1.2
+            shareRotation = 10
+        }
+        
+        withAnimation(.interpolatingSpring(stiffness: 300, damping: 10).delay(0.1)) {
+            shareScale = 1.0
+            shareRotation = 0
+        }
+        
+        Task { @MainActor in
+            let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+            impactFeedback.impactOccurred()
+        }
+    }
+    
+    private func createParticleBurst() {
+        let particleCount = Int.random(in: 6...8)
+        var newParticles: [HeartParticle] = []
+        
+        for i in 0..<particleCount {
+            let angle = (Double(i) / Double(particleCount)) * 360.0 + Double.random(in: -20...20)
+            let distance = Double.random(in: 30...50)
+            
+            let particle = HeartParticle(
+                id: UUID(),
+                x: 0,
+                y: 0,
+                size: CGFloat.random(in: 4...7),
+                opacity: 1.0,
+                scale: 1.0,
+                angle: angle,
+                distance: distance
+            )
+            newParticles.append(particle)
+        }
+        
+        particles = newParticles
+        
+        withAnimation(.easeOut(duration: 0.6)) {
+            for i in 0..<particles.count {
+                let angle = particles[i].angle * .pi / 180
+                particles[i].x = cos(angle) * particles[i].distance
+                particles[i].y = sin(angle) * particles[i].distance
+                particles[i].opacity = 0
+                particles[i].scale = 0.3
+            }
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+            particles.removeAll()
+        }
+    }
+
+    private func shareWhisper() {
+        Task { @MainActor in
+            // Use centralized BackgroundConfig
+            let background = BackgroundConfig.random()
+
+            var text = entry.text.trimmingCharacters(in: .whitespacesAndNewlines)
+            let terminals = CharacterSet(charactersIn: ".,;:!?…")
+            while let last = text.last, terminals.contains(String(last).unicodeScalars.first!) {
+                text = String(text.dropLast())
+            }
+
+            let card = ZStack {
+                Image(background.imageName).resizable().aspectRatio(contentMode: .fill)
+                    .frame(width: 1080, height: 1080).clipped()
+                VStack(spacing: 24) {
+                    Text(text)
+                        .font(.system(size: 80, weight: .bold, design: .serif))
+                        .foregroundColor(Color(hex: background.textColor))
+                        .multilineTextAlignment(.center)
+                        .lineLimit(3)
+                        .lineSpacing(10)
+                        .tracking(-0.4)
+                        .minimumScaleFactor(0.75)
+                        .allowsTightening(true)
+                        .frame(maxWidth: 820)
+                    Image("whisper-logo")
+                        .resizable()
+                        .renderingMode(.template)
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 140)
+                        .foregroundColor(Color(hex: background.textColor))
+                        .opacity(0.82)
+                }
+            }
+            .frame(width: 1080, height: 1080)
+
+            let image = ShareRenderer.image(
+                for: card,
+                size: CGSize(width: 1080, height: 1080),
+                colorScheme: .light
+            )
+            ShareManager.presentFromTopController(image: image, caption: nil)
+        }
     }
 
     private func getPromptQuestion(for index: Int) -> String {

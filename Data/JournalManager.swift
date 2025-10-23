@@ -7,23 +7,19 @@ import WidgetKit
 class JournalManager: ObservableObject {
     static let shared = JournalManager()
 
-    // Use @Published to trigger view updates
     @Published var entries: [JournalEntry] = []
     @Published var isLoading = false
     
     private let db = Firestore.firestore()
     private var listener: ListenerRegistration?
     private var authStateListener: AuthStateDidChangeListenerHandle?
-    
-    // Widget support
-    private let sharedDefaults = UserDefaults.standard
+    private let sharedDefaults = UserDefaults(suiteName: "group.com.studioeight.mantra") ?? UserDefaults.standard
 
     private init() {
-        // Load entries when user signs in
         setupAuthListener()
     }
     
-    // MARK: - Auth Listener - FIXED: Updated to new Firebase syntax
+    // MARK: - Auth Listener
     private func setupAuthListener() {
         authStateListener = Auth.auth().addStateDidChangeListener { [weak self] _, user in
             if let user = user {
@@ -34,13 +30,14 @@ class JournalManager: ObservableObject {
         }
     }
 
-    // MARK: - Save Entry to Firebase
+    // MARK: - Save Entry to Firebase (Updated for V2)
     func saveEntry(
         mood: String,
         response1: String,
         response2: String,
         response3: String,
-        mantra: String
+        mantra: String,
+        journalType: JournalType = .guided
     ) {
         guard let userId = Auth.auth().currentUser?.uid else {
             print("❌ No authenticated user - cannot save entry")
@@ -52,17 +49,93 @@ class JournalManager: ObservableObject {
             mood: mood,
             text: mantra,
             colorHex: colorForMood(mood),
-            prompts: [response1, response2, response3]
+            prompts: [response1, response2, response3],
+            isFavorited: false,
+            isPinned: false,
+            journalType: journalType
         )
 
-        // Add to local array immediately for UI responsiveness
         entries.append(entry)
-        
-        // Save to Firebase
         saveToFirebase(entry: entry, userId: userId)
+    }
+    
+    // MARK: - Toggle Favorite
+    func toggleFavorite(_ entry: JournalEntry) {
+        guard let userId = Auth.auth().currentUser?.uid,
+              let index = entries.firstIndex(where: { $0.id == entry.id }) else {
+            return
+        }
         
-        // Save latest mantra for widget
-        saveLatestMantraForWidget(mantra, mood: mood)
+        entries[index].isFavorited.toggle()
+        
+        db.collection("users")
+          .document(userId)
+          .collection("journalEntries")
+          .document(entry.id)
+          .updateData(["isFavorited": entries[index].isFavorited]) { error in
+              if let error = error {
+                  print("❌ Failed to update favorite status: \(error.localizedDescription)")
+              }
+          }
+    }
+    
+    // MARK: - Toggle Pin (Only one can be pinned at a time)
+    func togglePin(_ entry: JournalEntry) {
+        guard let userId = Auth.auth().currentUser?.uid,
+              let index = entries.firstIndex(where: { $0.id == entry.id }) else {
+            return
+        }
+        
+        let wasPinned = entries[index].isPinned
+        
+        // If pinning this entry, unpin all others
+        if !wasPinned {
+            for i in 0..<entries.count {
+                if entries[i].isPinned {
+                    entries[i].isPinned = false
+                    updatePinStatusInFirebase(userId: userId, entryId: entries[i].id, isPinned: false)
+                }
+            }
+        }
+        
+        // Toggle current entry
+        entries[index].isPinned.toggle()
+        updatePinStatusInFirebase(userId: userId, entryId: entry.id, isPinned: entries[index].isPinned)
+        
+        // Update widget with background
+        if entries[index].isPinned {
+            let background = BackgroundConfig.random()
+            saveLatestMantraForWidget(
+                entries[index].text,
+                mood: entries[index].mood,
+                backgroundImage: background.imageName,
+                textColor: background.textColor
+            )
+        } else {
+            clearWidget()
+        }
+    }
+    
+    private func updatePinStatusInFirebase(userId: String, entryId: String, isPinned: Bool) {
+        db.collection("users")
+          .document(userId)
+          .collection("journalEntries")
+          .document(entryId)
+          .updateData(["isPinned": isPinned]) { error in
+              if let error = error {
+                  print("❌ Failed to update pin status: \(error.localizedDescription)")
+              }
+          }
+    }
+    
+    // MARK: - Get Pinned Entry
+    var pinnedEntry: JournalEntry? {
+        entries.first(where: { $0.isPinned })
+    }
+    
+    // MARK: - Get Favorited Entries
+    var favoritedEntries: [JournalEntry] {
+        entries.filter { $0.isFavorited }.sorted { $0.date > $1.date }
     }
     
     private func saveToFirebase(entry: JournalEntry, userId: String) {
@@ -73,6 +146,9 @@ class JournalManager: ObservableObject {
             "text": entry.text,
             "colorHex": entry.colorHex,
             "prompts": entry.prompts,
+            "isFavorited": entry.isFavorited,
+            "isPinned": entry.isPinned,
+            "journalType": entry.journalType.rawValue,
             "createdAt": Timestamp(date: Date())
         ]
         
@@ -83,7 +159,6 @@ class JournalManager: ObservableObject {
           .setData(entryData) { error in
               if let error = error {
                   print("❌ Failed to save entry to Firebase: \(error.localizedDescription)")
-                  // Remove from local array if Firebase save failed
                   DispatchQueue.main.async {
                       self.entries.removeAll { $0.id == entry.id }
                   }
@@ -97,7 +172,6 @@ class JournalManager: ObservableObject {
     private func loadUserEntries(userId: String) {
         isLoading = true
         
-        // Set up real-time listener
         listener = db.collection("users")
             .document(userId)
             .collection("journalEntries")
@@ -130,13 +204,21 @@ class JournalManager: ObservableObject {
                         return nil
                     }
                     
+                    let isFavorited = data["isFavorited"] as? Bool ?? false
+                    let isPinned = data["isPinned"] as? Bool ?? false
+                    let journalTypeString = data["journalType"] as? String ?? "guided"
+                    let journalType = JournalType(rawValue: journalTypeString) ?? .guided
+                    
                     return JournalEntry(
                         id: id,
                         date: timestamp.dateValue(),
                         mood: mood,
                         text: text,
                         colorHex: colorHex,
-                        prompts: prompts
+                        prompts: prompts,
+                        isFavorited: isFavorited,
+                        isPinned: isPinned,
+                        journalType: journalType
                     )
                 }
                 
@@ -147,7 +229,7 @@ class JournalManager: ObservableObject {
             }
     }
     
-    // MARK: - Clear Entries (on sign out)
+    // MARK: - Clear Entries
     private func clearEntries() {
         listener?.remove()
         listener = nil
@@ -162,10 +244,8 @@ class JournalManager: ObservableObject {
             return
         }
         
-        // Remove from local array immediately
         entries.removeAll { $0.id == entry.id }
         
-        // Delete from Firebase
         db.collection("users")
           .document(userId)
           .collection("journalEntries")
@@ -173,7 +253,6 @@ class JournalManager: ObservableObject {
           .delete() { error in
               if let error = error {
                   print("❌ Failed to delete entry from Firebase: \(error.localizedDescription)")
-                  // Re-add to local array if Firebase delete failed
                   DispatchQueue.main.async {
                       self.entries.append(entry)
                   }
@@ -183,52 +262,51 @@ class JournalManager: ObservableObject {
           }
     }
     
-    // MARK: - Clear All Entries (for account deletion)
-    /// Called when user deletes their account
-    /// Removes all local data, stops listeners, and clears widget data
+    // MARK: - Clear All Entries
     func clearAllEntries() {
         print("🗑️ JournalManager: Clearing all entries for account deletion")
-        
-        // Stop listening to Firestore
         listener?.remove()
         listener = nil
-        
-        // Clear all journal entries from memory
         entries.removeAll()
-        
-        // Clear widget data
         sharedDefaults.removeObject(forKey: "latestMantra")
         sharedDefaults.removeObject(forKey: "latestMood")
+        sharedDefaults.removeObject(forKey: "widgetBackground")
+        sharedDefaults.removeObject(forKey: "widgetTextColor")
         sharedDefaults.removeObject(forKey: "mantraTimestamp")
-        
-        // Refresh widgets to show empty state
         WidgetCenter.shared.reloadAllTimelines()
-        
         print("✅ JournalManager: All data cleared")
     }
 
     // MARK: - Widget Support
-    func saveLatestMantraForWidget(_ mantra: String, mood: String) {
+    func saveLatestMantraForWidget(_ mantra: String, mood: String, backgroundImage: String, textColor: String) {
         sharedDefaults.set(mantra, forKey: "latestMantra")
         sharedDefaults.set(mood, forKey: "latestMood")
+        sharedDefaults.set(backgroundImage, forKey: "widgetBackground")
+        sharedDefaults.set(textColor, forKey: "widgetTextColor")
         sharedDefaults.set(Date(), forKey: "mantraTimestamp")
-        
-        // Trigger widget refresh
         WidgetCenter.shared.reloadAllTimelines()
-        
-        print("✅ Mantra saved for widget: \(mantra)")
+        print("✅ Mantra saved for widget: \(mantra) with background: \(backgroundImage)")
     }
     
-    func getLatestWidgetData() -> (mantra: String, mood: String, timestamp: Date)? {
+    func clearWidget() {
+        sharedDefaults.removeObject(forKey: "latestMantra")
+        sharedDefaults.removeObject(forKey: "latestMood")
+        sharedDefaults.removeObject(forKey: "widgetBackground")
+        sharedDefaults.removeObject(forKey: "widgetTextColor")
+        WidgetCenter.shared.reloadAllTimelines()
+    }
+    
+    func getLatestWidgetData() -> (mantra: String, mood: String, backgroundImage: String, textColor: String, timestamp: Date)? {
         guard let mantra = sharedDefaults.string(forKey: "latestMantra"),
               let mood = sharedDefaults.string(forKey: "latestMood"),
+              let backgroundImage = sharedDefaults.string(forKey: "widgetBackground"),
+              let textColor = sharedDefaults.string(forKey: "widgetTextColor"),
               let timestamp = sharedDefaults.object(forKey: "mantraTimestamp") as? Date else {
             return nil
         }
-        return (mantra: mantra, mood: mood, timestamp: timestamp)
+        return (mantra: mantra, mood: mood, backgroundImage: backgroundImage, textColor: textColor, timestamp: timestamp)
     }
     
-    // Legacy method for backward compatibility
     func getLatestMantraForWidget() -> (mantra: String, mood: String)? {
         if let data = getLatestWidgetData() {
             return (data.mantra, data.mood)
@@ -236,14 +314,12 @@ class JournalManager: ObservableObject {
         return nil
     }
     
-    // MARK: - Legacy Methods (kept for compatibility)
+    // MARK: - Legacy Methods
     func save() {
-        // This method is now handled automatically by saveEntry()
         print("ℹ️ Legacy save() called - entries are auto-saved to Firebase")
     }
 
     func load() {
-        // This method is now handled automatically by auth listener
         print("ℹ️ Legacy load() called - entries are auto-loaded from Firebase")
     }
     
