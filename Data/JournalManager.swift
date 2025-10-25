@@ -30,14 +30,16 @@ class JournalManager: ObservableObject {
         }
     }
 
-    // MARK: - Save Entry to Firebase (Updated for V2)
+    // MARK: - Save Entry to Firebase (Updated for V3)
     func saveEntry(
         mood: String,
         response1: String,
         response2: String,
         response3: String,
         mantra: String,
-        journalType: JournalType = .guided
+        journalType: JournalType = .guided,
+        backgroundImage: String,
+        textColor: String
     ) {
         guard let userId = Auth.auth().currentUser?.uid else {
             print("❌ No authenticated user - cannot save entry")
@@ -52,7 +54,9 @@ class JournalManager: ObservableObject {
             prompts: [response1, response2, response3],
             isFavorited: false,
             isPinned: false,
-            journalType: journalType
+            journalType: journalType,
+            backgroundImage: backgroundImage,
+            textColor: textColor
         )
 
         entries.append(entry)
@@ -102,14 +106,13 @@ class JournalManager: ObservableObject {
         entries[index].isPinned.toggle()
         updatePinStatusInFirebase(userId: userId, entryId: entry.id, isPinned: entries[index].isPinned)
         
-        // Update widget with background
+        // Update widget using entry's saved background
         if entries[index].isPinned {
-            let background = BackgroundConfig.random()
             saveLatestMantraForWidget(
                 entries[index].text,
                 mood: entries[index].mood,
-                backgroundImage: background.imageName,
-                textColor: background.textColor
+                backgroundImage: entries[index].backgroundImage,
+                textColor: entries[index].textColor
             )
         } else {
             clearWidget()
@@ -149,6 +152,8 @@ class JournalManager: ObservableObject {
             "isFavorited": entry.isFavorited,
             "isPinned": entry.isPinned,
             "journalType": entry.journalType.rawValue,
+            "backgroundImage": entry.backgroundImage,
+            "textColor": entry.textColor,
             "createdAt": Timestamp(date: Date())
         ]
         
@@ -208,6 +213,8 @@ class JournalManager: ObservableObject {
                     let isPinned = data["isPinned"] as? Bool ?? false
                     let journalTypeString = data["journalType"] as? String ?? "guided"
                     let journalType = JournalType(rawValue: journalTypeString) ?? .guided
+                    let backgroundImage = data["backgroundImage"] as? String ?? "whisper-bg-1"
+                    let textColor = data["textColor"] as? String ?? "#FFFFFF"
                     
                     return JournalEntry(
                         id: id,
@@ -218,7 +225,9 @@ class JournalManager: ObservableObject {
                         prompts: prompts,
                         isFavorited: isFavorited,
                         isPinned: isPinned,
-                        journalType: journalType
+                        journalType: journalType,
+                        backgroundImage: backgroundImage,
+                        textColor: textColor
                     )
                 }
                 

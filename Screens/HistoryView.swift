@@ -781,8 +781,11 @@ struct HistoryCardView: View {
 
     private func shareWhisper() {
         Task { @MainActor in
-            // Use centralized BackgroundConfig
-            let background = BackgroundConfig.random()
+            // Use entry's saved background
+            let background = BackgroundConfig(
+                imageName: entry.backgroundImage,
+                textColor: entry.textColor
+            )
 
             var text = entry.text.trimmingCharacters(in: .whitespacesAndNewlines)
             let terminals = CharacterSet(charactersIn: ".,;:!?…")

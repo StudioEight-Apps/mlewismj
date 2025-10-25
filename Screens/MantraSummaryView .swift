@@ -1,5 +1,7 @@
 import SwiftUI
 import WidgetKit
+import FirebaseAuth
+import FirebaseFirestore
 
 struct MantraSummaryView: View {
     var mood: String
@@ -13,6 +15,7 @@ struct MantraSummaryView: View {
     
     @State private var currentEntry: JournalEntry?
     @State private var shareImage: UIImage?
+    @State private var showBackgroundSelector = false
     
     // Animation states
     @State private var heartScale: CGFloat = 1.0
@@ -21,6 +24,7 @@ struct MantraSummaryView: View {
     @State private var pinOffsetY: CGFloat = 0
     @State private var shareScale: CGFloat = 1.0
     @State private var shareRotation: Double = 0
+    @State private var shuffleRotation: Double = 0
     
     // Particle states for heart burst
     @State private var particles: [HeartParticle] = []
@@ -92,6 +96,21 @@ struct MantraSummaryView: View {
                 // Floating translucent action bar
                 ZStack {
                     HStack(spacing: 0) {
+                        Spacer()
+                        
+                        // Shuffle button
+                        Button {
+                            animateShuffle()
+                            showBackgroundSelector = true
+                        } label: {
+                            Image(systemName: "sparkles")
+                                .font(.system(size: 18, weight: .light))
+                                .foregroundColor(Color(hex: "#8A8A8A").opacity(0.7))
+                                .frame(width: 44, height: 44)
+                                .rotationEffect(.degrees(shuffleRotation))
+                        }
+                        .buttonStyle(.plain)
+                        
                         Spacer()
                         
                         // Pin button
@@ -200,28 +219,75 @@ struct MantraSummaryView: View {
         .navigationBarBackButtonHidden(true)
         .navigationBarHidden(true)
         .toolbar(.hidden, for: .navigationBar)
+        .sheet(isPresented: $showBackgroundSelector) {
+            BackgroundSelectorModal(mantra: mantra) { selectedBg in
+                withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                    selectedBackground = selectedBg
+                }
+                
+                // If entry already saved, update it in Firebase
+                if let entry = currentEntry {
+                    updateEntryBackground(entry: entry, background: selectedBg)
+                }
+            }
+        }
         .onAppear {
             // Random background selection using BackgroundConfig
             selectedBackground = BackgroundConfig.random()
             
-            // Save entry immediately when view appears
+            // Check if entry already exists
             saveJournalEntry()
-            
-            // Hide navigation bar
-            Task { @MainActor in
-                if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                   let window = windowScene.windows.first,
-                   let navController = findNavigationController(in: window.rootViewController) {
-                    navController.setNavigationBarHidden(true, animated: false)
-                }
-            }
         }
+    }
+    
+    private func animateShuffle() {
+        withAnimation(.interpolatingSpring(stiffness: 300, damping: 15)) {
+            shuffleRotation = 360
+        }
+        
+        withAnimation(.interpolatingSpring(stiffness: 300, damping: 10).delay(0.1)) {
+            shuffleRotation = 0
+        }
+        
+        Task { @MainActor in
+            let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+            impactFeedback.impactOccurred()
+        }
+    }
+    
+    private func updateEntryBackground(entry: JournalEntry, background: BackgroundConfig) {
+        guard let userId = Auth.auth().currentUser?.uid,
+              let index = journalManager.entries.firstIndex(where: { $0.id == entry.id }) else {
+            return
+        }
+        
+        journalManager.entries[index].backgroundImage = background.imageName
+        journalManager.entries[index].textColor = background.textColor
+        
+        let db = Firestore.firestore()
+        db.collection("users")
+          .document(userId)
+          .collection("journalEntries")
+          .document(entry.id)
+          .updateData([
+              "backgroundImage": background.imageName,
+              "textColor": background.textColor
+          ]) { error in
+              if let error = error {
+                  print("❌ Failed to update background: \(error.localizedDescription)")
+              } else {
+                  print("✅ Background updated successfully")
+              }
+          }
+        
+        // Update current entry reference
+        currentEntry = journalManager.entries[index]
     }
     
     private func togglePin() {
         guard let entry = currentEntry else { return }
         
-        // Twitter-style bounce animation
+        // Bounce animation - Pinterest-style
         withAnimation(.interpolatingSpring(stiffness: 300, damping: 15)) {
             pinScale = 1.3
             pinOffsetY = -3
@@ -248,10 +314,9 @@ struct MantraSummaryView: View {
     private func toggleFavorite() {
         guard let entry = currentEntry else { return }
         
-        // Only create particles when favoriting (not unfavoriting)
-        let isFavoriting = !(currentEntry?.isFavorited ?? false)
+        let isFavoriting = !entry.isFavorited
         
-        // Twitter heart animation - scale + wiggle
+        // Spring animation - Instagram-style
         withAnimation(.interpolatingSpring(stiffness: 300, damping: 12)) {
             heartScale = 1.3
             heartRotation = -8
@@ -403,13 +468,20 @@ struct MantraSummaryView: View {
         
         if let existing = existingEntry {
             currentEntry = existing
+            // Use existing entry's background
+            selectedBackground = BackgroundConfig(
+                imageName: existing.backgroundImage,
+                textColor: existing.textColor
+            )
         } else {
             journalManager.saveEntry(
                 mood: mood,
                 response1: prompt1,
                 response2: prompt2,
                 response3: prompt3,
-                mantra: mantra
+                mantra: mantra,
+                backgroundImage: selectedBackground.imageName,
+                textColor: selectedBackground.textColor
             )
             
             // Find the newly created entry

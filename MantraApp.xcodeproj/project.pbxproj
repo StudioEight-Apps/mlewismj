@@ -58,6 +58,7 @@
 		FBD43C2F2DF0AA5100C100D5 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD43C2E2DF0AA5100C100D5 /* Theme.swift */; };
 		FBD9D1A32EA59927002C681E /* HeartParticle.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD9D1A22EA59927002C681E /* HeartParticle.swift */; };
 		FBD9D1D72EAA67EB002C681E /* BackgroundConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD9D1D62EAA67EB002C681E /* BackgroundConfig.swift */; };
+		FBD9D1F22EAD6DF5002C681E /* BackgroundSelectorModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD9D1F12EAD6DF5002C681E /* BackgroundSelectorModal.swift */; };
 		FBDE1DAD2E5DFA1A00AE17A3 /* SubscriptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBDE1DAC2E5DFA1A00AE17A3 /* SubscriptionManager.swift */; };
 		FBDE1DB32E5DFE2B00AE17A3 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBDE1DB22E5DFE2B00AE17A3 /* PaywallView.swift */; };
 		FBE92F112E98529E007F55C0 /* WhisperVoice.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBE92F102E98529E007F55C0 /* WhisperVoice.swift */; };
@@ -150,6 +151,7 @@
 		FBD43C2E2DF0AA5100C100D5 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		FBD9D1A22EA59927002C681E /* HeartParticle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartParticle.swift; sourceTree = "<group>"; };
 		FBD9D1D62EAA67EB002C681E /* BackgroundConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundConfig.swift; sourceTree = "<group>"; };
+		FBD9D1F12EAD6DF5002C681E /* BackgroundSelectorModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundSelectorModal.swift; sourceTree = "<group>"; };
 		FBDE1DAC2E5DFA1A00AE17A3 /* SubscriptionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionManager.swift; sourceTree = "<group>"; };
 		FBDE1DAE2E5DFCBD00AE17A3 /* StoreKitTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKitTest.framework; path = Platforms/MacOSX.platform/Developer/Library/Frameworks/StoreKitTest.framework; sourceTree = DEVELOPER_DIR; };
 		FBDE1DB22E5DFE2B00AE17A3 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
@@ -254,6 +256,7 @@
 		FB2CA7592DD3C64E006C687D = {
 			isa = PBXGroup;
 			children = (
+				FBD9D1F12EAD6DF5002C681E /* BackgroundSelectorModal.swift */,
 				FBD9D1D62EAA67EB002C681E /* BackgroundConfig.swift */,
 				FBD9D1A22EA59927002C681E /* HeartParticle.swift */,
 				FBE92F102E98529E007F55C0 /* WhisperVoice.swift */,
@@ -562,6 +565,7 @@
 				FB2CA7B52DDF8D40006C687D /* LoginView .swift in Sources */,
 				FBDE1DAD2E5DFA1A00AE17A3 /* SubscriptionManager.swift in Sources */,
 				FB7FFBD02DF64550001DEF3D /* MantraCardGenerator.swift in Sources */,
+				FBD9D1F22EAD6DF5002C681E /* BackgroundSelectorModal.swift in Sources */,
 				FB2CA7992DD6970D006C687D /* MantraDetailView.swift in Sources */,
 				FB66DB982E8C34C700510B66 /* ShareRenderer.swift in Sources */,
 				FB2CA78F2DD67067006C687D /* WelcomeView.swift in Sources */,

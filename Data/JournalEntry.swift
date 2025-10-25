@@ -12,6 +12,10 @@ struct JournalEntry: Identifiable, Codable {
     var isFavorited: Bool = false
     var isPinned: Bool = false
     var journalType: JournalType = .guided
+    
+    // V3 Features - Permanent Background
+    var backgroundImage: String = "whisper-bg-1"
+    var textColor: String = "#FFFFFF"
 }
 
 // Journal Type Enum - Guided vs Free Journal
