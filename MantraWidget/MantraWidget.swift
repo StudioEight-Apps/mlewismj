@@ -7,8 +7,8 @@ struct Provider: TimelineProvider {
             date: Date(),
             mantra: "Your daily whisper will appear here",
             mood: "calm",
-            backgroundImage: "whisper_bg_cream",
-            textColor: "#C22716"
+            backgroundImage: "whisper_bg_crinkledbeige",
+            textColor: "#5B3520"
         )
     }
 
@@ -17,8 +17,8 @@ struct Provider: TimelineProvider {
             date: Date(),
             mantra: "Breathe deeply and trust your journey",
             mood: "calm",
-            backgroundImage: "whisper_bg_cream",
-            textColor: "#C22716"
+            backgroundImage: "whisper_bg_crinkledbeige",
+            textColor: "#5B3520"
         )
         completion(entry)
     }
@@ -27,8 +27,8 @@ struct Provider: TimelineProvider {
         let sharedDefaults = UserDefaults(suiteName: "group.com.studioeight.mantra")
         let mantra = sharedDefaults?.string(forKey: "latestMantra") ?? "How are you feeling today?"
         let mood = sharedDefaults?.string(forKey: "latestMood") ?? "calm"
-        let backgroundImage = sharedDefaults?.string(forKey: "widgetBackground") ?? "whisper_bg_cream"
-        let textColor = sharedDefaults?.string(forKey: "widgetTextColor") ?? "#C22716"
+        let backgroundImage = sharedDefaults?.string(forKey: "widgetBackground") ?? "whisper_bg_crinkledbeige"
+        let textColor = sharedDefaults?.string(forKey: "widgetTextColor") ?? "#5B3520"
         let lastUpdated = sharedDefaults?.object(forKey: "lastUpdated") as? Date
         
         print("🔄 Widget Timeline Request:")
@@ -355,8 +355,8 @@ extension Color {
         date: .now,
         mantra: "Create space for your feelings, then choose peace for your heart.",
         mood: "calm",
-        backgroundImage: "whisper_bg_cream",
-        textColor: "#C22716"
+        backgroundImage: "whisper_bg_crinkledbeige",
+        textColor: "#5B3520"
     )
 }
 

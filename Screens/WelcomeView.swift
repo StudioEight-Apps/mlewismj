@@ -19,20 +19,6 @@ struct WelcomeView: View {
    // Name prompt banner states
    @State private var hasSeenNamePrompt = UserDefaults.standard.bool(forKey: "hasSeenNamePrompt")
    @State private var showNamePrompt = false
-   
-   // Background pairings for share cards with color mapping
-   private let backgroundPairings: [(background: String, textColor: String, borderColor: String)] = [
-       ("whisper_bg_01_bone", "#1E1B19", "#DCD2C4"),
-       ("whisper_bg_02_sand", "#1E1B19", "#DCD2C4"),
-       ("whisper_bg_03_taupe", "#1E1B19", "#DCD2C4"),
-       ("whisper_bg_04_clay", "#EAD8C9", "#3C3630"),
-       ("whisper_bg_05_terracotta", "#F2E2D6", "#3C3630"),
-       ("whisper_bg_06_olive", "#E6EAD9", "#3C3630"),
-       ("whisper_bg_07_sage", "#DDE7DC", "#3C3630"),
-       ("whisper_bg_08_moss", "#DFE7D6", "#3C3630"),
-       ("whisper_bg_09_cacao", "#ECDDC7", "#3C3630"),
-       ("whisper_bg_10_charcoal", "#E8DEC9", "#3C3630")
-   ]
 
    var body: some View {
        NavigationView {
@@ -289,7 +275,7 @@ struct WelcomeView: View {
    
    private func shareWhisper() {
        Task { @MainActor in
-           let randomPairing = backgroundPairings.randomElement() ?? backgroundPairings[0]
+           let randomBackground = BackgroundConfig.random()
            
            var cleanedWhisper = dailyWhisper.trimmingCharacters(in: .whitespacesAndNewlines)
            if cleanedWhisper.last == "." {
@@ -297,15 +283,11 @@ struct WelcomeView: View {
            }
            
            let shareCard = ZStack {
-               Image(randomPairing.background)
+               Image(randomBackground.imageName)
                    .resizable()
                    .aspectRatio(contentMode: .fill)
                    .frame(width: 1080, height: 1350)
                    .clipped()
-               
-               RoundedRectangle(cornerRadius: 0)
-                   .strokeBorder(Color(hex: randomPairing.borderColor), lineWidth: 2)
-                   .frame(width: 1080, height: 1350)
                
                VStack(spacing: 0) {
                    Spacer()
@@ -313,7 +295,7 @@ struct WelcomeView: View {
                    VStack(spacing: 22) {
                        Text(cleanedWhisper)
                            .font(.system(size: 68, weight: .bold, design: .serif))
-                           .foregroundColor(Color(hex: randomPairing.textColor))
+                           .foregroundColor(Color(hex: randomBackground.textColor))
                            .multilineTextAlignment(.center)
                            .lineSpacing(6)
                            .tracking(-0.3)
@@ -327,7 +309,7 @@ struct WelcomeView: View {
                            .renderingMode(.template)
                            .aspectRatio(contentMode: .fit)
                            .frame(width: 160)
-                           .foregroundColor(Color(hex: randomPairing.textColor))
+                           .foregroundColor(Color(hex: randomBackground.textColor))
                            .opacity(0.82)
                    }
                    .offset(y: 30)

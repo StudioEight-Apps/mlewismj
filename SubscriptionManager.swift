@@ -9,13 +9,13 @@ class SubscriptionManager: ObservableObject {
     
     @Published var isLoading = false
     @Published var errorMessage: String?
-    @Published var hasActiveSubscription = true  // TEMP: Free until EIN received
+    @Published var hasActiveSubscription = false
     @Published var currentSubscription: SubscriptionPlan?
     
     private let productIDs: Set<String> = [
-        "com.mantraapp.MantraApp.weekly",
-        "com.mantraapp.MantraApp.monthly",
-        "com.mantraapp.MantraApp.annual"
+        "com.studioeight.mantra.weekly",
+        "com.studioeight.mantra.monthly",
+        "com.studioeight.mantra.annual"
     ]
     
     private var products: [Product] = []
@@ -32,11 +32,10 @@ class SubscriptionManager: ObservableObject {
         isInitialized = true
         
         print("Initializing SubscriptionManager...")
-        // TEMP: Skip StoreKit initialization for free version
-        // updateListenerTask = listenForTransactions()
-        // await loadProducts()
-        // await checkSubscriptionStatus()
-        print("SubscriptionManager initialization complete - FREE VERSION")
+        updateListenerTask = listenForTransactions()
+        await loadProducts()
+        await checkSubscriptionStatus()
+        print("SubscriptionManager initialization complete")
     }
     
     deinit {
@@ -44,9 +43,6 @@ class SubscriptionManager: ObservableObject {
     }
     
     func loadProducts() async {
-        // TEMP: Skip product loading for free version
-        return
-        
         print("Starting to load products...")
         print("Product IDs to load: \(productIDs)")
         
@@ -94,9 +90,6 @@ class SubscriptionManager: ObservableObject {
     }
     
     func purchase(plan: SubscriptionPlan) async {
-        // TEMP: Skip purchases for free version
-        return
-        
         guard let product = getProduct(for: plan) else {
             errorMessage = "Product not found"
             print("Purchase failed: Product not found for \(plan.rawValue)")
@@ -141,9 +134,6 @@ class SubscriptionManager: ObservableObject {
     }
     
     func restorePurchases() async {
-        // TEMP: Skip restore for free version
-        return
-        
         print("Starting purchase restoration...")
         isLoading = true
         errorMessage = nil
@@ -161,11 +151,6 @@ class SubscriptionManager: ObservableObject {
     }
     
     func checkSubscriptionStatus() async {
-        // TEMP: Force free version until EIN received
-        self.hasActiveSubscription = true
-        print("Subscription status check - FREE VERSION ACTIVE")
-        return
-        
         print("Checking subscription status...")
         var hasActiveSubscription = false
         var currentPlan: SubscriptionPlan?
@@ -270,9 +255,9 @@ class SubscriptionManager: ObservableObject {
 }
 
 enum SubscriptionPlan: String, CaseIterable {
-    case weekly = "com.mantraapp.MantraApp.weekly"
-    case monthly = "com.mantraapp.MantraApp.monthly"
-    case annual = "com.mantraapp.MantraApp.annual"
+    case weekly = "com.studioeight.mantra.weekly"
+    case monthly = "com.studioeight.mantra.monthly"
+    case annual = "com.studioeight.mantra.annual"
     
     var displayName: String {
         switch self {
@@ -285,16 +270,16 @@ enum SubscriptionPlan: String, CaseIterable {
     var price: String {
         switch self {
         case .weekly: return "$2.99"
-        case .monthly: return "$9.99"
+        case .monthly: return "$7.99"
         case .annual: return "$59.99"
         }
     }
     
     var badge: String? {
         switch self {
-        case .weekly: return "MOST POPULAR"
-        case .monthly: return nil
-        case .annual: return nil
+        case .weekly: return nil
+        case .monthly: return "MOST POPULAR"
+        case .annual: return "BEST VALUE"
         }
     }
 }

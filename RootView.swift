@@ -8,11 +8,6 @@ struct RootView: View {
     @State private var hasCheckedOnboarding = false
     @State private var isStoreKitReady = false
     
-    // Development bypass - remove before App Store submission
-    #if DEBUG
-    @State private var bypassSubscription = false
-    #endif
-    
     var body: some View {
         Group {
             if isShowingSplash {
@@ -21,33 +16,7 @@ struct RootView: View {
                 // Show onboarding only for truly new users (never seen onboarding AND not signed in)
                 OnboardingCoordinator()
             } else if authViewModel.isSignedIn && isStoreKitReady && !subscriptionManager.hasActiveSubscription {
-                #if DEBUG
-                if bypassSubscription {
-                    WelcomeView()
-                } else {
-                    ZStack {
-                        PaywallView()
-                        
-                        // Development bypass button
-                        VStack {
-                            Spacer()
-                            HStack {
-                                Spacer()
-                                Button("DEV: Skip Paywall") {
-                                    bypassSubscription = true
-                                }
-                                .padding(8)
-                                .background(Color.red.opacity(0.8))
-                                .foregroundColor(.white)
-                                .cornerRadius(8)
-                                .padding()
-                            }
-                        }
-                    }
-                }
-                #else
                 PaywallView()
-                #endif
             } else if authViewModel.isSignedIn && subscriptionManager.hasActiveSubscription {
                 WelcomeView()
             } else if authViewModel.isSignedIn && !isStoreKitReady {
@@ -59,16 +28,6 @@ struct RootView: View {
                         Text("Loading...")
                             .font(.system(size: 16, weight: .medium))
                             .foregroundColor(Color(hex: "#2A2A2A"))
-                        
-                        #if DEBUG
-                        Button("DEV: Skip Loading") {
-                            bypassSubscription = true
-                        }
-                        .padding()
-                        .background(Color.red.opacity(0.8))
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
-                        #endif
                     }
                 }
             } else {
