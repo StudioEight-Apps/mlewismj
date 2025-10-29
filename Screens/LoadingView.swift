@@ -5,9 +5,28 @@ struct LoadingView: View {
     var response1: String
     var response2: String
     var response3: String
+    var journalType: JournalType = .guided
 
     @State private var isLoadingComplete = false
     @State private var generatedMantra: String = ""
+    
+    // Convenience initializer for free journal
+    init(mood: String, freeJournalText: String) {
+        self.mood = mood
+        self.response1 = freeJournalText
+        self.response2 = ""
+        self.response3 = ""
+        self.journalType = .free
+    }
+    
+    // Original initializer for guided journal
+    init(mood: String, response1: String, response2: String, response3: String) {
+        self.mood = mood
+        self.response1 = response1
+        self.response2 = response2
+        self.response3 = response3
+        self.journalType = .guided
+    }
 
     var body: some View {
         ZStack {
@@ -21,7 +40,8 @@ struct LoadingView: View {
                     prompt1: response1,
                     prompt2: response2,
                     prompt3: response3,
-                    mantra: generatedMantra
+                    mantra: generatedMantra,
+                    journalType: journalType
                 )
             } else {
                 VStack(spacing: 0) {
@@ -55,7 +75,8 @@ struct LoadingView: View {
                             mood: mood,
                             response1: response1,
                             response2: response2,
-                            response3: response3
+                            response3: response3,
+                            journalType: journalType
                         ) { result in
                             generatedMantra = result ?? "Breathe. You are here now."
                             isLoadingComplete = true

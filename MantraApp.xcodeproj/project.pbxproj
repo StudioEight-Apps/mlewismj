@@ -59,6 +59,8 @@
 		FBD9D1A32EA59927002C681E /* HeartParticle.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD9D1A22EA59927002C681E /* HeartParticle.swift */; };
 		FBD9D1D72EAA67EB002C681E /* BackgroundConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD9D1D62EAA67EB002C681E /* BackgroundConfig.swift */; };
 		FBD9D1F22EAD6DF5002C681E /* BackgroundSelectorModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD9D1F12EAD6DF5002C681E /* BackgroundSelectorModal.swift */; };
+		FBD9D1FA2EB29F0E002C681E /* JournalModeSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD9D1F92EB29F0E002C681E /* JournalModeSelectionView.swift */; };
+		FBD9D1FC2EB29F2F002C681E /* FreeJournalPromptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD9D1FB2EB29F2F002C681E /* FreeJournalPromptView.swift */; };
 		FBDE1DAD2E5DFA1A00AE17A3 /* SubscriptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBDE1DAC2E5DFA1A00AE17A3 /* SubscriptionManager.swift */; };
 		FBDE1DB32E5DFE2B00AE17A3 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBDE1DB22E5DFE2B00AE17A3 /* PaywallView.swift */; };
 		FBE92F112E98529E007F55C0 /* WhisperVoice.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBE92F102E98529E007F55C0 /* WhisperVoice.swift */; };
@@ -152,6 +154,8 @@
 		FBD9D1A22EA59927002C681E /* HeartParticle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartParticle.swift; sourceTree = "<group>"; };
 		FBD9D1D62EAA67EB002C681E /* BackgroundConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundConfig.swift; sourceTree = "<group>"; };
 		FBD9D1F12EAD6DF5002C681E /* BackgroundSelectorModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundSelectorModal.swift; sourceTree = "<group>"; };
+		FBD9D1F92EB29F0E002C681E /* JournalModeSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalModeSelectionView.swift; sourceTree = "<group>"; };
+		FBD9D1FB2EB29F2F002C681E /* FreeJournalPromptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeJournalPromptView.swift; sourceTree = "<group>"; };
 		FBDE1DAC2E5DFA1A00AE17A3 /* SubscriptionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionManager.swift; sourceTree = "<group>"; };
 		FBDE1DAE2E5DFCBD00AE17A3 /* StoreKitTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKitTest.framework; path = Platforms/MacOSX.platform/Developer/Library/Frameworks/StoreKitTest.framework; sourceTree = DEVELOPER_DIR; };
 		FBDE1DB22E5DFE2B00AE17A3 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
@@ -256,6 +260,8 @@
 		FB2CA7592DD3C64E006C687D = {
 			isa = PBXGroup;
 			children = (
+				FBD9D1FB2EB29F2F002C681E /* FreeJournalPromptView.swift */,
+				FBD9D1F92EB29F0E002C681E /* JournalModeSelectionView.swift */,
 				FBD9D1F12EAD6DF5002C681E /* BackgroundSelectorModal.swift */,
 				FBD9D1D62EAA67EB002C681E /* BackgroundConfig.swift */,
 				FBD9D1A22EA59927002C681E /* HeartParticle.swift */,
@@ -539,6 +545,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FBD9D1FC2EB29F2F002C681E /* FreeJournalPromptView.swift in Sources */,
 				FB2CA7B72DDF8E31006C687D /* SignUpView.swift in Sources */,
 				FB5AC75B2E2AEBD800F6C9EF /* OnboardingPage1.swift in Sources */,
 				FB7FFBCE2DF64503001DEF3D /* ImageShareHelper.swift in Sources */,
@@ -551,6 +558,7 @@
 				FB2CA7A82DDE988C006C687D /* PromptQuestions .swift in Sources */,
 				FB6D64942E5D126B0025D416 /* SecureAPIManager.swift in Sources */,
 				FB2CA7972DD68C4A006C687D /* HistoryView.swift in Sources */,
+				FBD9D1FA2EB29F0E002C681E /* JournalModeSelectionView.swift in Sources */,
 				FBE92F112E98529E007F55C0 /* WhisperVoice.swift in Sources */,
 				FB66DB962E8C34AF00510B66 /* ShareManager.swift in Sources */,
 				FBDE1DB32E5DFE2B00AE17A3 /* PaywallView.swift in Sources */,

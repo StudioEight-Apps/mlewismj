@@ -9,6 +9,7 @@ struct MantraSummaryView: View {
     var prompt2: String
     var prompt3: String
     var mantra: String
+    var journalType: JournalType = .guided
     
     @Environment(\.dismiss) var dismiss
     @ObservedObject var journalManager = JournalManager.shared
@@ -480,6 +481,7 @@ struct MantraSummaryView: View {
                 response2: prompt2,
                 response3: prompt3,
                 mantra: mantra,
+                journalType: journalType,
                 backgroundImage: selectedBackground.imageName,
                 textColor: selectedBackground.textColor
             )

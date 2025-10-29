@@ -241,7 +241,7 @@ struct WelcomeView: View {
    
    var buttonStack: some View {
        VStack(spacing: 12) {
-           NavigationLink(destination: NewMantraView()) {
+           NavigationLink(destination: JournalModeSelectionView()) {
                Text("Start Journaling")
                    .font(.system(size: 17, weight: .semibold))
                    .foregroundColor(.white)

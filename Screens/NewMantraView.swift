@@ -3,6 +3,9 @@ import SwiftUI
 struct NewMantraView: View {
     @State private var selectedMood: String? = nil
     @State private var navigateToPrompt = false
+    
+    // Journal type - defaults to .guided for backward compatibility
+    var journalType: JournalType = .guided
 
     // Exactly 24 moods - now in alphabetical order
     let moods: [String] = [
@@ -45,18 +48,17 @@ struct NewMantraView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            ZStack {
-                // Background
-                LinearGradient(
-                    gradient: Gradient(colors: [
-                        Color(hex: "#FFFCF5"),
-                        Color(hex: "#FBF8F2")
-                    ]),
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .ignoresSafeArea()
+        ZStack {
+            // Background
+            LinearGradient(
+                gradient: Gradient(colors: [
+                    Color(hex: "#FFFCF5"),
+                    Color(hex: "#FBF8F2")
+                ]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
                 
                 // Single unified ScrollView
                 ScrollView {
@@ -155,9 +157,12 @@ struct NewMantraView: View {
                 }
             }
             .navigationDestination(isPresented: $navigateToPrompt) {
-                Prompt1View(mood: selectedMood ?? "")
+                if journalType == .guided {
+                    Prompt1View(mood: selectedMood ?? "")
+                } else {
+                    FreeJournalPromptView(mood: selectedMood ?? "")
+                }
             }
-        }
     }
 }
 
