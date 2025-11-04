@@ -120,7 +120,7 @@ struct Prompt1View: View {
             .padding(.bottom, 40)
         }
         .background(Color(hex: "#FFFCF5"))
-        .navigationBarHidden(true)
+        .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 BackButton()
@@ -142,7 +142,7 @@ struct Prompt1View: View {
     }
 }
 
-// Custom back button
+// Custom back button - chevron only
 struct BackButton: View {
     @Environment(\.dismiss) var dismiss
     
@@ -150,13 +150,11 @@ struct BackButton: View {
         Button(action: {
             dismiss()
         }) {
-            HStack(spacing: 4) {
-                Image(systemName: "chevron.left")
-                    .font(.system(size: 17, weight: .medium))
-                Text("Back")
-                    .font(.system(size: 17))
-            }
-            .foregroundColor(Color(hex: "#A6B4FF"))
+            Image(systemName: "chevron.left")
+                .font(.system(size: 20, weight: .semibold))
+                .foregroundColor(Color(hex: "#A6B4FF"))
+                .frame(width: 44, height: 44)
+                .contentShape(Rectangle())
         }
     }
 }

@@ -37,6 +37,16 @@ struct MantraSummaryView: View {
     private var cleanedMantra: String {
         let terminalPunctuation = CharacterSet(charactersIn: ".,;:!?…")
         var cleaned = mantra.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        // Remove leading and trailing quotation marks
+        if cleaned.hasPrefix("\"") && cleaned.hasSuffix("\"") {
+            cleaned = String(cleaned.dropFirst().dropLast())
+        }
+        if cleaned.hasPrefix("'") && cleaned.hasSuffix("'") {
+            cleaned = String(cleaned.dropFirst().dropLast())
+        }
+        
+        // Remove terminal punctuation
         while let last = cleaned.last, terminalPunctuation.contains(String(last).unicodeScalars.first!) {
             cleaned = String(cleaned.dropLast())
         }

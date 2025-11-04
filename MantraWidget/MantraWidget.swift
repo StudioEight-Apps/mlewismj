@@ -70,20 +70,26 @@ struct MantraWidgetEntryView: View {
     var body: some View {
         switch family {
         case .accessoryRectangular:
-            // Lock screen - text only for reliability
-            VStack(spacing: 2) {
+            // Lock screen - text logo (safe), centered layout
+            VStack(alignment: .center, spacing: 2) {
+                // Whisper text logo - centered, styled
                 Text("whisper")
-                    .font(.system(size: 10, weight: .medium))
-                    .foregroundColor(.primary)
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundColor(.secondary)
+                    .tracking(0.5)
                 
+                // Main text - 3 lines, center-aligned
                 Text(entry.mantra)
                     .font(.system(size: 11, weight: .regular))
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.7)
+                    .foregroundColor(.primary)
+                    .lineLimit(3)
+                    .minimumScaleFactor(0.85)
                     .multilineTextAlignment(.center)
+                    .lineSpacing(0.5)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding(.horizontal, 6)
-            .padding(.vertical, 4)
+            .padding(.vertical, 2)
             .containerBackground(for: .widget) {
                 Color.clear
             }

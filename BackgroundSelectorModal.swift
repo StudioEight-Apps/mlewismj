@@ -45,6 +45,7 @@ struct BackgroundSelectorModal: View {
                             .foregroundColor(Color(hex: "#2A2A2A"))
                             .frame(width: 40, height: 40)
                     }
+                    .buttonStyle(.plain)
                     
                     Spacer()
                     
@@ -127,6 +128,7 @@ struct BackgroundSelectorModal: View {
                         .background(Color.black)
                         .cornerRadius(28)
                 }
+                .buttonStyle(.plain)
                 .padding(.horizontal, 32)
                 .padding(.bottom, 40)
             }

@@ -2,12 +2,10 @@ import SwiftUI
 
 struct JournalModeSelectionView: View {
     @State private var selectedType: JournalType? = nil
-    @State private var navigateToMood = false
     @State private var cardScale: [JournalType: CGFloat] = [.guided: 1.0, .free: 1.0]
     
     var body: some View {
-        NavigationStack {
-            ZStack {
+        ZStack {
                 // Background matching app theme
                 LinearGradient(
                     gradient: Gradient(colors: [
@@ -20,7 +18,7 @@ struct JournalModeSelectionView: View {
                 .ignoresSafeArea()
                 
                 VStack(spacing: 0) {
-                    Spacer().frame(height: 60)
+                    Spacer().frame(height: 30)
                     
                     // Title
                     Text("How would you like\nto journal today?")
@@ -55,11 +53,10 @@ struct JournalModeSelectionView: View {
                     Spacer()
                     
                     // Continue Button
-                    Button(action: {
-                        navigateToMood = true
-                        
-                        let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
-                        impactFeedback.impactOccurred()
+                    NavigationLink(destination: Group {
+                        if let type = selectedType {
+                            NewMantraView(journalType: type)
+                        }
                     }) {
                         Text("Continue")
                             .font(.system(size: 17, weight: .semibold))
@@ -82,20 +79,16 @@ struct JournalModeSelectionView: View {
                     .scaleEffect(selectedType != nil ? 1.0 : 0.98)
                     .opacity(selectedType != nil ? 1.0 : 0.6)
                     .animation(.spring(response: 0.3, dampingFraction: 0.6), value: selectedType)
+                    .simultaneousGesture(TapGesture().onEnded {
+                        let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+                        impactFeedback.impactOccurred()
+                    })
                     .padding(.horizontal, 24)
                     .padding(.bottom, 40)
                 }
-            }
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationDestination(isPresented: $navigateToMood) {
-                if let type = selectedType {
-                    NewMantraView(journalType: type)
-                }
-            }
         }
     }
     
-    @ViewBuilder
     private func journalTypeCard(
         type: JournalType,
         icon: String,

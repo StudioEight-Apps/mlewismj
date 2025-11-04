@@ -185,20 +185,33 @@ private struct EntryListView: View {
     let entries: [JournalEntry]
     @State private var localScrollToDate: Date?
     @Binding var scrollToDate: Date?
+    @State private var entryToDelete: JournalEntry?
+    @State private var showDeleteAlert = false
 
     var body: some View {
         ScrollViewReader { proxy in
-            ScrollView {
-                LazyVStack(spacing: 16) {
-                    ForEach(entries, id: \.id) { entry in
-                        HistoryCardView(entry: entry)
-                            .id(entry.id)
-                    }
+            List {
+                ForEach(entries, id: \.id) { entry in
+                    HistoryCardView(entry: entry)
+                        .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                        .listRowSeparator(.hidden)
+                        .listRowBackground(Color.clear)
+                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                            Button(role: .destructive) {
+                                entryToDelete = entry
+                                showDeleteAlert = true
+                            } label: {
+                                Image(systemName: "trash.fill")
+                                    .font(.system(size: 20, weight: .medium))
+                            }
+                            .tint(Color(hex: "#F5A5A5"))
+                        }
+                        .id(entry.id)
                 }
-                .padding(.horizontal, 16)
-                .padding(.top, 20)
-                .padding(.bottom, 100)
             }
+            .listStyle(.plain)
+            .scrollContentBackground(.hidden)
+            .background(Color.clear)
             .onChange(of: scrollToDate) { _, newValue in
                 guard let d = newValue else { return }
                 if let target = entries.first(where: { Calendar.current.isDate($0.date, inSameDayAs: d) }) {
@@ -206,6 +219,21 @@ private struct EntryListView: View {
                         proxy.scrollTo(target.id, anchor: .top)
                     }
                 }
+            }
+            .alert("Delete this entry?", isPresented: $showDeleteAlert) {
+                Button("Cancel", role: .cancel) {
+                    entryToDelete = nil
+                }
+                Button("Delete", role: .destructive) {
+                    if let entry = entryToDelete {
+                        withAnimation {
+                            JournalManager.shared.deleteEntry(entry)
+                        }
+                        entryToDelete = nil
+                    }
+                }
+            } message: {
+                Text("This entry will be permanently deleted.")
             }
         }
     }

@@ -15,5 +15,17 @@
 			</array>
 		</dict>
 	</array>
+	<key>FB</key>
+	<string></string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string></string>
+	</array>
+	<key>instagram</key>
+	<string></string>
+	<key>instagram-stories</key>
+	<string></string>
+	<key>twitter</key>
+	<string></string>
 </dict>
 </plist>

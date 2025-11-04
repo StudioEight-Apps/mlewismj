@@ -9,23 +9,22 @@ struct FreeJournalPromptView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // Question Card - larger for free journal
-            VStack(spacing: 0) {
+            // Header section with title and body text
+            VStack(spacing: 12) {
                 Text("What's on your mind?")
-                    .font(.system(size: 24, weight: .semibold))
-                    .foregroundColor(Color(hex: "#1C1C1E"))
+                    .font(.system(size: 26, weight: .semibold))
+                    .foregroundColor(Color(hex: "#2A2A2A"))
                     .multilineTextAlignment(.center)
                     .lineSpacing(4)
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 32)
-                    .frame(maxWidth: .infinity)
-                    .background(
-                        RoundedRectangle(cornerRadius: 18)
-                            .fill(Color.white)
-                            .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 2)
-                    )
-                    .padding(.horizontal, 24)
+                
+                Text("A judgment-free space to let it out and breathe easier.")
+                    .font(.system(size: 16, weight: .regular))
+                    .foregroundColor(Color(hex: "#6E6E73"))
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(4)
+                    .padding(.horizontal, 32)
             }
+            .padding(.horizontal, 24)
             .padding(.top, 60)
             
             // Text Input Preview Box
@@ -54,12 +53,12 @@ struct FreeJournalPromptView: View {
                             RoundedRectangle(cornerRadius: 12)
                                 .stroke(isInputFocused ? Color(hex: "#A6B4FF").opacity(0.4) : Color(hex: "#E5E5EA"), lineWidth: 1.5)
                         )
-                        .shadow(color: isInputFocused ? Color.black.opacity(0.08) : Color.clear, radius: 8, x: 0, y: 2)
+                        .shadow(color: isInputFocused ? Color.black.opacity(0.08) : Color.black.opacity(0.04), radius: 8, x: 0, y: 2)
                 )
             }
             .buttonStyle(PlainButtonStyle())
             .padding(.horizontal, 24)
-            .padding(.top, 24)
+            .padding(.top, 28)
             .animation(.easeOut(duration: 0.25), value: isInputFocused)
             
             Spacer()
@@ -103,7 +102,7 @@ struct FreeJournalPromptView: View {
             .padding(.bottom, 40)
         }
         .background(Color(hex: "#FFFCF5"))
-        .navigationBarHidden(true)
+        .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 BackButton()

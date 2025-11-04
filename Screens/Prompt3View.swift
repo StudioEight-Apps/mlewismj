@@ -124,7 +124,7 @@ struct Prompt3View: View {
             .padding(.bottom, 40)
         }
         .background(Color(hex: "#FFFCF5"))
-        .navigationBarHidden(true)
+        .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 BackButton()

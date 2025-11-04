@@ -23,47 +23,17 @@ struct MantraGenerator {
                 return
             }
 
-            // Build the user prompt based on journal type
-            let userPrompt: String
-            if journalType == .free {
-                // For free journal, create a custom prompt that emphasizes short, punchy mantras
-                userPrompt = """
-                Based on this person's mood (\(mood)) and their free-form journal entry below, create a SHORT, PUNCHY mantra in the exact style of these examples:
-                
-                Examples of the style:
-                - "Confidence starts when comparison stops"
-                - "Move like it's already happening"
-                - "Let them wonder"
-                - "Your pace is perfect"
-                - "Trust the timing"
-                
-                Their journal entry:
-                \(response1)
-                
-                Create a mantra that is:
-                - Maximum 12 words
-                - No colons or definitions
-                - Conversational and direct
-                - Empowering and personal
-                - Sounds like advice from a wise friend
-                
-                Return ONLY the mantra, nothing else.
-                """
-            } else {
-                // Use the original guided prompt
-                userPrompt = WhisperVoice.personalizedMantraPrompt(
-                    mood: mood,
-                    response1: response1,
-                    response2: response2,
-                    response3: response3
-                )
-            }
-
+            // Use the same WhisperVoice prompt for both guided and free journal
             let requestBody: [String: Any] = [
                 "model": "gpt-4o",
                 "messages": [
                     ["role": "system", "content": WhisperVoice.systemPrompt],
-                    ["role": "user", "content": userPrompt]
+                    ["role": "user", "content": WhisperVoice.personalizedMantraPrompt(
+                        mood: mood,
+                        response1: response1,
+                        response2: response2,
+                        response3: response3
+                    )]
                 ],
                 "temperature": 0.8,
                 "max_tokens": 80
