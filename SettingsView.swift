@@ -4,6 +4,7 @@ struct SettingsView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @State private var showingPrivacyPolicy = false
     @State private var showingEditProfile = false
+    @State private var showingSubscriptionInfo = false
     
     // Delete account flow - 3 confirmations
     @State private var showingFirstConfirmation = false
@@ -32,6 +33,13 @@ struct SettingsView: View {
                         openAppStoreSubscriptions()
                     }) {
                         settingsRow(icon: "creditcard.fill", title: "Manage Membership")
+                    }
+                    .buttonStyle(BounceButtonStyle())
+                    
+                    Button(action: {
+                        showingSubscriptionInfo = true
+                    }) {
+                        settingsRow(icon: "info.circle.fill", title: "Subscription Information")
                     }
                     .buttonStyle(BounceButtonStyle())
                     
@@ -101,6 +109,9 @@ struct SettingsView: View {
         }
         .sheet(isPresented: $showingEditProfile) {
             EditProfileView()
+        }
+        .sheet(isPresented: $showingSubscriptionInfo) {
+            SubscriptionInfoView()
         }
         // FIRST CONFIRMATION: Are you sure?
         .alert("Delete Account?", isPresented: $showingFirstConfirmation) {
@@ -498,6 +509,154 @@ struct PrivacyPolicyView: View {
             Text(content)
                 .font(.system(size: 16))
                 .foregroundColor(Color(hex: "#2A2A2A"))
+                .lineSpacing(4)
+        }
+    }
+}
+
+// MARK: - Subscription Info View
+struct SubscriptionInfoView: View {
+    @Environment(\.dismiss) private var dismiss
+    
+    var body: some View {
+        NavigationView {
+            ZStack {
+                Color(hex: "#FFFCF5")
+                    .ignoresSafeArea()
+                
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 24) {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Subscription Plans")
+                                .font(.system(size: 32, weight: .bold, design: .serif))
+                                .foregroundColor(Color(hex: "#2A2A2A"))
+                            
+                            Text("All plans include full access to Whisper")
+                                .font(.system(size: 14))
+                                .foregroundColor(Color(hex: "#5B5564"))
+                        }
+                        
+                        // Pricing Cards
+                        VStack(spacing: 16) {
+                            pricingCard(title: "Weekly", price: "$2.99", period: "per week")
+                            pricingCard(title: "Monthly", price: "$7.99", period: "per month", badge: "MOST POPULAR")
+                            pricingCard(title: "Annual", price: "$59.99", period: "per year", badge: "BEST VALUE")
+                        }
+                        
+                        // Details Section
+                        VStack(alignment: .leading, spacing: 20) {
+                            infoSection(title: "Free Trial", content: "All plans include a 3-day free trial. You won't be charged until the trial ends.")
+                            
+                            infoSection(title: "Auto-Renewal", content: "Subscriptions automatically renew unless cancelled at least 24 hours before the end of the current period.")
+                            
+                            infoSection(title: "Cancellation", content: "Cancel anytime in your Apple ID settings. No refunds for partial periods.")
+                            
+                            infoSection(title: "Content Access", content: "Full access to journal entries, AI-powered mantras, widgets, and all premium features.")
+                        }
+                        
+                        // Links Section
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Legal")
+                                .font(.system(size: 20, weight: .semibold, design: .serif))
+                                .foregroundColor(Color(hex: "#2A2A2A"))
+                            
+                            Link(destination: URL(string: "https://www.studioeight.app/privacy.html")!) {
+                                HStack {
+                                    Text("Privacy Policy")
+                                        .font(.system(size: 16, weight: .medium))
+                                        .foregroundColor(Color(hex: "#A6B4FF"))
+                                    Spacer()
+                                    Image(systemName: "arrow.up.right")
+                                        .font(.system(size: 12))
+                                        .foregroundColor(Color(hex: "#A6B4FF"))
+                                }
+                                .padding(16)
+                                .background(Color.white)
+                                .cornerRadius(12)
+                                .shadow(color: Color(hex: "#A6B4FF").opacity(0.15), radius: 8, x: 0, y: 4)
+                            }
+                            
+                            Link(destination: URL(string: "https://www.studioeight.app/terms.html")!) {
+                                HStack {
+                                    Text("Terms of Use")
+                                        .font(.system(size: 16, weight: .medium))
+                                        .foregroundColor(Color(hex: "#A6B4FF"))
+                                    Spacer()
+                                    Image(systemName: "arrow.up.right")
+                                        .font(.system(size: 12))
+                                        .foregroundColor(Color(hex: "#A6B4FF"))
+                                }
+                                .padding(16)
+                                .background(Color.white)
+                                .cornerRadius(12)
+                                .shadow(color: Color(hex: "#A6B4FF").opacity(0.15), radius: 8, x: 0, y: 4)
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 20)
+                    .padding(.bottom, 40)
+                }
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") {
+                        dismiss()
+                    }
+                    .foregroundColor(Color(hex: "#A6B4FF"))
+                    .font(.system(size: 16, weight: .semibold))
+                }
+            }
+        }
+    }
+    
+    private func pricingCard(title: String, price: String, period: String, badge: String? = nil) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title)
+                        .font(.system(size: 24, weight: .semibold, design: .serif))
+                        .foregroundColor(Color(hex: "#2A2A2A"))
+                    
+                    HStack(alignment: .firstTextBaseline, spacing: 4) {
+                        Text(price)
+                            .font(.system(size: 20, weight: .medium))
+                            .foregroundColor(Color(hex: "#2A2A2A"))
+                        Text(period)
+                            .font(.system(size: 14))
+                            .foregroundColor(Color(hex: "#5B5564"))
+                    }
+                }
+                
+                Spacer()
+                
+                if let badge = badge {
+                    Text(badge)
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(Color(hex: "#A6B4FF"))
+                        .cornerRadius(12)
+                }
+            }
+        }
+        .padding(20)
+        .background(Color.white)
+        .cornerRadius(16)
+        .shadow(color: Color(hex: "#A6B4FF").opacity(0.15), radius: 8, x: 0, y: 4)
+    }
+    
+    private func infoSection(title: String, content: String) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(.system(size: 18, weight: .semibold, design: .serif))
+                .foregroundColor(Color(hex: "#2A2A2A"))
+            
+            Text(content)
+                .font(.system(size: 15))
+                .foregroundColor(Color(hex: "#5B5564"))
                 .lineSpacing(4)
         }
     }

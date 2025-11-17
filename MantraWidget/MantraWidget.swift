@@ -25,33 +25,109 @@ struct Provider: TimelineProvider {
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<SimpleEntry>) -> ()) {
         let sharedDefaults = UserDefaults(suiteName: "group.com.studioeight.mantra")
-        let mantra = sharedDefaults?.string(forKey: "latestMantra") ?? "How are you feeling today?"
-        let mood = sharedDefaults?.string(forKey: "latestMood") ?? "calm"
-        let backgroundImage = sharedDefaults?.string(forKey: "widgetBackground") ?? "whisper_bg_crinkledbeige"
-        let textColor = sharedDefaults?.string(forKey: "widgetTextColor") ?? "#5B3520"
-        let lastUpdated = sharedDefaults?.object(forKey: "lastUpdated") as? Date
-        
-        print("🔄 Widget Timeline Request:")
-        print("   App Group: group.com.studioeight.mantra")
-        print("   Mantra: \(mantra)")
-        print("   Mood: \(mood)")
-        print("   Background: \(backgroundImage)")
-        print("   Text Color: \(textColor)")
-        print("   Last Updated: \(lastUpdated?.formatted() ?? "never")")
-        
         let currentDate = Date()
-        let entry = SimpleEntry(
-            date: currentDate,
-            mantra: mantra,
-            mood: mood,
-            backgroundImage: backgroundImage,
-            textColor: textColor
+        let calendar = Calendar.current
+        
+        // Check if there's a pinned entry
+        let hasPinnedEntry = sharedDefaults?.bool(forKey: "hasPinnedEntry") ?? false
+        
+        if hasPinnedEntry {
+            // PINNED MODE: Single entry with pinned mantra (doesn't change)
+            let mantra = sharedDefaults?.string(forKey: "latestMantra") ?? "How are you feeling today?"
+            let mood = sharedDefaults?.string(forKey: "latestMood") ?? "calm"
+            let backgroundImage = sharedDefaults?.string(forKey: "widgetBackground") ?? "whisper_bg_crinkledbeige"
+            let textColor = sharedDefaults?.string(forKey: "widgetTextColor") ?? "#5B3520"
+            
+            let entry = SimpleEntry(
+                date: currentDate,
+                mantra: mantra,
+                mood: mood,
+                backgroundImage: backgroundImage,
+                textColor: textColor
+            )
+            
+            print("📌 Widget: Pinned mode - showing pinned mantra")
+            
+            // Single entry timeline - stays until unpinned
+            let nextUpdate = calendar.date(byAdding: .hour, value: 1, to: currentDate)!
+            let timeline = Timeline(entries: [entry], policy: .after(nextUpdate))
+            completion(timeline)
+            
+        } else if let entriesData = sharedDefaults?.data(forKey: "allEntries"),
+                  let decodedEntries = try? JSONDecoder().decode([[String: String]].self, from: entriesData),
+                  !decodedEntries.isEmpty {
+            
+            // ROTATION MODE: Generate 24-hour timeline (Apple's recommended approach)
+            var timelineEntries: [SimpleEntry] = []
+            
+            // Start from current hour, generate entries for next 24 hours
+            let startOfCurrentHour = calendar.dateComponents([.year, .month, .day, .hour], from: currentDate)
+            guard let currentHourDate = calendar.date(from: startOfCurrentHour) else {
+                // Fallback if date calculation fails
+                let entry = createPlaceholderEntry(date: currentDate)
+                let timeline = Timeline(entries: [entry], policy: .atEnd)
+                completion(timeline)
+                return
+            }
+            
+            // Generate 24 entries (one for each hour)
+            for hourOffset in 0..<24 {
+                guard let entryDate = calendar.date(byAdding: .hour, value: hourOffset, to: currentHourDate) else {
+                    continue
+                }
+                
+                // Deterministic selection based on hour + day of year
+                let hour = calendar.component(.hour, from: entryDate)
+                let dayOfYear = calendar.ordinality(of: .day, in: .year, for: entryDate) ?? 1
+                
+                // Seed ensures: same hour + day = same mantra across all widgets
+                let seed = (hour + dayOfYear)
+                let index = seed % decodedEntries.count
+                let selectedEntry = decodedEntries[index]
+                
+                let mantra = selectedEntry["mantra"] ?? "How are you feeling today?"
+                let mood = selectedEntry["mood"] ?? "calm"
+                let backgroundImage = selectedEntry["backgroundImage"] ?? "whisper_bg_crinkledbeige"
+                let textColor = selectedEntry["textColor"] ?? "#5B3520"
+                
+                let entry = SimpleEntry(
+                    date: entryDate,
+                    mantra: mantra,
+                    mood: mood,
+                    backgroundImage: backgroundImage,
+                    textColor: textColor
+                )
+                
+                timelineEntries.append(entry)
+            }
+            
+            print("🔄 Widget: Rotation mode - generated 24-hour timeline from \(decodedEntries.count) entries")
+            
+            // iOS will automatically switch between entries at the right time
+            // atEnd policy means regenerate timeline after 24 hours
+            let timeline = Timeline(entries: timelineEntries, policy: .atEnd)
+            completion(timeline)
+            
+        } else {
+            // NO ENTRIES: Show placeholder
+            print("📱 Widget: No entries available - showing placeholder")
+            
+            let entry = createPlaceholderEntry(date: currentDate)
+            let nextUpdate = calendar.date(byAdding: .hour, value: 1, to: currentDate)!
+            let timeline = Timeline(entries: [entry], policy: .after(nextUpdate))
+            completion(timeline)
+        }
+    }
+    
+    // Helper function to create placeholder entry
+    private func createPlaceholderEntry(date: Date) -> SimpleEntry {
+        return SimpleEntry(
+            date: date,
+            mantra: "How are you feeling today?",
+            mood: "calm",
+            backgroundImage: "whisper_bg_crinkledbeige",
+            textColor: "#5B3520"
         )
-        
-        let nextUpdate = Calendar.current.date(byAdding: .hour, value: 1, to: currentDate)!
-        let timeline = Timeline(entries: [entry], policy: .after(nextUpdate))
-        
-        completion(timeline)
     }
 }
 
@@ -115,7 +191,7 @@ struct MantraWidgetEntryView: View {
             }
             
         default:
-            // Home screen widgets - Co—Star inspired dark design
+            // Home screen widgets - Co–Star inspired dark design
             HomeScreenWidget(entry: entry, family: family)
         }
     }

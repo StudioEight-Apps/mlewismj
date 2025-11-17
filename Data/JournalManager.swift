@@ -61,6 +61,9 @@ class JournalManager: ObservableObject {
 
         entries.append(entry)
         saveToFirebase(entry: entry, userId: userId)
+        
+        // Sync to widget for rotation
+        syncEntriesToWidget()
     }
     
     // MARK: - Toggle Favorite
@@ -114,8 +117,12 @@ class JournalManager: ObservableObject {
                 backgroundImage: entries[index].backgroundImage,
                 textColor: entries[index].textColor
             )
+            // Set pin flag for widget
+            sharedDefaults.set(true, forKey: "hasPinnedEntry")
         } else {
             clearWidget()
+            // Clear pin flag - widget will use rotation
+            sharedDefaults.set(false, forKey: "hasPinnedEntry")
         }
     }
     
@@ -234,6 +241,9 @@ class JournalManager: ObservableObject {
                 DispatchQueue.main.async {
                     self?.entries = loadedEntries
                     print("✅ Loaded \(loadedEntries.count) entries from Firebase")
+                    
+                    // Sync entries to widget for rotation feature
+                    self?.syncEntriesToWidget()
                 }
             }
     }
@@ -267,6 +277,10 @@ class JournalManager: ObservableObject {
                   }
               } else {
                   print("✅ Entry deleted from Firebase successfully")
+                  // Update widget rotation pool
+                  DispatchQueue.main.async {
+                      self.syncEntriesToWidget()
+                  }
               }
           }
     }
@@ -282,6 +296,8 @@ class JournalManager: ObservableObject {
         sharedDefaults.removeObject(forKey: "widgetBackground")
         sharedDefaults.removeObject(forKey: "widgetTextColor")
         sharedDefaults.removeObject(forKey: "mantraTimestamp")
+        sharedDefaults.removeObject(forKey: "hasPinnedEntry")
+        sharedDefaults.removeObject(forKey: "allEntries")
         WidgetCenter.shared.reloadAllTimelines()
         print("✅ JournalManager: All data cleared")
     }
@@ -303,6 +319,38 @@ class JournalManager: ObservableObject {
         sharedDefaults.removeObject(forKey: "widgetBackground")
         sharedDefaults.removeObject(forKey: "widgetTextColor")
         WidgetCenter.shared.reloadAllTimelines()
+    }
+    
+    // MARK: - Widget Auto-Rotation Support
+    /// Syncs simplified entry data to UserDefaults for widget rotation feature
+    /// Called whenever entries are loaded, added, or deleted
+    func syncEntriesToWidget() {
+        guard !entries.isEmpty else {
+            // Clear rotation data if no entries
+            sharedDefaults.removeObject(forKey: "allEntries")
+            WidgetCenter.shared.reloadAllTimelines()
+            print("📱 Widget: No entries to sync for rotation")
+            return
+        }
+        
+        // Create lightweight array with only data widget needs
+        let simplifiedEntries: [[String: String]] = entries.map { entry in
+            return [
+                "mantra": entry.text,
+                "mood": entry.mood,
+                "backgroundImage": entry.backgroundImage,
+                "textColor": entry.textColor
+            ]
+        }
+        
+        // Save to shared UserDefaults
+        if let encoded = try? JSONEncoder().encode(simplifiedEntries) {
+            sharedDefaults.set(encoded, forKey: "allEntries")
+            WidgetCenter.shared.reloadAllTimelines()
+            print("✅ Widget: Synced \(simplifiedEntries.count) entries for rotation")
+        } else {
+            print("❌ Widget: Failed to encode entries for rotation")
+        }
     }
     
     func getLatestWidgetData() -> (mantra: String, mood: String, backgroundImage: String, textColor: String, timestamp: Date)? {

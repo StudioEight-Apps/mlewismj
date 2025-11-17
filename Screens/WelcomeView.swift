@@ -489,7 +489,7 @@ struct WhisperShareButton: View {
                         y: 4
                     )
                 
-                Image(systemName: "square.and.arrow.up")
+                Image(systemName: "paperplane")
                     .font(.system(size: 16, weight: .medium))
                     .foregroundColor(Color(hex: "#7A6EFF"))
             }

@@ -1,10 +1,10 @@
 import SwiftUI
 
-struct OnboardingPage1: View {
+struct OnboardingPage5: View {
     var body: some View {
         ZStack {
             // Background - properly scaled to fill screen
-            Image("bg1_cream_scribble")
+            Image("bg5_cream_scribble_plane")
                 .resizable()
                 .scaledToFill()
                 .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
@@ -24,7 +24,7 @@ struct OnboardingPage1: View {
                 
                 // Text content - centered
                 VStack(spacing: 14) {
-                    Text("Your thoughts were meant to pass through, not live inside you.")
+                    Text("Begin your journaling journey.")
                         .font(.system(size: 30, weight: .medium, design: .serif))
                         .foregroundColor(Color(hex: "#2A2A2A"))
                         .multilineTextAlignment(.center)
@@ -32,7 +32,7 @@ struct OnboardingPage1: View {
                         .frame(maxWidth: 360)
                         .fixedSize(horizontal: false, vertical: true)
                     
-                    Text("Give your mind space to breathe your journal can hold the rest.")
+                    Text("Start your first reflection and let Whisper begin sending mantras to guide you.")
                         .font(.system(size: 17, weight: .regular))
                         .foregroundColor(Color(hex: "#2A2A2A").opacity(0.85))
                         .multilineTextAlignment(.center)

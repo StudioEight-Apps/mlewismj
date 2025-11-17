@@ -10,6 +10,10 @@ struct LoginView: View {
     @State private var showingError = false
     @State private var errorMessage = ""
     
+    // Forgot password
+    @State private var showingResetPassword = false
+    @State private var resetEmail = ""
+    
     // Animation states
     @State private var loginPressed = false
     @State private var applePressed = false
@@ -88,6 +92,21 @@ struct LoginView: View {
                         .shadow(color: Color.black.opacity(0.02), radius: 2, x: 0, y: 1)
                         .autocapitalization(.none)
                         .disableAutocorrection(true)
+                    
+                    // Forgot Password Link
+                    HStack {
+                        Spacer()
+                        Button(action: {
+                            resetEmail = email
+                            showingResetPassword = true
+                        }) {
+                            Text("Forgot Password?")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(Color(hex: "#A6B8FA"))
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                    }
+                    .padding(.top, 4)
                 }
                 .padding(.top, 100)
                 .padding(.horizontal, 24)
@@ -208,6 +227,17 @@ struct LoginView: View {
         } message: {
             Text(errorMessage)
         }
+        .alert("Reset Password", isPresented: $showingResetPassword) {
+            TextField("Email", text: $resetEmail)
+            Button("Send Reset Link") {
+                handleResetPassword()
+            }
+            Button("Cancel", role: .cancel) {
+                resetEmail = ""
+            }
+        } message: {
+            Text("Enter your email address to receive a password reset link.")
+        }
     }
     
     // MARK: - Actions
@@ -229,6 +259,26 @@ struct LoginView: View {
             case .failure(let error):
                 self.errorMessage = error.localizedDescription
                 self.showingError = true
+            }
+        }
+    }
+    
+    func handleResetPassword() {
+        guard !resetEmail.isEmpty else {
+            errorMessage = "Please enter your email address"
+            showingError = true
+            return
+        }
+        
+        authViewModel.resetPassword(email: resetEmail.trimmingCharacters(in: .whitespacesAndNewlines)) { result in
+            switch result {
+            case .success:
+                errorMessage = "Password reset email sent! Check your inbox."
+                showingError = true
+                resetEmail = ""
+            case .failure(let error):
+                errorMessage = error.localizedDescription
+                showingError = true
             }
         }
     }

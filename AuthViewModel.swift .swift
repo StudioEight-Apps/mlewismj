@@ -105,6 +105,33 @@ class AuthViewModel: ObservableObject {
         }
     }
     
+    // MARK: - Reset Password
+    func resetPassword(email: String, completion: @escaping (Result<Void, Error>) -> Void) {
+        Auth.auth().sendPasswordReset(withEmail: email) { error in
+            if let error = error {
+                let nsError = error as NSError
+                var customError: Error
+                
+                switch nsError.code {
+                case AuthErrorCode.invalidEmail.rawValue:
+                    customError = NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Please enter a valid email address."])
+                case AuthErrorCode.userNotFound.rawValue:
+                    customError = NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "No account found with this email."])
+                default:
+                    customError = NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Failed to send reset email. Please try again."])
+                }
+                
+                DispatchQueue.main.async {
+                    completion(.failure(customError))
+                }
+            } else {
+                DispatchQueue.main.async {
+                    completion(.success(()))
+                }
+            }
+        }
+    }
+    
     func signInWithGoogle(completion: @escaping (Result<Void, Error>) -> Void) {
         GoogleAuthManager.shared.signInWithGoogle { result in
             DispatchQueue.main.async {
@@ -228,7 +255,7 @@ class AuthViewModel: ObservableObject {
             if let error = error {
                 print("❌ Error fetching journal entries for deletion: \(error.localizedDescription)")
             } else {
-                print("📝 Found \(snapshot?.documents.count ?? 0) journal entries to delete")
+                print("📄 Found \(snapshot?.documents.count ?? 0) journal entries to delete")
             }
             
             // Delete entries in batch

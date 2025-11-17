@@ -2,87 +2,49 @@ import SwiftUI
 
 struct OnboardingPage3: View {
     var body: some View {
-        GeometryReader { geometry in
-            let safeArea = geometry.safeAreaInsets
-            let availableHeight = geometry.size.height - safeArea.top - safeArea.bottom
-            
-            ZStack {
-                // Subtle gradient background for depth
-                LinearGradient(
-                    gradient: Gradient(colors: [
-                        Color(hex: "#FFFCF5"),
-                        Color(hex: "#FFF9ED")
-                    ]),
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
+        ZStack {
+            // Background - properly scaled to fill screen
+            Image("bg3_cream_scribble_diagonal")
+                .resizable()
+                .scaledToFill()
+                .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+                .clipped()
                 .ignoresSafeArea()
+            
+            // Content overlay
+            VStack(spacing: 0) {
+                // Logo at top
+                Image("whisper-logo")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(height: 28)
+                    .padding(.top, 60)
                 
-                VStack(spacing: 0) {
-                    // Logo positioning - very high
-                    Spacer()
-                        .frame(height: safeArea.top + 10)
-                    
-                    // Whisper logo - positioned as high as possible
-                    Image("whisper-logo")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(height: 32)
-                    
-                    // Spacing between logo and icon
-                    Spacer()
-                        .frame(height: availableHeight * 0.08)
-                    
-                    // Illustration - larger and more prominent
-                    HStack {
-                        Spacer()
-                        Image("onboarding_icon_s3")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(height: availableHeight * 0.28)
-                            .frame(maxWidth: geometry.size.width * 0.75)
-                        Spacer()
-                    }
-                    
-                    // Gap between icon and title
-                    Spacer()
-                        .frame(height: availableHeight * 0.06)
-                    
-                    // Title - single line
-                    Text("Build habits that help")
-                        .font(.system(size: 28, weight: .bold))
+                Spacer()
+                
+                // Text content - centered
+                VStack(spacing: 14) {
+                    Text("A smarter way to journal. It listens and it responds.")
+                        .font(.system(size: 30, weight: .medium, design: .serif))
                         .foregroundColor(Color(hex: "#2A2A2A"))
                         .multilineTextAlignment(.center)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.7)
-                        .padding(.horizontal, 32)
+                        .tracking(0.5)
+                        .frame(maxWidth: 360)
+                        .fixedSize(horizontal: false, vertical: true)
                     
-                    // Gap between title and body
-                    Spacer()
-                        .frame(height: availableHeight * 0.025)
-                    
-                    // Body - slightly larger and better weight
-                    HStack {
-                        Spacer()
-                        Text("Just a few minutes a day builds clarity balance and focus. With Whisper reflection becomes a lasting habit that strengthens your daily routine.")
-                            .font(.system(size: 16, weight: .regular))
-                            .foregroundColor(Color(hex: "#666666"))
-                            .multilineTextAlignment(.center)
-                            .lineLimit(4)
-                            .lineSpacing(4)
-                            .frame(maxWidth: geometry.size.width * 0.82)
-                        Spacer()
-                    }
-                    
-                    // Fill remaining space
-                    Spacer()
-                    
-                    // Bottom safe area
-                    Spacer()
-                        .frame(height: max(safeArea.bottom, 20))
+                    Text("Whisper learns from what you write and talks back through guidance on your widgets.")
+                        .font(.system(size: 17, weight: .regular))
+                        .foregroundColor(Color(hex: "#2A2A2A").opacity(0.85))
+                        .multilineTextAlignment(.center)
+                        .lineSpacing(4)
+                        .frame(maxWidth: 360)
                 }
+                .padding(.horizontal, 24)
+                
+                Spacer()
+                Spacer()
             }
         }
-        .ignoresSafeArea(.all, edges: .all)
+        .background(Color(hex: "#FFFCF5"))
     }
 }
