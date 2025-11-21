@@ -32,7 +32,7 @@ struct OnboardingPage1: View {
                         .frame(maxWidth: 360)
                         .fixedSize(horizontal: false, vertical: true)
                     
-                    Text("Give your mind space to breathe your journal can hold the rest.")
+                    Text("Give your mind space to breathe, your journal can hold the rest.")
                         .font(.system(size: 17, weight: .regular))
                         .foregroundColor(Color(hex: "#2A2A2A").opacity(0.85))
                         .multilineTextAlignment(.center)
