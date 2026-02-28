@@ -5,28 +5,30 @@ struct FreeJournalPromptView: View {
     @State private var showTextEditor = false
     @FocusState private var isInputFocused: Bool
     @State private var isButtonPressed = false
+    @Environment(\.colorScheme) var colorScheme
+    private var colors: AppColors { AppColors(colorScheme) }
     let mood: String
-    
+
     var body: some View {
         VStack(spacing: 0) {
             // Header section with title and body text
             VStack(spacing: 12) {
                 Text("What's on your mind?")
-                    .font(.system(size: 26, weight: .semibold))
-                    .foregroundColor(Color(hex: "#2A2A2A"))
+                    .font(.system(size: 26, weight: .semibold, design: .serif))
+                    .foregroundColor(colors.primaryText)
                     .multilineTextAlignment(.center)
                     .lineSpacing(4)
-                
+
                 Text("A judgment-free space to let it out and breathe easier.")
                     .font(.system(size: 16, weight: .regular))
-                    .foregroundColor(Color(hex: "#6E6E73"))
+                    .foregroundColor(colors.descriptionText)
                     .multilineTextAlignment(.center)
                     .lineSpacing(4)
                     .padding(.horizontal, 32)
             }
             .padding(.horizontal, 24)
             .padding(.top, 60)
-            
+
             // Text Input Preview Box
             Button(action: {
                 showTextEditor = true
@@ -35,12 +37,12 @@ struct FreeJournalPromptView: View {
                     Text(responseText.isEmpty ? "Write as much or as little as you'd like..." : responseText)
                         .font(.system(size: 16, weight: .regular))
                         .italic(responseText.isEmpty)
-                        .foregroundColor(responseText.isEmpty ? Color(hex: "#999999") : Color(hex: "#1C1C1E"))
+                        .foregroundColor(responseText.isEmpty ? colors.placeholder : colors.primaryText)
                         .multilineTextAlignment(.leading)
                         .lineLimit(8)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .opacity(responseText.isEmpty ? 0.8 : 1.0)
-                    
+
                     Spacer()
                 }
                 .padding(16)
@@ -48,35 +50,34 @@ struct FreeJournalPromptView: View {
                 .frame(maxWidth: .infinity)
                 .background(
                     RoundedRectangle(cornerRadius: 12)
-                        .fill(Color.white)
+                        .fill(colors.questionCard)
                         .overlay(
                             RoundedRectangle(cornerRadius: 12)
-                                .stroke(isInputFocused ? Color(hex: "#A6B4FF").opacity(0.4) : Color(hex: "#E5E5EA"), lineWidth: 1.5)
+                                .stroke(isInputFocused ? colors.inputFocusBorder : colors.inputBorder, lineWidth: 1.5)
                         )
-                        .shadow(color: isInputFocused ? Color.black.opacity(0.08) : Color.black.opacity(0.04), radius: 8, x: 0, y: 2)
+                        .shadow(color: isInputFocused ? colors.cardShadow : colors.cardShadowLight, radius: 8, x: 0, y: 2)
                 )
             }
             .buttonStyle(PlainButtonStyle())
             .padding(.horizontal, 24)
             .padding(.top, 28)
             .animation(.easeOut(duration: 0.25), value: isInputFocused)
-            
+
             Spacer()
-            
-            // Continue Button with press animation
+
+            // Continue Button
             NavigationLink(destination: LoadingView(
                 mood: mood,
                 freeJournalText: responseText
             )) {
                 Text("Continue")
                     .font(.system(size: 17, weight: .semibold))
-                    .foregroundColor(.white)
+                    .foregroundColor(colors.buttonText)
                     .frame(height: 52)
                     .frame(maxWidth: .infinity)
                     .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color(hex: "#A6B4FF"))
-                            .shadow(color: Color(hex: "#A6B4FF").opacity(0.2), radius: 4, x: 0, y: 2)
+                        RoundedRectangle(cornerRadius: 26)
+                            .fill(colors.buttonBackground)
                     )
                     .scaleEffect(isButtonPressed ? 0.97 : 1.0)
             }
@@ -101,7 +102,7 @@ struct FreeJournalPromptView: View {
             .padding(.horizontal, 24)
             .padding(.bottom, 40)
         }
-        .background(Color(hex: "#FFFCF5"))
+        .background(colors.secondaryBackground)
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
@@ -125,64 +126,66 @@ struct FreeJournalPromptView: View {
 struct FreeJournalTextEditorView: View {
     @Binding var text: String
     @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) var colorScheme
+    private var colors: AppColors { AppColors(colorScheme) }
     @FocusState private var isEditorFocused: Bool
     @State private var characterCount: Int = 0
-    
+
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ZStack {
                 // Background
-                Color(hex: "#FFFCF5")
+                colors.editorBackground
                     .ignoresSafeArea()
-                
+
                 VStack(spacing: 0) {
-                    // Header with question
+                    // Header with question - SERIF FONT
                     VStack(alignment: .leading, spacing: 8) {
                         Text("What's on your mind?")
-                            .font(.system(size: 19, weight: .medium))
-                            .foregroundColor(Color(hex: "#1C1C1E"))
+                            .font(.system(size: 19, weight: .medium, design: .serif))
+                            .foregroundColor(colors.primaryText)
                             .lineSpacing(5)
                             .fixedSize(horizontal: false, vertical: true)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, 24)
                     .padding(.vertical, 24)
-                    
+
                     // Subtle divider
                     Rectangle()
-                        .fill(Color(hex: "#E5E5EA").opacity(0.5))
+                        .fill(colors.divider)
                         .frame(height: 0.5)
                         .padding(.horizontal, 24)
-                    
+
                     // Text editor area
                     ZStack(alignment: .topLeading) {
                         // Elegant placeholder
                         if text.isEmpty {
                             Text("Share your thoughts...")
                                 .font(.system(size: 17, weight: .regular))
-                                .foregroundColor(Color(hex: "#B0B3BA"))
+                                .foregroundColor(colors.placeholder)
                                 .padding(.horizontal, 28)
                                 .padding(.top, 24)
                                 .transition(.opacity.combined(with: .scale(scale: 0.98)))
                         }
-                        
+
                         // Text editor with better padding
                         TextEditor(text: $text)
                             .font(.system(size: 17, weight: .regular))
-                            .foregroundColor(Color(hex: "#1C1C1E"))
+                            .foregroundColor(colors.primaryText)
                             .lineSpacing(6)
                             .padding(.horizontal, 20)
                             .padding(.top, 16)
                             .scrollContentBackground(.hidden)
                             .focused($isEditorFocused)
-                            .onChange(of: text) { newValue in
+                            .onChange(of: text) { oldValue, newValue in
                                 withAnimation(.easeOut(duration: 0.2)) {
                                     characterCount = newValue.count
                                 }
                             }
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    
+
                     Spacer()
                 }
             }
@@ -191,16 +194,16 @@ struct FreeJournalTextEditorView: View {
                 ToolbarItem(placement: .principal) {
                     Text("Your Journal")
                         .font(.system(size: 15, weight: .medium))
-                        .foregroundColor(Color(hex: "#6E6E73"))
+                        .foregroundColor(colors.mutedText)
                 }
-                
+
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
                         dismiss()
                     }) {
                         Text("Done")
                             .font(.system(size: 17, weight: .semibold))
-                            .foregroundColor(Color(hex: "#A6B4FF"))
+                            .foregroundColor(colors.primaryText)
                     }
                 }
             }

@@ -6,10 +6,12 @@
       "scale" : "1x"
     },
     {
+      "filename" : "whisper_bg_deepreds 1.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+      "filename" : "whisper_bg_deepreds 2.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

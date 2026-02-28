@@ -6,29 +6,25 @@ struct Prompt1View: View {
     @State private var showTextEditor = false
     @FocusState private var isInputFocused: Bool
     @State private var isButtonPressed = false
+    @Environment(\.colorScheme) var colorScheme
+    private var colors: AppColors { AppColors(colorScheme) }
     let mood: String
 
     var body: some View {
         VStack(spacing: 0) {
-            // Stack for prompt indicator and question card
             VStack(spacing: 0) {
-                // Prompt Indicator - Caption typography
                 Text("Prompt 1 of 3")
                     .font(.system(size: 13, weight: .regular))
-                    .foregroundColor(Color(hex: "#6E6E73"))
+                    .foregroundColor(colors.promptCapsuleText)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 5)
-                    .background(
-                        Capsule()
-                            .fill(Color(hex: "#F5F5F5"))
-                    )
+                    .background(Capsule().fill(colors.promptCapsule))
                     .zIndex(1)
                     .offset(y: 12)
-                
-                // Question Card - Reduced size and padding - NO SERIF
+
                 Text(currentQuestion)
-                    .font(.system(size: 20, weight: .semibold))
-                    .foregroundColor(Color(hex: "#1C1C1E"))
+                    .font(.system(size: 20, weight: .semibold, design: .serif))
+                    .foregroundColor(colors.primaryText)
                     .multilineTextAlignment(.center)
                     .lineSpacing(4)
                     .lineLimit(nil)
@@ -38,27 +34,27 @@ struct Prompt1View: View {
                     .frame(maxWidth: .infinity)
                     .background(
                         RoundedRectangle(cornerRadius: 18)
-                            .fill(Color.white)
-                            .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 2)
+                            .fill(colors.questionCard)
+                            .shadow(color: colors.questionCardShadow, radius: 8, x: 0, y: 2)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 18)
+                                    .stroke(colors.cardBorder, lineWidth: 0.5)
+                            )
                     )
                     .padding(.horizontal, 24)
             }
             .padding(.top, 60)
 
-            // Text Input Preview Box with improved styling
-            Button(action: {
-                showTextEditor = true
-            }) {
+            Button(action: { showTextEditor = true }) {
                 HStack {
                     Text(responseText.isEmpty ? "Write as much or as little as you'd like..." : responseText)
                         .font(.system(size: 16, weight: .regular))
                         .italic(responseText.isEmpty)
-                        .foregroundColor(responseText.isEmpty ? Color(hex: "#999999") : Color(hex: "#1C1C1E"))
+                        .foregroundColor(responseText.isEmpty ? colors.placeholder : colors.primaryText)
                         .multilineTextAlignment(.leading)
                         .lineLimit(4)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .opacity(responseText.isEmpty ? 0.8 : 1.0)
-                    
                     Spacer()
                 }
                 .padding(16)
@@ -66,12 +62,11 @@ struct Prompt1View: View {
                 .frame(maxWidth: .infinity)
                 .background(
                     RoundedRectangle(cornerRadius: 12)
-                        .fill(Color.white)
+                        .fill(colors.questionCard)
                         .overlay(
                             RoundedRectangle(cornerRadius: 12)
-                                .stroke(isInputFocused ? Color(hex: "#A6B4FF").opacity(0.4) : Color(hex: "#E5E5EA"), lineWidth: 1.5)
+                                .stroke(isInputFocused ? colors.inputFocusBorder : colors.inputBorder, lineWidth: 1.5)
                         )
-                        .shadow(color: isInputFocused ? Color.black.opacity(0.08) : Color.clear, radius: 8, x: 0, y: 2)
                 )
             }
             .buttonStyle(PlainButtonStyle())
@@ -81,20 +76,19 @@ struct Prompt1View: View {
 
             Spacer()
 
-            // Continue Button with press animation
             NavigationLink(destination: Prompt2View(
                 mood: mood,
-                prompt1: responseText
+                prompt1: responseText,
+                question1: currentQuestion
             )) {
                 Text("Continue")
                     .font(.system(size: 17, weight: .semibold))
-                    .foregroundColor(.white)
+                    .foregroundColor(colors.buttonText)
                     .frame(height: 52)
                     .frame(maxWidth: .infinity)
                     .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color(hex: "#A6B4FF"))
-                            .shadow(color: Color(hex: "#A6B4FF").opacity(0.2), radius: 4, x: 0, y: 2)
+                        RoundedRectangle(cornerRadius: 26)
+                            .fill(colors.buttonBackground)
                     )
                     .scaleEffect(isButtonPressed ? 0.97 : 1.0)
             }
@@ -105,21 +99,17 @@ struct Prompt1View: View {
                 DragGesture(minimumDistance: 0)
                     .onChanged { _ in
                         if !responseText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                            withAnimation(.easeOut(duration: 0.1)) {
-                                isButtonPressed = true
-                            }
+                            withAnimation(.easeOut(duration: 0.1)) { isButtonPressed = true }
                         }
                     }
                     .onEnded { _ in
-                        withAnimation(.easeOut(duration: 0.1)) {
-                            isButtonPressed = false
-                        }
+                        withAnimation(.easeOut(duration: 0.1)) { isButtonPressed = false }
                     }
             )
             .padding(.horizontal, 24)
             .padding(.bottom, 40)
         }
-        .background(Color(hex: "#FFFCF5"))
+        .background(colors.secondaryBackground)
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
@@ -132,7 +122,6 @@ struct Prompt1View: View {
         .sheet(isPresented: $showTextEditor) {
             TextEditorView(text: $responseText, question: currentQuestion)
                 .onDisappear {
-                    // Simulate focus state when returning from editor
                     isInputFocused = !responseText.isEmpty
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                         isInputFocused = false
@@ -145,14 +134,14 @@ struct Prompt1View: View {
 // Custom back button - chevron only
 struct BackButton: View {
     @Environment(\.dismiss) var dismiss
-    
+    @Environment(\.colorScheme) var colorScheme
+    private var colors: AppColors { AppColors(colorScheme) }
+
     var body: some View {
-        Button(action: {
-            dismiss()
-        }) {
+        Button(action: { dismiss() }) {
             Image(systemName: "chevron.left")
                 .font(.system(size: 20, weight: .semibold))
-                .foregroundColor(Color(hex: "#A6B4FF"))
+                .foregroundColor(colors.navTint)
                 .frame(width: 44, height: 44)
                 .contentShape(Rectangle())
         }
@@ -164,64 +153,60 @@ struct TextEditorView: View {
     @Binding var text: String
     let question: String
     @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) var colorScheme
+    private var colors: AppColors { AppColors(colorScheme) }
     @FocusState private var isEditorFocused: Bool
     @State private var characterCount: Int = 0
-    
+
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ZStack {
-                // Background
-                Color(hex: "#FFFCF5")
+                colors.editorBackground
                     .ignoresSafeArea()
-                
+
                 VStack(spacing: 0) {
-                    // Question header - more minimal and elegant
                     VStack(alignment: .leading, spacing: 8) {
                         Text(question)
-                            .font(.system(size: 19, weight: .medium))
-                            .foregroundColor(Color(hex: "#1C1C1E"))
+                            .font(.system(size: 19, weight: .medium, design: .serif))
+                            .foregroundColor(colors.primaryText)
                             .lineSpacing(5)
                             .fixedSize(horizontal: false, vertical: true)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, 24)
                     .padding(.vertical, 24)
-                    
-                    // Subtle divider
+
                     Rectangle()
-                        .fill(Color(hex: "#E5E5EA").opacity(0.5))
+                        .fill(colors.divider)
                         .frame(height: 0.5)
                         .padding(.horizontal, 24)
-                    
-                    // Text editor area
+
                     ZStack(alignment: .topLeading) {
-                        // Elegant placeholder
                         if text.isEmpty {
                             Text("Share your thoughts...")
                                 .font(.system(size: 17, weight: .regular))
-                                .foregroundColor(Color(hex: "#B0B3BA"))
+                                .foregroundColor(colors.placeholder)
                                 .padding(.horizontal, 28)
                                 .padding(.top, 24)
                                 .transition(.opacity.combined(with: .scale(scale: 0.98)))
                         }
-                        
-                        // Text editor with better padding
+
                         TextEditor(text: $text)
                             .font(.system(size: 17, weight: .regular))
-                            .foregroundColor(Color(hex: "#1C1C1E"))
+                            .foregroundColor(colors.primaryText)
                             .lineSpacing(6)
                             .padding(.horizontal, 20)
                             .padding(.top, 16)
                             .scrollContentBackground(.hidden)
                             .focused($isEditorFocused)
-                            .onChange(of: text) { newValue in
+                            .onChange(of: text) { oldValue, newValue in
                                 withAnimation(.easeOut(duration: 0.2)) {
                                     characterCount = newValue.count
                                 }
                             }
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    
+
                     Spacer()
                 }
             }
@@ -230,22 +215,18 @@ struct TextEditorView: View {
                 ToolbarItem(placement: .principal) {
                     Text("Your Response")
                         .font(.system(size: 15, weight: .medium))
-                        .foregroundColor(Color(hex: "#6E6E73"))
+                        .foregroundColor(colors.mutedText)
                 }
-                
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        dismiss()
-                    }) {
+                    Button(action: { dismiss() }) {
                         Text("Done")
                             .font(.system(size: 17, weight: .semibold))
-                            .foregroundColor(Color(hex: "#A6B4FF"))
+                            .foregroundColor(colors.primaryText)
                     }
                 }
             }
             .onAppear {
                 characterCount = text.count
-                // Auto-focus keyboard with slight delay
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                     isEditorFocused = true
                 }

@@ -15,6 +15,57 @@ class JournalManager: ObservableObject {
     private var authStateListener: AuthStateDidChangeListenerHandle?
     private let sharedDefaults = UserDefaults(suiteName: "group.com.studioeight.mantra") ?? UserDefaults.standard
 
+    // MARK: - Widget Keys (App Group)
+    private enum WidgetKeys {
+        static let hasPinnedEntry = "hasPinnedEntry"
+        static let latestMantra = "latestMantra"
+        static let latestMood = "latestMood"
+        static let widgetBackground = "widgetBackground"
+        static let widgetTextColor = "widgetTextColor"
+        static let widgetAlignment = "widgetAlignment"
+        static let mantraTimestamp = "mantraTimestamp"
+        static let allEntries = "allEntries"
+    }
+
+    /// Clears pinned payload keys so the widget cannot keep rendering stale pinned content after unpin.
+    private func clearPinnedWidgetPayload() {
+        sharedDefaults.removeObject(forKey: WidgetKeys.latestMantra)
+        sharedDefaults.removeObject(forKey: WidgetKeys.latestMood)
+        sharedDefaults.removeObject(forKey: WidgetKeys.widgetBackground)
+        sharedDefaults.removeObject(forKey: WidgetKeys.widgetTextColor)
+        sharedDefaults.removeObject(forKey: WidgetKeys.widgetAlignment)
+        sharedDefaults.removeObject(forKey: WidgetKeys.mantraTimestamp)
+    }
+
+    /// Writes a widget-safe "latest" payload. Used for pinned mode and as a rotation fallback.
+    private func writeLatestWidgetPayload(mantra: String, mood: String, backgroundImage: String, textColor: String, timestamp: Date = Date()) {
+        let alignment = BackgroundConfig.widgetAlignmentString(for: backgroundImage)
+        sharedDefaults.set(mantra, forKey: WidgetKeys.latestMantra)
+        sharedDefaults.set(mood, forKey: WidgetKeys.latestMood)
+        sharedDefaults.set(backgroundImage, forKey: WidgetKeys.widgetBackground)
+        sharedDefaults.set(textColor, forKey: WidgetKeys.widgetTextColor)
+        sharedDefaults.set(alignment, forKey: WidgetKeys.widgetAlignment)
+        sharedDefaults.set(timestamp, forKey: WidgetKeys.mantraTimestamp)
+    }
+
+    /// Ensures the widget always has something renderable (prevents grey placeholder on fresh installs / empty states).
+    private func ensureWidgetRenderableFallbackIfNeeded() {
+        if sharedDefaults.string(forKey: WidgetKeys.latestMantra) != nil { return }
+        writeLatestWidgetPayload(
+            mantra: "How are you feeling today?",
+            mood: "calm",
+            backgroundImage: "whisper_bg_crinkledbeige",
+            textColor: "#5B3520",
+            timestamp: Date()
+        )
+        sharedDefaults.set(false, forKey: WidgetKeys.hasPinnedEntry)
+    }
+
+    private func reloadWidgets() {
+        WidgetCenter.shared.reloadTimelines(ofKind: "MantraWidget")
+        WidgetCenter.shared.reloadAllTimelines()
+    }
+
     private init() {
         setupAuthListener()
     }
@@ -39,19 +90,21 @@ class JournalManager: ObservableObject {
         mantra: String,
         journalType: JournalType = .guided,
         backgroundImage: String,
-        textColor: String
+        textColor: String,
+        promptQuestions: [String] = []
     ) {
         guard let userId = Auth.auth().currentUser?.uid else {
             print("❌ No authenticated user - cannot save entry")
             return
         }
-        
+
         let entry = JournalEntry(
             date: Date(),
             mood: mood,
             text: mantra,
             colorHex: colorForMood(mood),
             prompts: [response1, response2, response3],
+            promptQuestions: promptQuestions,
             isFavorited: false,
             isPinned: false,
             journalType: journalType,
@@ -109,20 +162,43 @@ class JournalManager: ObservableObject {
         entries[index].isPinned.toggle()
         updatePinStatusInFirebase(userId: userId, entryId: entry.id, isPinned: entries[index].isPinned)
         
-        // Update widget using entry's saved background
         if entries[index].isPinned {
+            // PINNING
+            // Set flag first so the widget reload will see pinned mode
+            sharedDefaults.set(true, forKey: WidgetKeys.hasPinnedEntry)
+            
             saveLatestMantraForWidget(
                 entries[index].text,
                 mood: entries[index].mood,
                 backgroundImage: entries[index].backgroundImage,
                 textColor: entries[index].textColor
             )
-            // Set pin flag for widget
-            sharedDefaults.set(true, forKey: "hasPinnedEntry")
+            
+            WidgetCenter.shared.reloadTimelines(ofKind: "MantraWidget")
+            WidgetCenter.shared.reloadAllTimelines()
         } else {
-            clearWidget()
-            // Clear pin flag - widget will use rotation
-            sharedDefaults.set(false, forKey: "hasPinnedEntry")
+            // UNPINNING
+            // Switch to rotation mode immediately
+            sharedDefaults.set(false, forKey: WidgetKeys.hasPinnedEntry)
+
+            // Clear pinned payload so WidgetKit cannot keep showing the last pinned whisper forever.
+            clearPinnedWidgetPayload()
+
+            // Ensure rotation entries are synced, and write an immediate fallback "latest" payload for render safety.
+            syncEntriesToWidget()
+            if let fallback = entries.first(where: { $0.id != entry.id }) ?? entries.first {
+                writeLatestWidgetPayload(
+                    mantra: fallback.text,
+                    mood: fallback.mood,
+                    backgroundImage: fallback.backgroundImage,
+                    textColor: fallback.textColor,
+                    timestamp: Date()
+                )
+            } else {
+                ensureWidgetRenderableFallbackIfNeeded()
+            }
+
+            reloadWidgets()
         }
     }
     
@@ -156,6 +232,7 @@ class JournalManager: ObservableObject {
             "text": entry.text,
             "colorHex": entry.colorHex,
             "prompts": entry.prompts,
+            "promptQuestions": entry.promptQuestions,
             "isFavorited": entry.isFavorited,
             "isPinned": entry.isPinned,
             "journalType": entry.journalType.rawValue,
@@ -216,13 +293,14 @@ class JournalManager: ObservableObject {
                         return nil
                     }
                     
+                    let promptQuestions = data["promptQuestions"] as? [String] ?? []
                     let isFavorited = data["isFavorited"] as? Bool ?? false
                     let isPinned = data["isPinned"] as? Bool ?? false
                     let journalTypeString = data["journalType"] as? String ?? "guided"
                     let journalType = JournalType(rawValue: journalTypeString) ?? .guided
                     let backgroundImage = data["backgroundImage"] as? String ?? "whisper-bg-1"
                     let textColor = data["textColor"] as? String ?? "#FFFFFF"
-                    
+
                     return JournalEntry(
                         id: id,
                         date: timestamp.dateValue(),
@@ -230,6 +308,7 @@ class JournalManager: ObservableObject {
                         text: text,
                         colorHex: colorHex,
                         prompts: prompts,
+                        promptQuestions: promptQuestions,
                         isFavorited: isFavorited,
                         isPinned: isPinned,
                         journalType: journalType,
@@ -253,7 +332,23 @@ class JournalManager: ObservableObject {
         listener?.remove()
         listener = nil
         entries.removeAll()
+        
+        // Clear widget cache on sign out so one account never shows another account's data
+        clearWidgetCacheForSignOut()
+        
         print("🔄 Cleared entries for signed out user")
+    }
+    
+    private func clearWidgetCacheForSignOut() {
+        sharedDefaults.removeObject(forKey: WidgetKeys.latestMantra)
+        sharedDefaults.removeObject(forKey: WidgetKeys.latestMood)
+        sharedDefaults.removeObject(forKey: WidgetKeys.widgetBackground)
+        sharedDefaults.removeObject(forKey: WidgetKeys.widgetTextColor)
+        sharedDefaults.removeObject(forKey: WidgetKeys.mantraTimestamp)
+        sharedDefaults.removeObject(forKey: WidgetKeys.hasPinnedEntry)
+        sharedDefaults.removeObject(forKey: WidgetKeys.allEntries)
+        WidgetCenter.shared.reloadTimelines(ofKind: "MantraWidget")
+        WidgetCenter.shared.reloadAllTimelines()
     }
     
     // MARK: - Delete Entry
@@ -277,7 +372,6 @@ class JournalManager: ObservableObject {
                   }
               } else {
                   print("✅ Entry deleted from Firebase successfully")
-                  // Update widget rotation pool
                   DispatchQueue.main.async {
                       self.syncEntriesToWidget()
                   }
@@ -291,61 +385,65 @@ class JournalManager: ObservableObject {
         listener?.remove()
         listener = nil
         entries.removeAll()
-        sharedDefaults.removeObject(forKey: "latestMantra")
-        sharedDefaults.removeObject(forKey: "latestMood")
-        sharedDefaults.removeObject(forKey: "widgetBackground")
-        sharedDefaults.removeObject(forKey: "widgetTextColor")
-        sharedDefaults.removeObject(forKey: "mantraTimestamp")
-        sharedDefaults.removeObject(forKey: "hasPinnedEntry")
-        sharedDefaults.removeObject(forKey: "allEntries")
+        
+        sharedDefaults.removeObject(forKey: WidgetKeys.latestMantra)
+        sharedDefaults.removeObject(forKey: WidgetKeys.latestMood)
+        sharedDefaults.removeObject(forKey: WidgetKeys.widgetBackground)
+        sharedDefaults.removeObject(forKey: WidgetKeys.widgetTextColor)
+        sharedDefaults.removeObject(forKey: WidgetKeys.mantraTimestamp)
+        sharedDefaults.removeObject(forKey: WidgetKeys.hasPinnedEntry)
+        sharedDefaults.removeObject(forKey: WidgetKeys.allEntries)
+        
+        WidgetCenter.shared.reloadTimelines(ofKind: "MantraWidget")
         WidgetCenter.shared.reloadAllTimelines()
         print("✅ JournalManager: All data cleared")
     }
 
     // MARK: - Widget Support
     func saveLatestMantraForWidget(_ mantra: String, mood: String, backgroundImage: String, textColor: String) {
-        sharedDefaults.set(mantra, forKey: "latestMantra")
-        sharedDefaults.set(mood, forKey: "latestMood")
-        sharedDefaults.set(backgroundImage, forKey: "widgetBackground")
-        sharedDefaults.set(textColor, forKey: "widgetTextColor")
-        sharedDefaults.set(Date(), forKey: "mantraTimestamp")
-        WidgetCenter.shared.reloadAllTimelines()
+        writeLatestWidgetPayload(mantra: mantra, mood: mood, backgroundImage: backgroundImage, textColor: textColor, timestamp: Date())
+        reloadWidgets()
         print("✅ Mantra saved for widget: \(mantra) with background: \(backgroundImage)")
     }
     
     func clearWidget() {
-        sharedDefaults.removeObject(forKey: "latestMantra")
-        sharedDefaults.removeObject(forKey: "latestMood")
-        sharedDefaults.removeObject(forKey: "widgetBackground")
-        sharedDefaults.removeObject(forKey: "widgetTextColor")
-        WidgetCenter.shared.reloadAllTimelines()
+        clearPinnedWidgetPayload()
+        sharedDefaults.removeObject(forKey: WidgetKeys.allEntries)
+        sharedDefaults.set(false, forKey: WidgetKeys.hasPinnedEntry)
+        reloadWidgets()
     }
     
     // MARK: - Widget Auto-Rotation Support
-    /// Syncs simplified entry data to UserDefaults for widget rotation feature
-    /// Called whenever entries are loaded, added, or deleted
     func syncEntriesToWidget() {
         guard !entries.isEmpty else {
-            // Clear rotation data if no entries
-            sharedDefaults.removeObject(forKey: "allEntries")
-            WidgetCenter.shared.reloadAllTimelines()
-            print("📱 Widget: No entries to sync for rotation")
+            // Keep widget renderable even when there are no entries yet (fresh install / new account).
+            sharedDefaults.removeObject(forKey: WidgetKeys.allEntries)
+            ensureWidgetRenderableFallbackIfNeeded()
+            reloadWidgets()
+            print("📱 Widget: No entries to sync for rotation - wrote fallback payload")
             return
         }
         
-        // Create lightweight array with only data widget needs
         let simplifiedEntries: [[String: String]] = entries.map { entry in
+            let bg = entry.backgroundImage.trimmingCharacters(in: .whitespacesAndNewlines)
+            let safeBackground = bg.isEmpty ? "whisper_bg_crinkledbeige" : bg
+
+            let tc = entry.textColor.trimmingCharacters(in: .whitespacesAndNewlines)
+            let safeTextColor = tc.isEmpty ? "#5B3520" : tc
+            
+            let alignment = BackgroundConfig.widgetAlignmentString(for: safeBackground)
+
             return [
                 "mantra": entry.text,
                 "mood": entry.mood,
-                "backgroundImage": entry.backgroundImage,
-                "textColor": entry.textColor
+                "backgroundImage": safeBackground,
+                "textColor": safeTextColor,
+                "widgetAlignment": alignment
             ]
         }
         
-        // Save to shared UserDefaults
         if let encoded = try? JSONEncoder().encode(simplifiedEntries) {
-            sharedDefaults.set(encoded, forKey: "allEntries")
+            sharedDefaults.set(encoded, forKey: WidgetKeys.allEntries)
             WidgetCenter.shared.reloadAllTimelines()
             print("✅ Widget: Synced \(simplifiedEntries.count) entries for rotation")
         } else {
@@ -354,11 +452,11 @@ class JournalManager: ObservableObject {
     }
     
     func getLatestWidgetData() -> (mantra: String, mood: String, backgroundImage: String, textColor: String, timestamp: Date)? {
-        guard let mantra = sharedDefaults.string(forKey: "latestMantra"),
-              let mood = sharedDefaults.string(forKey: "latestMood"),
-              let backgroundImage = sharedDefaults.string(forKey: "widgetBackground"),
-              let textColor = sharedDefaults.string(forKey: "widgetTextColor"),
-              let timestamp = sharedDefaults.object(forKey: "mantraTimestamp") as? Date else {
+        guard let mantra = sharedDefaults.string(forKey: WidgetKeys.latestMantra),
+              let mood = sharedDefaults.string(forKey: WidgetKeys.latestMood),
+              let backgroundImage = sharedDefaults.string(forKey: WidgetKeys.widgetBackground),
+              let textColor = sharedDefaults.string(forKey: WidgetKeys.widgetTextColor),
+              let timestamp = sharedDefaults.object(forKey: WidgetKeys.mantraTimestamp) as? Date else {
             return nil
         }
         return (mantra: mantra, mood: mood, backgroundImage: backgroundImage, textColor: textColor, timestamp: timestamp)

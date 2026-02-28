@@ -8,13 +8,13 @@ class AppleAuthManager: NSObject, ObservableObject {
     static let shared = AppleAuthManager()
     
     private var currentNonce: String?
-    private var completion: ((Result<User, Error>) -> Void)?
+    private var completion: ((Result<AuthUserInfo, Error>) -> Void)?
     
     private override init() {
         super.init()
     }
     
-    func signInWithApple(completion: @escaping (Result<User, Error>) -> Void) {
+    func signInWithApple(completion: @escaping (Result<AuthUserInfo, Error>) -> Void) {
         print("DEBUG: Starting Apple Sign-In process")
         
         // Comprehensive environment and configuration check
@@ -215,13 +215,15 @@ extension AppleAuthManager: ASAuthorizationControllerDelegate {
                     return
                 }
                 
+                // Capture isNewUser flag from Firebase auth result
+                let isNewUser = authResult?.additionalUserInfo?.isNewUser ?? false
                 print("🎉 DEBUG: Firebase sign-in successful!")
                 print("🎉 DEBUG: Firebase User ID: \(user.uid)")
                 print("🎉 DEBUG: Firebase User Email: \(user.email ?? "nil")")
-                print("🎉 DEBUG: Is new user: \(authResult?.additionalUserInfo?.isNewUser ?? false)")
+                print("🎉 DEBUG: Is new user: \(isNewUser)")
                 
                 // Save user info if it's a new user
-                if authResult?.additionalUserInfo?.isNewUser == true {
+                if isNewUser {
                     print("🎉 DEBUG: Saving new user info...")
                     let firstName = appleIDCredential.fullName?.givenName ?? ""
                     let lastName = appleIDCredential.fullName?.familyName ?? ""
@@ -245,7 +247,10 @@ extension AppleAuthManager: ASAuthorizationControllerDelegate {
                 }
                 
                 print("🎉 DEBUG: Calling completion with success")
-                self.completion?(.success(user))
+                
+                // Return AuthUserInfo with both user and isNewUser flag
+                let userInfo = AuthUserInfo(user: user, isNewUser: isNewUser)
+                self.completion?(.success(userInfo))
             }
         }
     }

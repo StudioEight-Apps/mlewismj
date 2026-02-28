@@ -2,7 +2,11 @@ import SwiftUI
 
 // MARK: - History View
 struct HistoryView: View {
+    var scrollToEntryId: String? = nil
+
     @ObservedObject var journalManager = JournalManager.shared
+    @Environment(\.colorScheme) var colorScheme
+    private var colors: AppColors { AppColors(colorScheme) }
     @State private var showingCalendar = false
     @State private var selectedDate: Date?
     @State private var scrollToDate: Date?
@@ -11,10 +15,9 @@ struct HistoryView: View {
 
     enum HistoryTab { case all, favorites }
 
-    // Keep this tiny so Swift's type checker is happy
     var body: some View {
         ZStack {
-            Color(hex: "#FFFCF5").ignoresSafeArea()
+            colors.secondaryBackground.ignoresSafeArea()
 
             VStack(spacing: 0) {
                 segmentedControl
@@ -38,7 +41,8 @@ struct HistoryView: View {
 
                     EntryListView(
                         entries: filteredEntries.sorted(by: { $0.date > $1.date }),
-                        scrollToDate: $scrollToDate
+                        scrollToDate: $scrollToDate,
+                        scrollToEntryId: scrollToEntryId
                     )
                 }
             }
@@ -58,23 +62,21 @@ struct HistoryView: View {
                 )
             }
         }
-        .preferredColorScheme(.light)
+        .tint(colors.navTint)
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(false)
         .toolbar {
             ToolbarItem(placement: .principal) {
-                Image("whisper-logo")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 32)
-                    .accessibilityLabel("Whisper")
+                Text("My Journal")
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundColor(colors.primaryText)
             }
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button { showingCalendar = true } label: {
                     Image(systemName: "calendar")
                         .font(.system(size: 20, weight: .medium))
-                        .foregroundColor(Color(hex: "#2A2A2A"))
+                        .foregroundColor(colors.primaryText)
                         .frame(width: 24, height: 24)
                 }
             }
@@ -112,24 +114,26 @@ private struct EmptyStateView: View {
     let isFavoritesTab: Bool
     let hasDateFilter: Bool
     let clearFilter: () -> Void
+    @Environment(\.colorScheme) var colorScheme
+    private var colors: AppColors { AppColors(colorScheme) }
 
     var body: some View {
         VStack(spacing: 20) {
             Spacer()
 
-            Image(systemName: isFavoritesTab ? "heart" : "book.closed")
+            Image(systemName: isFavoritesTab ? "heart.fill" : "book.closed")
                 .font(.system(size: 60))
-                .foregroundColor(Color(hex: "#5B5564"))
+                .foregroundColor(colors.emptyStateIcon)
 
             Text(isFavoritesTab ? "No favorites yet" : "No thoughts yet")
                 .font(.title2).fontWeight(.medium)
-                .foregroundColor(Color(hex: "#2B2834"))
+                .foregroundColor(colors.primaryText)
 
             Text(isFavoritesTab
                  ? "Tap the heart on entries you love"
                  : (hasDateFilter ? "Try selecting a different date" : "Create your first thought to see it here"))
             .font(.body)
-            .foregroundColor(Color(hex: "#5B5564"))
+            .foregroundColor(colors.secondaryText)
             .multilineTextAlignment(.center)
 
             if hasDateFilter {
@@ -138,7 +142,7 @@ private struct EmptyStateView: View {
                     .foregroundColor(.white)
                     .padding(.horizontal, 20)
                     .padding(.vertical, 10)
-                    .background(Color(hex: "#A6B4FF"))
+                    .background(AppColors.gold)
                     .cornerRadius(20)
                     .buttonStyle(.plain)
             }
@@ -151,17 +155,19 @@ private struct EmptyStateView: View {
 private struct FilterHeaderView: View {
     let date: Date
     let clearFilter: () -> Void
+    @Environment(\.colorScheme) var colorScheme
+    private var colors: AppColors { AppColors(colorScheme) }
 
     var body: some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Showing entries for:")
                     .font(.system(size: 12, weight: .medium))
-                    .foregroundColor(Color(hex: "#5B5564"))
+                    .foregroundColor(colors.secondaryText)
 
                 Text(DateFormatter.mediumDate.string(from: date))
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(Color(hex: "#2A2A2A"))
+                    .foregroundColor(colors.primaryText)
             }
 
             Spacer()
@@ -171,12 +177,12 @@ private struct FilterHeaderView: View {
                 .foregroundColor(.white)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
-                .background(Color(hex: "#A6B4FF"))
+                .background(AppColors.gold)
                 .cornerRadius(16)
                 .buttonStyle(.plain)
         }
         .padding(.vertical, 12)
-        .background(Color.white.opacity(0.7))
+        .background(colors.card.opacity(0.7))
         .cornerRadius(12)
     }
 }
@@ -185,6 +191,7 @@ private struct EntryListView: View {
     let entries: [JournalEntry]
     @State private var localScrollToDate: Date?
     @Binding var scrollToDate: Date?
+    var scrollToEntryId: String? = nil
     @State private var entryToDelete: JournalEntry?
     @State private var showDeleteAlert = false
 
@@ -192,26 +199,42 @@ private struct EntryListView: View {
         ScrollViewReader { proxy in
             List {
                 ForEach(entries, id: \.id) { entry in
-                    HistoryCardView(entry: entry)
-                        .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-                        .listRowSeparator(.hidden)
-                        .listRowBackground(Color.clear)
-                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                            Button(role: .destructive) {
-                                entryToDelete = entry
-                                showDeleteAlert = true
-                            } label: {
-                                Image(systemName: "trash.fill")
-                                    .font(.system(size: 20, weight: .medium))
-                            }
-                            .tint(Color(hex: "#F5A5A5"))
+                    ZStack {
+                        NavigationLink(destination: JournalEntryDetailView(entryId: entry.id)) {
+                            EmptyView()
                         }
-                        .id(entry.id)
+                        .opacity(0)
+
+                        HistoryCardView(entry: entry)
+                    }
+                    .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
+                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                        Button(role: .destructive) {
+                            entryToDelete = entry
+                            showDeleteAlert = true
+                        } label: {
+                            Image(systemName: "trash.fill")
+                                .font(.system(size: 20, weight: .medium))
+                        }
+                        .tint(Color(hex: "#F5A5A5"))
+                    }
+                    .id(entry.id)
                 }
             }
             .listStyle(.plain)
             .scrollContentBackground(.hidden)
             .background(Color.clear)
+            .onAppear {
+                if let entryId = scrollToEntryId {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        withAnimation(.easeInOut(duration: 0.5)) {
+                            proxy.scrollTo(entryId, anchor: .top)
+                        }
+                    }
+                }
+            }
             .onChange(of: scrollToDate) { _, newValue in
                 guard let d = newValue else { return }
                 if let target = entries.first(where: { Calendar.current.isDate($0.date, inSameDayAs: d) }) {
@@ -245,6 +268,8 @@ struct CalendarPickerView: View {
     @Binding var isPresented: Bool
     @Binding var selectedDate: Date?
     let onDateSelected: (Date) -> Void
+    @Environment(\.colorScheme) var colorScheme
+    private var colors: AppColors { AppColors(colorScheme) }
 
     @State private var tempSelectedDate: Date?
 
@@ -272,9 +297,8 @@ struct CalendarPickerView: View {
 
     var body: some View {
         ZStack {
-            Color.black.opacity(0.3)
+            (colorScheme == .dark ? Color.black.opacity(0.7) : Color.black.opacity(0.3))
                 .ignoresSafeArea()
-                .background(.ultraThinMaterial)
                 .onTapGesture { isPresented = false }
 
             VStack(spacing: 0) {
@@ -283,12 +307,12 @@ struct CalendarPickerView: View {
                     Spacer()
                     Text("Select Date")
                         .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(Color(hex: "#2A2A2A"))
+                        .foregroundColor(colors.primaryText)
                     Spacer()
                     Button { isPresented = false } label: {
                         Image(systemName: "xmark")
                             .font(.system(size: 16, weight: .medium))
-                            .foregroundColor(Color(hex: "#2A2A2A"))
+                            .foregroundColor(colors.primaryText)
                             .frame(width: 44, height: 44)
                     }
                     .buttonStyle(.plain)
@@ -329,10 +353,10 @@ struct CalendarPickerView: View {
                 } label: {
                     Text("Continue")
                         .font(.system(size: 16, weight: .medium))
-                        .foregroundColor(tempSelectedDate != nil ? .white : Color(hex: "#999999"))
+                        .foregroundColor(tempSelectedDate != nil ? .white : colors.placeholder)
                         .frame(maxWidth: .infinity)
                         .frame(height: 50)
-                        .background(tempSelectedDate != nil ? Color(hex: "#A6B4FF") : Color(hex: "#f0f0f0"))
+                        .background(tempSelectedDate != nil ? AppColors.gold : colors.card)
                         .cornerRadius(12)
                 }
                 .buttonStyle(.plain)
@@ -341,7 +365,7 @@ struct CalendarPickerView: View {
                 .padding(.vertical, 20)
             }
             .frame(width: UIScreen.main.bounds.width * 0.9)
-            .background(Color.white)
+            .background(colors.calendarPopup)
             .cornerRadius(20)
         }
     }
@@ -369,6 +393,8 @@ struct MonthCalendarView: View {
     let journalEntries: [JournalEntry]
     @Binding var selectedDate: Date?
     let onDateTapped: (Date) -> Void
+    @Environment(\.colorScheme) var colorScheme
+    private var colors: AppColors { AppColors(colorScheme) }
 
     private let calendar = Calendar.current
     private let dateFormatter: DateFormatter = {
@@ -383,7 +409,7 @@ struct MonthCalendarView: View {
                 Spacer()
                 Text(dateFormatter.string(from: month))
                     .font(.system(size: 22, weight: .semibold))
-                    .foregroundColor(Color(hex: "#2A2A2A"))
+                    .foregroundColor(colors.primaryText)
                 Spacer()
             }
 
@@ -392,7 +418,7 @@ struct MonthCalendarView: View {
                     ForEach(["S", "M", "T", "W", "T", "F", "S"], id: \.self) { day in
                         Text(day)
                             .font(.system(size: 12, weight: .medium))
-                            .foregroundColor(Color(hex: "#999999"))
+                            .foregroundColor(colors.secondaryText)
                             .frame(maxWidth: .infinity)
                             .frame(height: 32)
                     }
@@ -453,6 +479,8 @@ struct CalendarDayView: View {
     let journalEntries: [JournalEntry]
     let selectedDate: Date?
     let onDateTapped: (Date) -> Void
+    @Environment(\.colorScheme) var colorScheme
+    private var colors: AppColors { AppColors(colorScheme) }
 
     private var entriesForDay: [JournalEntry] {
         guard let date = dayData.date else { return [] }
@@ -479,7 +507,7 @@ struct CalendarDayView: View {
                     .foregroundColor(
                         dayData.date == nil ? Color.clear :
                         (isSelected ? .white :
-                         (isToday ? Color(hex: "#A6B4FF") : Color(hex: "#2A2A2A")))
+                         (isToday ? AppColors.gold : colors.calendarDayText))
                     )
 
                 HStack(spacing: 2) {
@@ -494,8 +522,8 @@ struct CalendarDayView: View {
             .frame(maxWidth: .infinity)
             .frame(height: 40)
             .background(
-                isSelected ? Color(hex: "#A6B4FF") :
-                (entriesForDay.isEmpty ? Color.clear : Color(hex: "#A6B4FF").opacity(0.1))
+                isSelected ? AppColors.gold :
+                (entriesForDay.isEmpty ? Color.clear : AppColors.gold.opacity(0.1))
             )
             .cornerRadius(8)
         }
@@ -526,22 +554,18 @@ extension DateFormatter {
     }()
 }
 
-// MARK: - History Card (with animations) - POLISHED VERSION
+// MARK: - History Card — Clean summary, tap to open detail
 struct HistoryCardView: View {
     @ObservedObject var journalManager = JournalManager.shared
+    @Environment(\.colorScheme) var colorScheme
+    private var colors: AppColors { AppColors(colorScheme) }
     let entry: JournalEntry
-    @State private var isExpanded = false
-    
-    // Animation states
-    @State private var heartScale: CGFloat = 1.0
-    @State private var heartRotation: Double = 0
-    @State private var pinScale: CGFloat = 1.0
-    @State private var pinOffsetY: CGFloat = 0
-    @State private var shareScale: CGFloat = 1.0
-    @State private var shareRotation: Double = 0
-    @State private var particles: [HeartParticle] = []
 
-    private var moodColor: Color { Color(hex: entry.colorHex) }
+    private var liveEntry: JournalEntry {
+        journalManager.entries.first(where: { $0.id == entry.id }) ?? entry
+    }
+
+    private var moodColor: Color { Color(hex: colorForMood(entry.mood)) }
 
     private var formattedDate: String {
         let f = DateFormatter()
@@ -549,19 +573,22 @@ struct HistoryCardView: View {
         return f.string(from: entry.date)
     }
 
+    private var displayText: String {
+        entry.text.isEmpty ? "A moment of reflection" : entry.text
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            // MARK: - Header (Date & Mood Badge) - BETTER SPACING
             HStack(alignment: .center, spacing: 0) {
                 Text(formattedDate)
                     .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(Color(hex: "#7C7C7C"))
-                
+                    .foregroundColor(colors.secondaryText)
+
                 Spacer()
-                
+
                 Text(entry.mood.capitalized)
                     .font(.system(size: 13, weight: .medium))
-                    .foregroundColor(.white)
+                    .foregroundColor(Color(hex: "#2A2A2A"))
                     .padding(.horizontal, 14)
                     .padding(.vertical, 6)
                     .background(moodColor)
@@ -571,296 +598,57 @@ struct HistoryCardView: View {
             .padding(.top, 18)
             .padding(.bottom, 14)
 
-            // MARK: - Mantra Text - COMPACT
-            HStack(alignment: .top) {
-                Text(entry.text.isEmpty ? "Your personalized thought will appear here once complete." : entry.text)
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundColor(Color(hex: "#2B2834"))
+            HStack(alignment: .top, spacing: 12) {
+                Text(displayText)
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundColor(colors.primaryText)
                     .lineSpacing(4)
                     .multilineTextAlignment(.leading)
-                    .lineLimit(isExpanded ? nil : 3)
+                    .lineLimit(3)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                
-                Spacer(minLength: 0)
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundColor(colors.tertiaryText)
+                    .padding(.top, 4)
             }
             .padding(.horizontal, 20)
-            .padding(.bottom, 14)
-            .frame(minHeight: 55, alignment: .top)
+            .padding(.bottom, 16)
 
-            // MARK: - Action Buttons - SOFT & MINIMAL
-            HStack(spacing: 4) {
-                // Pin Button
-                Button {
-                    animatePin()
-                    journalManager.togglePin(entry)
-                } label: {
-                    Image(systemName: entry.isPinned ? "pin.fill" : "pin")
-                        .font(.system(size: 18, weight: .light))
-                        .foregroundColor(entry.isPinned ? Color(hex: "#A6B4FF") : Color(hex: "#9E9E9E"))
-                        .frame(width: 36, height: 36)
-                        .scaleEffect(pinScale)
-                        .offset(y: pinOffsetY)
+            HStack(spacing: 6) {
+                if liveEntry.isPinned {
+                    Image(systemName: "pin.fill")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(colorScheme == .dark ? AppColors.gold : colors.primaryText)
+                        .frame(width: 14, height: 14)
                 }
-                .buttonStyle(.plain)
-
-                // Share Button
-                Button {
-                    animateShare()
-                    shareWhisper()
-                } label: {
-                    Image(systemName: "paperplane")
-                        .font(.system(size: 17, weight: .light))
-                        .foregroundColor(Color(hex: "#9E9E9E"))
-                        .frame(width: 36, height: 36)
-                        .scaleEffect(shareScale)
-                        .rotationEffect(.degrees(shareRotation))
+                if liveEntry.isFavorited {
+                    Image(systemName: "heart.fill")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(AppColors.gold)
                 }
-                .buttonStyle(.plain)
-
                 Spacer()
-
-                // Favorite Button with particles
-                Button {
-                    animateFavorite()
-                    journalManager.toggleFavorite(entry)
-                } label: {
-                    ZStack {
-                        Image(systemName: entry.isFavorited ? "heart.fill" : "heart")
-                            .font(.system(size: 19, weight: .light))
-                            .foregroundColor(entry.isFavorited ? Color(hex: "#A6B4FF") : Color(hex: "#9E9E9E"))
-                            .frame(width: 36, height: 36)
-                            .scaleEffect(heartScale)
-                            .rotationEffect(.degrees(heartRotation))
-                        
-                        // Particle burst overlay
-                        ForEach(particles) { particle in
-                            Circle()
-                                .fill(Color(hex: "#A6B4FF"))
-                                .frame(width: particle.size, height: particle.size)
-                                .offset(x: particle.x, y: particle.y)
-                                .opacity(particle.opacity)
-                                .scaleEffect(particle.scale)
-                        }
-                    }
-                }
-                .buttonStyle(.plain)
             }
             .padding(.horizontal, 20)
-            .padding(.top, 12)
-            .padding(.bottom, 14)
-
-            // MARK: - Expandable Reflection Section - SOFT & MINIMAL
-            if isExpanded && !entry.prompts.isEmpty {
-                Divider()
-                    .background(Color(hex: "#E8E8E8"))
-                    .padding(.horizontal, 20)
-                
-                VStack(alignment: .leading, spacing: 16) {
-                    Text("Reflection")
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundColor(Color(hex: "#7A7A7A"))
-
-                    ForEach(Array(entry.prompts.enumerated()), id: \.offset) { i, answer in
-                        if !answer.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                            VStack(alignment: .leading, spacing: 6) {
-                                Text(getPromptQuestion(for: i))
-                                    .font(.system(size: 13, weight: .medium))
-                                    .foregroundColor(Color(hex: "#9E9E9E"))
-                                
-                                Text(answer)
-                                    .font(.system(size: 15))
-                                    .foregroundColor(Color(hex: "#2B2834"))
-                                    .lineSpacing(4)
-                            }
-                        }
-                    }
-                }
-                .padding(.horizontal, 20)
-                .padding(.top, 16)
-                .padding(.bottom, 14)
-                .transition(.opacity.combined(with: .move(edge: .top)))
-            }
-
-            // Show/Hide Reflection Button
-            if !entry.prompts.isEmpty {
-                Divider()
-                    .background(Color(hex: "#E8E8E8"))
-                
-                Button {
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                        isExpanded.toggle()
-                    }
-                } label: {
-                    HStack(spacing: 6) {
-                        Text(isExpanded ? "Show less" : "Show reflection")
-                            .font(.system(size: 14, weight: .medium))
-                        
-                        Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
-                            .font(.system(size: 11, weight: .semibold))
-                    }
-                    .foregroundColor(Color(hex: "#7A7A7A"))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
-                }
-                .buttonStyle(.plain)
-            }
+            .padding(.bottom, 16)
         }
-        // MARK: - Card Container - SOFT SHADOWS
-        .background(Color.white)
+        .background(
+            ZStack {
+                if colorScheme == .dark {
+                    RoundedRectangle(cornerRadius: 18).fill(colors.card)
+                        .shadow(color: Color.black.opacity(0.5), radius: 8, x: 0, y: 4)
+                } else {
+                    RoundedRectangle(cornerRadius: 18).fill(Color.white)
+                        .shadow(color: Color.black.opacity(0.06), radius: 2, x: 0, y: 1)
+                        .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+                        .shadow(color: Color.black.opacity(0.06), radius: 24, x: 0, y: 12)
+                }
+            }
+        )
         .clipShape(RoundedRectangle(cornerRadius: 18))
-        .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 2)
-    }
-    
-    // MARK: - Animation Functions
-    private func animatePin() {
-        withAnimation(.interpolatingSpring(stiffness: 300, damping: 15)) {
-            pinScale = 1.3
-            pinOffsetY = -3
-        }
-        
-        withAnimation(.interpolatingSpring(stiffness: 300, damping: 10).delay(0.1)) {
-            pinScale = 1.0
-            pinOffsetY = 0
-        }
-        
-        Task { @MainActor in
-            let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
-            impactFeedback.impactOccurred()
-        }
-    }
-    
-    private func animateFavorite() {
-        let isFavoriting = !entry.isFavorited
-        
-        withAnimation(.interpolatingSpring(stiffness: 300, damping: 12)) {
-            heartScale = 1.3
-            heartRotation = -8
-        }
-        
-        withAnimation(.interpolatingSpring(stiffness: 300, damping: 10).delay(0.1)) {
-            heartScale = 1.0
-            heartRotation = 0
-        }
-        
-        if isFavoriting {
-            createParticleBurst()
-        }
-        
-        Task { @MainActor in
-            let impactFeedback = UIImpactFeedbackGenerator(style: .light)
-            impactFeedback.impactOccurred()
-        }
-    }
-    
-    private func animateShare() {
-        withAnimation(.interpolatingSpring(stiffness: 300, damping: 15)) {
-            shareScale = 1.2
-            shareRotation = 10
-        }
-        
-        withAnimation(.interpolatingSpring(stiffness: 300, damping: 10).delay(0.1)) {
-            shareScale = 1.0
-            shareRotation = 0
-        }
-        
-        Task { @MainActor in
-            let impactFeedback = UIImpactFeedbackGenerator(style: .light)
-            impactFeedback.impactOccurred()
-        }
-    }
-    
-    private func createParticleBurst() {
-        let particleCount = Int.random(in: 6...8)
-        var newParticles: [HeartParticle] = []
-        
-        for i in 0..<particleCount {
-            let angle = (Double(i) / Double(particleCount)) * 360.0 + Double.random(in: -20...20)
-            let distance = Double.random(in: 30...50)
-            
-            let particle = HeartParticle(
-                id: UUID(),
-                x: 0,
-                y: 0,
-                size: CGFloat.random(in: 4...7),
-                opacity: 1.0,
-                scale: 1.0,
-                angle: angle,
-                distance: distance
-            )
-            newParticles.append(particle)
-        }
-        
-        particles = newParticles
-        
-        withAnimation(.easeOut(duration: 0.6)) {
-            for i in 0..<particles.count {
-                let angle = particles[i].angle * .pi / 180
-                particles[i].x = cos(angle) * particles[i].distance
-                particles[i].y = sin(angle) * particles[i].distance
-                particles[i].opacity = 0
-                particles[i].scale = 0.3
-            }
-        }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-            particles.removeAll()
-        }
-    }
-
-    private func shareWhisper() {
-        Task { @MainActor in
-            // Use entry's saved background
-            let background = BackgroundConfig(
-                imageName: entry.backgroundImage,
-                textColor: entry.textColor
-            )
-
-            var text = entry.text.trimmingCharacters(in: .whitespacesAndNewlines)
-            let terminals = CharacterSet(charactersIn: ".,;:!?…")
-            while let last = text.last, terminals.contains(String(last).unicodeScalars.first!) {
-                text = String(text.dropLast())
-            }
-
-            let card = ZStack {
-                Image(background.imageName).resizable().aspectRatio(contentMode: .fill)
-                    .frame(width: 1080, height: 1080).clipped()
-                VStack(spacing: 24) {
-                    Text(text)
-                        .font(.system(size: 80, weight: .bold, design: .serif))
-                        .foregroundColor(Color(hex: background.textColor))
-                        .multilineTextAlignment(.center)
-                        .lineLimit(3)
-                        .lineSpacing(10)
-                        .tracking(-0.4)
-                        .minimumScaleFactor(0.75)
-                        .allowsTightening(true)
-                        .frame(maxWidth: 820)
-                    Image("whisper-logo")
-                        .resizable()
-                        .renderingMode(.template)
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 140)
-                        .foregroundColor(Color(hex: background.textColor))
-                        .opacity(0.82)
-                }
-            }
-            .frame(width: 1080, height: 1080)
-
-            let image = ShareRenderer.image(
-                for: card,
-                size: CGSize(width: 1080, height: 1080),
-                colorScheme: .light
-            )
-            ShareManager.presentFromTopController(image: image, caption: nil)
-        }
-    }
-
-    private func getPromptQuestion(for index: Int) -> String {
-        switch index {
-        case 0: return "How are you feeling right now?"
-        case 1: return "Why do you think you're feeling this way?"
-        case 2: return "What's something you're grateful for right now?"
-        default: return "Reflection \(index + 1):"
-        }
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .stroke(colorScheme == .dark ? colors.cardBorder : Color.black.opacity(0.06), lineWidth: 0.5)
+        )
     }
 }

@@ -2,10 +2,15 @@ import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
+    @ObservedObject var themeManager = ThemeManager.shared
+    @ObservedObject var notificationManager = NotificationManager.shared
+    @Environment(\.colorScheme) var colorScheme
     @State private var showingPrivacyPolicy = false
     @State private var showingEditProfile = false
     @State private var showingSubscriptionInfo = false
-    
+    @State private var showingWidgetSetup = false
+    @State private var showTimePicker = false
+
     // Delete account flow - 3 confirmations
     @State private var showingFirstConfirmation = false
     @State private var showingSecondConfirmation = false
@@ -14,50 +19,65 @@ struct SettingsView: View {
     @State private var showingError = false
     @State private var errorMessage = ""
 
+    private var colors: AppColors { AppColors(colorScheme) }
+
     var body: some View {
         ZStack {
-            Color(hex: "#FFFCF5")
+            colors.secondaryBackground
                 .ignoresSafeArea()
-            
+
             VStack(spacing: 20) {
                 // Settings Options
                 VStack(spacing: 12) {
+                    // Appearance toggle
+                    appearanceRow
+
+                    // Daily reminder
+                    notificationRow
+
+                    Button(action: {
+                        showingWidgetSetup = true
+                    }) {
+                        settingsRow(icon: "rectangle.on.rectangle.angled", title: "Set Up Your Widget")
+                    }
+                    .buttonStyle(BounceButtonStyle())
+
                     Button(action: {
                         showingEditProfile = true
                     }) {
                         settingsRow(icon: "person.fill", title: "Edit Profile")
                     }
                     .buttonStyle(BounceButtonStyle())
-                    
+
                     Button(action: {
                         openAppStoreSubscriptions()
                     }) {
                         settingsRow(icon: "creditcard.fill", title: "Manage Membership")
                     }
                     .buttonStyle(BounceButtonStyle())
-                    
+
                     Button(action: {
                         showingSubscriptionInfo = true
                     }) {
                         settingsRow(icon: "info.circle.fill", title: "Subscription Information")
                     }
                     .buttonStyle(BounceButtonStyle())
-                    
+
                     Button(action: {
                         showingPrivacyPolicy = true
                     }) {
                         settingsRow(icon: "doc.text.fill", title: "Terms & Privacy Policy")
                     }
                     .buttonStyle(BounceButtonStyle())
-                    
+
                     Button(action: {
                         openSupportEmail()
                     }) {
                         settingsRow(icon: "questionmark.circle.fill", title: "Help & Support")
                     }
                     .buttonStyle(BounceButtonStyle())
-                    
-                    // Delete Account Button - FIXED: No subtitle, matches other rows
+
+                    // Delete Account Button
                     Button(action: {
                         showingFirstConfirmation = true
                     }) {
@@ -76,12 +96,12 @@ struct SettingsView: View {
                 }) {
                     Text("Log Out")
                         .font(.system(size: 16, weight: .semibold))
-                        .foregroundColor(.white)
+                        .foregroundColor(colors.buttonText)
                         .frame(maxWidth: .infinity)
                         .frame(height: 52)
-                        .background(Color(hex: "#A6B4FF"))
+                        .background(colors.buttonBackground)
                         .cornerRadius(12)
-                        .shadow(color: Color(hex: "#A6B4FF").opacity(0.3), radius: 6, x: 0, y: 3)
+                        .shadow(color: colors.cardShadow, radius: 6, x: 0, y: 3)
                 }
                 .buttonStyle(BounceButtonStyle())
                 .padding(.horizontal, 20)
@@ -102,8 +122,20 @@ struct SettingsView: View {
                 }
             }
         }
-        .navigationTitle("Settings")
+        .tint(colorScheme == .dark ? .blue : colors.navTint)
+        .accentColor(colorScheme == .dark ? .blue : colors.navTint)
+        .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text("Settings")
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundColor(colors.primaryText)
+            }
+        }
+        .sheet(isPresented: $showingWidgetSetup) {
+            WidgetSetupHomeScreen(isFromSettings: true)
+        }
         .sheet(isPresented: $showingPrivacyPolicy) {
             PrivacyPolicyView()
         }
@@ -148,38 +180,173 @@ struct SettingsView: View {
         }
     }
 
+    // MARK: - Appearance Toggle Row
+    private var appearanceRow: some View {
+        HStack {
+            HStack {
+                Image(systemName: "moon.fill")
+                    .foregroundColor(colors.primaryText)
+                    .font(.system(size: 18))
+                Text("Appearance")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(colors.primaryText)
+            }
+
+            Spacer()
+
+            // Three-segment capsule picker
+            HStack(spacing: 0) {
+                ForEach(["light", "dark", "system"], id: \.self) { mode in
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            themeManager.appearanceRaw = mode
+                        }
+                    } label: {
+                        Text(mode == "system" ? "Auto" : mode.capitalized)
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(themeManager.appearanceRaw == mode ? colors.buttonText : colors.secondaryText)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(
+                                Capsule()
+                                    .fill(themeManager.appearanceRaw == mode ? colors.buttonBackground : Color.clear)
+                            )
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(3)
+            .background(
+                Capsule()
+                    .fill(colors.card)
+                    .overlay(Capsule().stroke(colors.cardBorder, lineWidth: 0.5))
+            )
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 16)
+        .background(colors.settingsRow)
+        .cornerRadius(12)
+        .shadow(color: colors.cardShadow, radius: 8, x: 0, y: 4)
+        .shadow(color: colors.cardShadowLight, radius: 2, x: 0, y: 1)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(colors.cardBorder, lineWidth: 0.5)
+        )
+    }
+
+    // MARK: - Notification Row
+    private var notificationRow: some View {
+        VStack(spacing: 0) {
+            HStack {
+                HStack {
+                    Image(systemName: "bell.fill")
+                        .foregroundColor(colors.primaryText)
+                        .font(.system(size: 18))
+                    Text("Daily Reminder")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(colors.primaryText)
+                }
+
+                Spacer()
+
+                Toggle("", isOn: Binding(
+                    get: { notificationManager.isEnabled },
+                    set: { newValue in
+                        if newValue {
+                            notificationManager.requestPermission { granted in
+                                if granted {
+                                    notificationManager.isEnabled = true
+                                } else {
+                                    // Permission denied — open Settings
+                                    if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+                                        UIApplication.shared.open(settingsURL)
+                                    }
+                                }
+                            }
+                        } else {
+                            notificationManager.isEnabled = false
+                        }
+                    }
+                ))
+                .tint(AppColors.gold)
+                .labelsHidden()
+            }
+
+            // Time picker row — only visible when enabled
+            if notificationManager.isEnabled {
+                Divider()
+                    .background(colors.divider)
+                    .padding(.vertical, 10)
+
+                HStack {
+                    Text("Remind me at")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(colors.secondaryText)
+
+                    Spacer()
+
+                    DatePicker(
+                        "",
+                        selection: Binding(
+                            get: { notificationManager.reminderDate },
+                            set: { notificationManager.reminderDate = $0 }
+                        ),
+                        displayedComponents: .hourAndMinute
+                    )
+                    .labelsHidden()
+                    .tint(AppColors.gold)
+                }
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 16)
+        .background(colors.settingsRow)
+        .cornerRadius(12)
+        .shadow(color: colors.cardShadow, radius: 8, x: 0, y: 4)
+        .shadow(color: colors.cardShadowLight, radius: 2, x: 0, y: 1)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(colors.cardBorder, lineWidth: 0.5)
+        )
+        .animation(.easeInOut(duration: 0.2), value: notificationManager.isEnabled)
+    }
+
     private func settingsRow(icon: String, title: String, subtitle: String? = nil) -> some View {
         HStack {
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
                     Image(systemName: icon)
-                        .foregroundColor(Color(hex: "#A6B4FF"))
+                        .foregroundColor(colors.primaryText)
                         .font(.system(size: 18))
                     Text(title)
                         .font(.system(size: 16, weight: .semibold))
-                        .foregroundColor(Color(hex: "#2A2A2A"))
+                        .foregroundColor(colors.primaryText)
                 }
 
                 if let subtitle = subtitle {
                     Text(subtitle)
                         .font(.system(size: 14))
-                        .foregroundColor(Color(hex: "#5B5564"))
+                        .foregroundColor(colors.secondaryText)
                         .lineLimit(2)
                 }
             }
-            
+
             Spacer()
-            
+
             Image(systemName: "chevron.right")
-                .foregroundColor(Color(hex: "#A6B4FF"))
+                .foregroundColor(colors.secondaryText)
                 .font(.system(size: 14))
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 16)
-        .background(Color.white)
+        .background(colors.settingsRow)
         .cornerRadius(12)
-        .shadow(color: Color(hex: "#A6B4FF").opacity(0.15), radius: 8, x: 0, y: 4)
-        .shadow(color: Color(hex: "#A6B4FF").opacity(0.08), radius: 2, x: 0, y: 1)
+        .shadow(color: colors.cardShadow, radius: 8, x: 0, y: 4)
+        .shadow(color: colors.cardShadowLight, radius: 2, x: 0, y: 1)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(colors.cardBorder, lineWidth: 0.5)
+        )
     }
     
     private func openAppStoreSubscriptions() {
@@ -232,6 +399,8 @@ struct SettingsView: View {
 // MARK: - Edit Profile View
 struct EditProfileView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) var colorScheme
+    private var colors: AppColors { AppColors(colorScheme) }
     @EnvironmentObject var authViewModel: AuthViewModel
     @State private var firstName: String = ""
     @State private var lastName: String = ""
@@ -243,9 +412,9 @@ struct EditProfileView: View {
     @State private var alertMessage = ""
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ZStack {
-                Color(hex: "#FFFCF5")
+                colors.secondaryBackground
                     .ignoresSafeArea()
                 
                 VStack(spacing: 24) {
@@ -253,50 +422,50 @@ struct EditProfileView: View {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("First Name")
                                 .font(.system(size: 16, weight: .medium))
-                                .foregroundColor(Color(hex: "#2A2A2A"))
+                                .foregroundColor(colors.primaryText)
                             
                             TextField("Enter your first name", text: $firstName)
                                 .font(.system(size: 16))
                                 .padding(12)
-                                .background(Color.white)
+                                .background(colors.settingsRow)
                                 .cornerRadius(12)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 12)
-                                        .stroke(Color(hex: "#A6B4FF").opacity(0.3), lineWidth: 1)
+                                        .stroke(colors.cardBorder, lineWidth: 1)
                                 )
                         }
                         
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Last Name")
                                 .font(.system(size: 16, weight: .medium))
-                                .foregroundColor(Color(hex: "#2A2A2A"))
+                                .foregroundColor(colors.primaryText)
                             
                             TextField("Enter your last name", text: $lastName)
                                 .font(.system(size: 16))
                                 .padding(12)
-                                .background(Color.white)
+                                .background(colors.settingsRow)
                                 .cornerRadius(12)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 12)
-                                        .stroke(Color(hex: "#A6B4FF").opacity(0.3), lineWidth: 1)
+                                        .stroke(colors.cardBorder, lineWidth: 1)
                                 )
                         }
                         
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Email")
                                 .font(.system(size: 16, weight: .medium))
-                                .foregroundColor(Color(hex: "#2A2A2A"))
+                                .foregroundColor(colors.primaryText)
                             
                             TextField("Enter your email", text: $email)
                                 .font(.system(size: 16))
                                 .keyboardType(.emailAddress)
                                 .autocapitalization(.none)
                                 .padding(12)
-                                .background(Color.white)
+                                .background(colors.settingsRow)
                                 .cornerRadius(12)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 12)
-                                        .stroke(Color(hex: "#A6B4FF").opacity(0.3), lineWidth: 1)
+                                        .stroke(colors.cardBorder, lineWidth: 1)
                                 )
                         }
                     }
@@ -305,32 +474,32 @@ struct EditProfileView: View {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("New Password (optional)")
                                 .font(.system(size: 16, weight: .medium))
-                                .foregroundColor(Color(hex: "#2A2A2A"))
+                                .foregroundColor(colors.primaryText)
                             
                             SecureField("Enter new password", text: $newPassword)
                                 .font(.system(size: 16))
                                 .padding(12)
-                                .background(Color.white)
+                                .background(colors.settingsRow)
                                 .cornerRadius(12)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 12)
-                                        .stroke(Color(hex: "#A6B4FF").opacity(0.3), lineWidth: 1)
+                                        .stroke(colors.cardBorder, lineWidth: 1)
                                 )
                         }
                         
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Confirm Password")
                                 .font(.system(size: 16, weight: .medium))
-                                .foregroundColor(Color(hex: "#2A2A2A"))
+                                .foregroundColor(colors.primaryText)
                             
                             SecureField("Confirm new password", text: $confirmPassword)
                                 .font(.system(size: 16))
                                 .padding(12)
-                                .background(Color.white)
+                                .background(colors.settingsRow)
                                 .cornerRadius(12)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 12)
-                                        .stroke(Color(hex: "#A6B4FF").opacity(0.3), lineWidth: 1)
+                                        .stroke(colors.cardBorder, lineWidth: 1)
                                 )
                         }
                     }
@@ -340,20 +509,25 @@ struct EditProfileView: View {
                 .padding(.horizontal, 20)
                 .padding(.top, 20)
             }
-            .navigationTitle("Edit Profile")
+            .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text("Edit Profile")
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundColor(colors.primaryText)
+                }
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Cancel") {
                         dismiss()
                     }
-                    .foregroundColor(Color(hex: "#5B5564"))
+                    .foregroundColor(colors.secondaryText)
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Save") {
                         saveProfile()
                     }
-                    .foregroundColor(Color(hex: "#A6B4FF"))
+                    .foregroundColor(colors.primaryText)
                     .font(.system(size: 16, weight: .semibold))
                     .disabled(isLoading)
                 }
@@ -429,11 +603,13 @@ struct BounceButtonStyle: ButtonStyle {
 // MARK: - Privacy Policy View
 struct PrivacyPolicyView: View {
     @Environment(\.dismiss) private var dismiss
-    
+    @Environment(\.colorScheme) var colorScheme
+    private var colors: AppColors { AppColors(colorScheme) }
+
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ZStack {
-                Color(hex: "#FFFCF5")
+                colors.secondaryBackground
                     .ignoresSafeArea()
                 
                 ScrollView {
@@ -441,11 +617,11 @@ struct PrivacyPolicyView: View {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Terms & Privacy Policy")
                                 .font(.system(size: 32, weight: .bold, design: .serif))
-                                .foregroundColor(Color(hex: "#2A2A2A"))
+                                .foregroundColor(colors.primaryText)
                             
                             Text("Last updated: January 16, 2025")
                                 .font(.system(size: 14))
-                                .foregroundColor(Color(hex: "#5B5564"))
+                                .foregroundColor(colors.secondaryText)
                         }
                         
                         VStack(alignment: .leading, spacing: 20) {
@@ -493,7 +669,7 @@ struct PrivacyPolicyView: View {
                     Button("Done") {
                         dismiss()
                     }
-                    .foregroundColor(Color(hex: "#A6B4FF"))
+                    .foregroundColor(colors.primaryText)
                     .font(.system(size: 16, weight: .semibold))
                 }
             }
@@ -504,11 +680,11 @@ struct PrivacyPolicyView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title)
                 .font(.system(size: 20, weight: .semibold, design: .serif))
-                .foregroundColor(Color(hex: "#2A2A2A"))
+                .foregroundColor(colors.primaryText)
             
             Text(content)
                 .font(.system(size: 16))
-                .foregroundColor(Color(hex: "#2A2A2A"))
+                .foregroundColor(colors.primaryText)
                 .lineSpacing(4)
         }
     }
@@ -517,11 +693,13 @@ struct PrivacyPolicyView: View {
 // MARK: - Subscription Info View
 struct SubscriptionInfoView: View {
     @Environment(\.dismiss) private var dismiss
-    
+    @Environment(\.colorScheme) var colorScheme
+    private var colors: AppColors { AppColors(colorScheme) }
+
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ZStack {
-                Color(hex: "#FFFCF5")
+                colors.secondaryBackground
                     .ignoresSafeArea()
                 
                 ScrollView {
@@ -529,17 +707,16 @@ struct SubscriptionInfoView: View {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Subscription Plans")
                                 .font(.system(size: 32, weight: .bold, design: .serif))
-                                .foregroundColor(Color(hex: "#2A2A2A"))
+                                .foregroundColor(colors.primaryText)
                             
                             Text("All plans include full access to Whisper")
                                 .font(.system(size: 14))
-                                .foregroundColor(Color(hex: "#5B5564"))
+                                .foregroundColor(colors.secondaryText)
                         }
                         
                         // Pricing Cards
                         VStack(spacing: 16) {
                             pricingCard(title: "Weekly", price: "$2.99", period: "per week")
-                            pricingCard(title: "Monthly", price: "$7.99", period: "per month", badge: "MOST POPULAR")
                             pricingCard(title: "Annual", price: "$59.99", period: "per year", badge: "BEST VALUE")
                         }
                         
@@ -558,38 +735,38 @@ struct SubscriptionInfoView: View {
                         VStack(alignment: .leading, spacing: 12) {
                             Text("Legal")
                                 .font(.system(size: 20, weight: .semibold, design: .serif))
-                                .foregroundColor(Color(hex: "#2A2A2A"))
+                                .foregroundColor(colors.primaryText)
                             
-                            Link(destination: URL(string: "https://www.studioeight.app/privacy.html")!) {
+                            Link(destination: URL(string: "https://www.studioeight.app/whisper/privacy")!) {
                                 HStack {
                                     Text("Privacy Policy")
                                         .font(.system(size: 16, weight: .medium))
-                                        .foregroundColor(Color(hex: "#A6B4FF"))
+                                        .foregroundColor(colors.primaryText)
                                     Spacer()
                                     Image(systemName: "arrow.up.right")
                                         .font(.system(size: 12))
-                                        .foregroundColor(Color(hex: "#A6B4FF"))
+                                        .foregroundColor(colors.primaryText)
                                 }
                                 .padding(16)
-                                .background(Color.white)
+                                .background(colors.settingsRow)
                                 .cornerRadius(12)
-                                .shadow(color: Color(hex: "#A6B4FF").opacity(0.15), radius: 8, x: 0, y: 4)
+                                .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
                             }
-                            
-                            Link(destination: URL(string: "https://www.studioeight.app/terms.html")!) {
+
+                            Link(destination: URL(string: "https://www.studioeight.app/whisper/terms")!) {
                                 HStack {
                                     Text("Terms of Use")
                                         .font(.system(size: 16, weight: .medium))
-                                        .foregroundColor(Color(hex: "#A6B4FF"))
+                                        .foregroundColor(colors.primaryText)
                                     Spacer()
                                     Image(systemName: "arrow.up.right")
                                         .font(.system(size: 12))
-                                        .foregroundColor(Color(hex: "#A6B4FF"))
+                                        .foregroundColor(colors.primaryText)
                                 }
                                 .padding(16)
-                                .background(Color.white)
+                                .background(colors.settingsRow)
                                 .cornerRadius(12)
-                                .shadow(color: Color(hex: "#A6B4FF").opacity(0.15), radius: 8, x: 0, y: 4)
+                                .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
                             }
                         }
                     }
@@ -604,7 +781,7 @@ struct SubscriptionInfoView: View {
                     Button("Done") {
                         dismiss()
                     }
-                    .foregroundColor(Color(hex: "#A6B4FF"))
+                    .foregroundColor(colors.primaryText)
                     .font(.system(size: 16, weight: .semibold))
                 }
             }
@@ -617,15 +794,15 @@ struct SubscriptionInfoView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(title)
                         .font(.system(size: 24, weight: .semibold, design: .serif))
-                        .foregroundColor(Color(hex: "#2A2A2A"))
+                        .foregroundColor(colors.primaryText)
                     
                     HStack(alignment: .firstTextBaseline, spacing: 4) {
                         Text(price)
                             .font(.system(size: 20, weight: .medium))
-                            .foregroundColor(Color(hex: "#2A2A2A"))
+                            .foregroundColor(colors.primaryText)
                         Text(period)
                             .font(.system(size: 14))
-                            .foregroundColor(Color(hex: "#5B5564"))
+                            .foregroundColor(colors.secondaryText)
                     }
                 }
                 
@@ -637,26 +814,26 @@ struct SubscriptionInfoView: View {
                         .foregroundColor(.white)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 6)
-                        .background(Color(hex: "#A6B4FF"))
+                        .background(Color.black)
                         .cornerRadius(12)
                 }
             }
         }
         .padding(20)
-        .background(Color.white)
+        .background(colors.settingsRow)
         .cornerRadius(16)
-        .shadow(color: Color(hex: "#A6B4FF").opacity(0.15), radius: 8, x: 0, y: 4)
+        .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
     }
     
     private func infoSection(title: String, content: String) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title)
                 .font(.system(size: 18, weight: .semibold, design: .serif))
-                .foregroundColor(Color(hex: "#2A2A2A"))
+                .foregroundColor(colors.primaryText)
             
             Text(content)
                 .font(.system(size: 15))
-                .foregroundColor(Color(hex: "#5B5564"))
+                .foregroundColor(colors.secondaryText)
                 .lineSpacing(4)
         }
     }

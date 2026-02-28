@@ -1,15 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "whisper_bg_charcoalgrain.png",
+      "filename" : "blk.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "blk 1.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+      "filename" : "blk 2.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

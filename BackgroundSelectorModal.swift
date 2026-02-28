@@ -2,177 +2,305 @@ import SwiftUI
 
 struct BackgroundSelectorModal: View {
     @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) var colorScheme
+    private var colors: AppColors { AppColors(colorScheme) }
     let mantra: String
+    let currentBackground: BackgroundConfig
     let onSelect: (BackgroundConfig) -> Void
-    
-    @State private var currentIndex = 0
-    @State private var dragOffset: CGFloat = 0
-    
-    private let backgrounds = BackgroundConfig.allBackgrounds
-    private let cardWidth: CGFloat = UIScreen.main.bounds.width * 0.75
-    private let cardHeight: CGFloat = UIScreen.main.bounds.width * 0.75
-    
+
+    @State private var selectedCategory: BackgroundCategory = .color
+    @State private var currentPage: Int = 0
+
+    // iOS systemMedium widget: 360 × 169 pt, corner radius 16
+    private let widgetCorner: CGFloat = 16
+    private var widgetWidth: CGFloat {
+        UIScreen.main.bounds.width - 48 // 24pt padding each side
+    }
+    private var widgetHeight: CGFloat {
+        widgetWidth * (169.0 / 360.0) // Maintain exact medium widget ratio
+    }
+
     private var cleanedMantra: String {
         let terminalPunctuation = CharacterSet(charactersIn: ".,;:!?…")
         var cleaned = mantra.trimmingCharacters(in: .whitespacesAndNewlines)
+        if cleaned.hasPrefix("\"") && cleaned.hasSuffix("\"") {
+            cleaned = String(cleaned.dropFirst().dropLast())
+        }
+        if cleaned.hasPrefix("'") && cleaned.hasSuffix("'") {
+            cleaned = String(cleaned.dropFirst().dropLast())
+        }
         while let last = cleaned.last, terminalPunctuation.contains(String(last).unicodeScalars.first!) {
             cleaned = String(cleaned.dropLast())
         }
         return cleaned.trimmingCharacters(in: .whitespacesAndNewlines)
     }
-    
+
+    private var filteredBackgrounds: [BackgroundConfig] {
+        BackgroundConfig.backgrounds(for: selectedCategory)
+    }
+
+    private var formattedTime: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "h:mm a"
+        return formatter.string(from: Date())
+    }
+
+    /// The background for the currently visible page
+    private var activeBackground: BackgroundConfig {
+        let bgs = filteredBackgrounds
+        guard currentPage >= 0, currentPage < bgs.count else {
+            return bgs.first ?? currentBackground
+        }
+        return bgs[currentPage]
+    }
+
     var body: some View {
         ZStack {
-            // Soft gradient background
-            LinearGradient(
-                gradient: Gradient(colors: [
-                    Color(hex: "#FFFCF5"),
-                    Color(hex: "#F5EFE6")
-                ]),
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
-            
+            // Depth background — subtle radial glow in dark mode
+            modalBackground
+                .ignoresSafeArea()
+
             VStack(spacing: 0) {
-                // Header
+                // Drag indicator
+                Capsule()
+                    .fill(colors.divider)
+                    .frame(width: 36, height: 5)
+                    .padding(.top, 10)
+                    .padding(.bottom, 12)
+
+                // Close button
                 HStack {
                     Button {
                         dismiss()
                     } label: {
                         Image(systemName: "xmark")
-                            .font(.system(size: 18, weight: .medium))
-                            .foregroundColor(Color(hex: "#2A2A2A"))
-                            .frame(width: 40, height: 40)
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundColor(colors.secondaryText)
+                            .frame(width: 28, height: 28)
+                            .background(
+                                Circle().fill(colorScheme == .dark ? Color(hex: "#1E1E24") : colors.card)
+                            )
+                            .overlay(
+                                Circle().stroke(colorScheme == .dark ? Color.white.opacity(0.08) : colors.cardBorder, lineWidth: 0.5)
+                            )
                     }
                     .buttonStyle(.plain)
-                    
+
                     Spacer()
-                    
-                    Text("Choose Background")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(Color(hex: "#2A2A2A"))
-                    
-                    Spacer()
-                    
-                    // Invisible spacer for balance
-                    Color.clear.frame(width: 40, height: 40)
                 }
-                .padding(.horizontal, 20)
-                .padding(.top, 20)
-                .padding(.bottom, 16)
-                
-                // Page indicator
-                HStack(spacing: 6) {
-                    ForEach(0..<backgrounds.count, id: \.self) { index in
-                        Circle()
-                            .fill(index == currentIndex ? Color(hex: "#A6B4FF") : Color(hex: "#D0D0D0"))
-                            .frame(width: index == currentIndex ? 8 : 6, height: index == currentIndex ? 8 : 6)
-                            .animation(.spring(response: 0.3), value: currentIndex)
-                    }
-                }
-                .padding(.bottom, 24)
-                
-                // Carousel
-                GeometryReader { geometry in
-                    HStack(spacing: 20) {
-                        ForEach(Array(backgrounds.enumerated()), id: \.offset) { index, background in
-                            backgroundCard(background: background, index: index, geometry: geometry)
-                        }
-                    }
-                    .offset(x: CGFloat(-currentIndex) * (cardWidth + 20) + dragOffset + (geometry.size.width - cardWidth) / 2)
-                    .gesture(
-                        DragGesture()
-                            .onChanged { value in
-                                dragOffset = value.translation.width
-                            }
-                            .onEnded { value in
-                                let threshold: CGFloat = 50
-                                let velocity = value.predictedEndTranslation.width - value.translation.width
-                                
-                                if value.translation.width < -threshold || velocity < -100 {
-                                    if currentIndex < backgrounds.count - 1 {
-                                        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                                            currentIndex += 1
-                                        }
-                                    }
-                                } else if value.translation.width > threshold || velocity > 100 {
-                                    if currentIndex > 0 {
-                                        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                                            currentIndex -= 1
-                                        }
-                                    }
-                                }
-                                
-                                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                                    dragOffset = 0
-                                }
-                            }
-                    )
-                }
-                .frame(height: cardHeight + 40)
-                
+                .padding(.horizontal, 24)
+                .padding(.bottom, 18)
+
+                // Title
+                Text("Widget Style")
+                    .font(.system(size: 26, weight: .bold))
+                    .foregroundColor(colors.primaryText)
+                    .padding(.bottom, 6)
+
+                // Subtitle
+                Text("Swipe to preview each style")
+                    .font(.system(size: 15, weight: .regular))
+                    .foregroundColor(colors.secondaryText)
+                    .padding(.bottom, 20)
+
+                // Filter chips
+                filterChipsView
+                    .padding(.bottom, 24)
+
+                // Centered carousel zone
                 Spacer()
-                
-                // Continue button
-                Button {
-                    let selectedBackground = backgrounds[currentIndex]
-                    onSelect(selectedBackground)
-                    dismiss()
-                } label: {
-                    Text("Continue")
-                        .font(.system(size: 17, weight: .semibold))
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 56)
-                        .background(Color.black)
-                        .cornerRadius(28)
+
+                // Page counter — "1 of 8"
+                Text("\(currentPage + 1) of \(filteredBackgrounds.count)")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(colors.secondaryText)
+                    .padding(.bottom, 14)
+
+                // Swipeable widget carousel
+                TabView(selection: $currentPage) {
+                    ForEach(Array(filteredBackgrounds.enumerated()), id: \.element.imageName) { index, background in
+                        widgetCard(background: background)
+                            .tag(index)
+                    }
                 }
-                .buttonStyle(.plain)
-                .padding(.horizontal, 32)
-                .padding(.bottom, 40)
+                .tabViewStyle(.page(indexDisplayMode: .never))
+                .frame(height: widgetHeight + 40) // extra room for shadow
+
+                // Custom page dots
+                pageDots
+                    .padding(.top, 14)
+
+                Spacer()
+
+                // Apply button
+                applyButton
+                    .padding(.horizontal, 28)
+                    .padding(.bottom, 36)
             }
         }
-        .preferredColorScheme(.light)
+        .onAppear {
+            if let index = filteredBackgrounds.firstIndex(where: { $0.imageName == currentBackground.imageName }) {
+                currentPage = index
+            }
+        }
+        .onChange(of: selectedCategory) { _, _ in
+            currentPage = 0
+        }
     }
-    
-    private func backgroundCard(background: BackgroundConfig, index: Int, geometry: GeometryProxy) -> some View {
-        let scale = currentIndex == index ? 1.0 : 0.9
-        let opacity = currentIndex == index ? 1.0 : 0.6
-        
+
+    // MARK: - Modal Background — warm charcoal with depth
+    private var modalBackground: some View {
+        ZStack {
+            if colorScheme == .dark {
+                // Warm charcoal base — NOT black
+                Color(hex: "#161619")
+
+                // Top-to-bottom gradient for dimension
+                LinearGradient(
+                    colors: [
+                        Color(hex: "#1E1E24"),
+                        Color(hex: "#161619"),
+                        Color(hex: "#111114")
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+
+                // Soft center glow behind the card area
+                RadialGradient(
+                    colors: [
+                        Color(hex: "#1F1F26").opacity(0.6),
+                        Color.clear
+                    ],
+                    center: .init(x: 0.5, y: 0.55),
+                    startRadius: 40,
+                    endRadius: UIScreen.main.bounds.width * 0.7
+                )
+            } else {
+                colors.screenFade
+            }
+        }
+    }
+
+    // MARK: - Filter Chips
+    private var filterChipsView: some View {
+        HStack(spacing: 10) {
+            ForEach(BackgroundCategory.allCases, id: \.self) { category in
+                filterChip(category: category)
+            }
+        }
+    }
+
+    private func filterChip(category: BackgroundCategory) -> some View {
+        let isActive = selectedCategory == category
+
+        return Button {
+            withAnimation(.easeInOut(duration: 0.2)) {
+                selectedCategory = category
+            }
+        } label: {
+            HStack(spacing: 6) {
+                Image(category.icon)
+                    .renderingMode(.template)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 14, height: 14)
+                Text(category.rawValue)
+                    .font(.system(size: 14, weight: .semibold))
+            }
+            .foregroundColor(isActive ? colors.filterChipActiveText : colors.filterChipInactiveText)
+            .padding(.horizontal, 18)
+            .padding(.vertical, 10)
+            .background(
+                Capsule()
+                    .fill(isActive ? colors.filterChipActive : colors.filterChipInactive)
+            )
+            .overlay(
+                Capsule()
+                    .stroke(isActive ? Color.clear : colors.cardBorder, lineWidth: 0.5)
+            )
+        }
+        .buttonStyle(.plain)
+    }
+
+    // MARK: - Widget Card — Medium widget (360×169 ratio)
+    private func widgetCard(background: BackgroundConfig) -> some View {
+        let textColor = Color(hex: background.textColor)
+
         return ZStack {
+            // Background image
             Image(background.imageName)
                 .resizable()
                 .aspectRatio(contentMode: .fill)
-                .frame(width: cardWidth, height: cardHeight)
+                .frame(width: widgetWidth, height: widgetHeight)
                 .clipped()
-            
-            VStack(spacing: 20) {
+
+            // Widget content — centered preview layout
+            VStack(spacing: 0) {
+                // Logo — top center
+                Image("whisper-logo")
+                    .renderingMode(.template)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 10)
+                    .foregroundColor(textColor.opacity(0.6))
+                    .padding(.top, 12)
+
+                Spacer()
+
+                // Text — centered
                 Text(cleanedMantra)
-                    .font(.system(size: 24, weight: .bold, design: .serif))
-                    .foregroundColor(Color(hex: background.textColor))
+                    .font(.system(size: 15, weight: .semibold, design: .serif))
+                    .foregroundColor(textColor)
                     .multilineTextAlignment(.center)
                     .lineLimit(3)
                     .lineSpacing(4)
-                    .tracking(-0.4)
-                    .minimumScaleFactor(0.75)
-                    .allowsTightening(true)
-                    .frame(maxWidth: cardWidth - 56)
-                
-                Image("whisper-logo")
-                    .resizable()
-                    .renderingMode(.template)
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: cardWidth * 0.13)
-                    .foregroundColor(Color(hex: background.textColor))
-                    .opacity(0.82)
+                    .tracking(-0.3)
+                    .minimumScaleFactor(0.65)
+                    .padding(.horizontal, 20)
+
+                Spacer()
+            }
+            .frame(width: widgetWidth, height: widgetHeight)
+        }
+        .frame(width: widgetWidth, height: widgetHeight)
+        .clipShape(RoundedRectangle(cornerRadius: widgetCorner, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: widgetCorner, style: .continuous)
+                .stroke(colorScheme == .dark ? Color.white.opacity(0.08) : colors.cardBorder, lineWidth: 0.5)
+        )
+        // Floating shadow — visible against charcoal bg
+        .shadow(color: Color.black.opacity(colorScheme == .dark ? 0.5 : 0.18), radius: 4, x: 0, y: 3)
+        .shadow(color: Color.black.opacity(colorScheme == .dark ? 0.4 : 0.14), radius: 20, x: 0, y: 12)
+        .padding(.horizontal, 24)
+    }
+
+    // MARK: - Page Dots
+    private var pageDots: some View {
+        HStack(spacing: 6) {
+            ForEach(0..<filteredBackgrounds.count, id: \.self) { index in
+                Circle()
+                    .fill(index == currentPage ? colors.primaryText : colors.primaryText.opacity(0.2))
+                    .frame(width: index == currentPage ? 7 : 5, height: index == currentPage ? 7 : 5)
+                    .animation(.easeInOut(duration: 0.2), value: currentPage)
             }
         }
-        .frame(width: cardWidth, height: cardHeight)
-        .cornerRadius(24)
-        .shadow(color: Color.black.opacity(0.15), radius: 20, x: 0, y: 10)
-        .scaleEffect(scale)
-        .opacity(opacity)
-        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: currentIndex)
+    }
+
+    // MARK: - Apply Button
+    private var applyButton: some View {
+        Button {
+            onSelect(activeBackground)
+            dismiss()
+        } label: {
+            Text("Apply")
+                .font(.system(size: 17, weight: .semibold))
+                .foregroundColor(colors.buttonText)
+                .frame(maxWidth: .infinity)
+                .frame(height: 52)
+                .background(colors.buttonBackground)
+                .cornerRadius(26)
+        }
+        .buttonStyle(.plain)
     }
 }

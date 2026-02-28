@@ -6,8 +6,9 @@ struct JournalEntry: Identifiable, Codable {
     var mood: String
     var text: String        // this is the mantra
     var colorHex: String    // theme color
-    var prompts: [String]   // response1, response2, response3
-    
+    var prompts: [String]                // response1, response2, response3
+    var promptQuestions: [String] = []    // the actual questions asked (saved for display)
+
     // V2 Features - Favorites & Pinning
     var isFavorited: Bool = false
     var isPinned: Bool = false

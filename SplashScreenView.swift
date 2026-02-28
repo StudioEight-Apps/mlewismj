@@ -6,25 +6,19 @@ struct SplashScreenView: View {
     
     var body: some View {
         ZStack {
-            Color(hex: "#FFFCF5")
+            Color(hex: "#1A1A1A")
                 .ignoresSafeArea()
-            
-            VStack(spacing: 16) {
-                // Whisper logo - properly sized for splash
-                Image("whisper-logo")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(maxWidth: 180)
-                    .accessibilityLabel("Whisper")
-                    .scaleEffect(isAnimating ? 1.0 : 0.8)
-                    .opacity(isAnimating ? 1.0 : 0.3)
-                
-                // Subtle tagline
-                Text("smart journal")
-                    .font(.system(size: 16, weight: .regular, design: .default))
-                    .foregroundColor(Color(hex: "#888888"))
-                    .opacity(isAnimating ? 0.8 : 0.0)
-            }
+
+            // Whisper logo - light on dark
+            Image("whisper-logo")
+                .renderingMode(.template)
+                .resizable()
+                .scaledToFit()
+                .frame(maxWidth: 180)
+                .foregroundColor(Color(hex: "#F5EFE7"))
+                .accessibilityLabel("Whisper")
+                .scaleEffect(isAnimating ? 1.0 : 0.8)
+                .opacity(isAnimating ? 1.0 : 0.3)
         }
         .onAppear {
             // Animate logo in

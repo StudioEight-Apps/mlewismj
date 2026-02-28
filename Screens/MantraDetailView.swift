@@ -3,7 +3,9 @@ import Firebase
 
 struct MantraDetailView: View {
     var entry: [String: Any]
-    
+    @Environment(\.colorScheme) var colorScheme
+    private var colors: AppColors { AppColors(colorScheme) }
+
     // Helper to get journal type
     private var journalType: JournalType {
         if let typeString = entry["journalType"] as? String,
@@ -63,6 +65,7 @@ struct MantraDetailView: View {
             }
             .padding()
         }
+        .tint(colors.navTint)
         .navigationTitle("Entry")
         .navigationBarTitleDisplayMode(.inline)
     }

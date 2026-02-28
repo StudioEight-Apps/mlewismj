@@ -14,85 +14,79 @@ struct LoginView: View {
     @State private var showingResetPassword = false
     @State private var resetEmail = ""
     
-    // Animation states
-    @State private var loginPressed = false
-    @State private var applePressed = false
-    @State private var googlePressed = false
-    @State private var backPressed = false
-    
     var body: some View {
-        ScrollView {
+        ZStack {
+            // Background - matches onboarding theme
+            OnboardingTheme.background.ignoresSafeArea()
+            
             VStack(spacing: 0) {
-                // Custom Back Arrow - positioned below status bar
+                // Back Button - top left
                 HStack {
-                    Button(action: {
-                        backPressed = true
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                            backPressed = false
-                        }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                            dismiss()
-                        }
-                    }) {
+                    Button(action: { dismiss() }) {
                         Image(systemName: "chevron.left")
-                            .font(.system(size: 22, weight: .semibold))
-                            .foregroundColor(Color(hex: "#A6B8FA"))
+                            .font(.system(size: 20, weight: .medium))
+                            .foregroundColor(OnboardingTheme.foreground)
                             .frame(width: 44, height: 44)
-                            .background(Color.clear)
                     }
                     .buttonStyle(PlainButtonStyle())
-                    .scaleEffect(backPressed ? 0.85 : 1.0)
-                    .animation(.easeInOut(duration: 0.1), value: backPressed)
                     Spacer()
                 }
-                .padding(.horizontal, 16)
-                .padding(.top, 50)
+                .padding(.horizontal, 12)
+                .padding(.top, 8)
                 
-                // Whisper Logo Image - 20% larger
+                // Whisper Logo
                 Image("whisper-logo")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .frame(height: 48)
-                    .foregroundColor(Color(hex: "#2A2A2A"))
-                    .padding(.top, 40)
+                    .frame(height: 40)
+                    .padding(.top, 32)
                 
-                // Form Fields - moved down more
-                VStack(spacing: 16) {
+                // Title
+                Text("Welcome back")
+                    .font(.system(size: 28, weight: .regular, design: .serif))
+                    .italic()
+                    .foregroundColor(OnboardingTheme.foreground)
+                    .padding(.top, 16)
+                
+                // Form Fields
+                VStack(spacing: 12) {
                     // Email Field
-                    TextField("Email", text: $email)
-                        .font(.system(size: 16, weight: .regular))
-                        .foregroundColor(Color(hex: "#2A2A2A"))
-                        .padding(.horizontal, 12)
+                    TextField("", text: $email, prompt: Text("Email").foregroundColor(OnboardingTheme.placeholder))
+                        .font(OnboardingTheme.body())
+                        .foregroundColor(OnboardingTheme.foreground)
+                        .padding(.horizontal, 16)
                         .frame(height: 52)
-                        .background(Color.white)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(OnboardingTheme.inputBackground)
+                        )
                         .overlay(
                             RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color(hex: "#E4E4E4"), lineWidth: 1)
+                                .stroke(OnboardingTheme.inputBorder, lineWidth: 1)
                         )
-                        .cornerRadius(12)
-                        .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 2)
-                        .shadow(color: Color.black.opacity(0.02), radius: 2, x: 0, y: 1)
                         .keyboardType(.emailAddress)
                         .autocapitalization(.none)
                         .disableAutocorrection(true)
-                    
+                        .contentShape(Rectangle())
+
                     // Password Field
-                    SecureField("Password", text: $password)
-                        .font(.system(size: 16, weight: .regular))
-                        .foregroundColor(Color(hex: "#2A2A2A"))
-                        .padding(.horizontal, 12)
+                    SecureField("", text: $password, prompt: Text("Password").foregroundColor(OnboardingTheme.placeholder))
+                        .font(OnboardingTheme.body())
+                        .foregroundColor(OnboardingTheme.foreground)
+                        .padding(.horizontal, 16)
                         .frame(height: 52)
-                        .background(Color.white)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(OnboardingTheme.inputBackground)
+                        )
                         .overlay(
                             RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color(hex: "#E4E4E4"), lineWidth: 1)
+                                .stroke(OnboardingTheme.inputBorder, lineWidth: 1)
                         )
-                        .cornerRadius(12)
-                        .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 2)
-                        .shadow(color: Color.black.opacity(0.02), radius: 2, x: 0, y: 1)
                         .autocapitalization(.none)
                         .disableAutocorrection(true)
-                    
+                        .contentShape(Rectangle())
+
                     // Forgot Password Link
                     HStack {
                         Spacer()
@@ -101,126 +95,108 @@ struct LoginView: View {
                             showingResetPassword = true
                         }) {
                             Text("Forgot Password?")
-                                .font(.system(size: 14, weight: .medium))
-                                .foregroundColor(Color(hex: "#A6B8FA"))
+                                .font(OnboardingTheme.caption())
+                                .foregroundColor(OnboardingTheme.accent)
                         }
                         .buttonStyle(PlainButtonStyle())
                     }
                     .padding(.top, 4)
                 }
-                .padding(.top, 100)
-                .padding(.horizontal, 24)
+                .padding(.horizontal, OnboardingTheme.screenPadding)
+                .padding(.top, 48)
                 
-                // Log In Button - 32px from fields
-                Button(action: {
-                    loginPressed = true
-                    handleLogin()
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                        loginPressed = false
-                    }
-                }) {
+                // Log In Button
+                Button(action: handleLogin) {
                     Text("Log In")
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundColor(Color(hex: "#FFFFFF"))
+                        .font(OnboardingTheme.button())
+                        .foregroundColor(OnboardingTheme.buttonText)
                         .frame(maxWidth: .infinity)
-                        .frame(height: 52)
-                        .background(Color(hex: "#A6B8FA"))
-                        .cornerRadius(12)
+                        .frame(height: OnboardingTheme.buttonHeight)
+                        .background(
+                            RoundedRectangle(cornerRadius: OnboardingTheme.buttonRadius)
+                                .fill(OnboardingTheme.accent)
+                        )
                 }
                 .buttonStyle(PlainButtonStyle())
-                .scaleEffect(loginPressed ? 0.96 : 1.0)
-                .shadow(color: Color(hex: "#A6B8FA").opacity(loginPressed ? 0.15 : 0.25), radius: loginPressed ? 4 : 8, x: 0, y: loginPressed ? 2 : 4)
-                .shadow(color: Color.black.opacity(loginPressed ? 0.03 : 0.06), radius: loginPressed ? 2 : 4, x: 0, y: loginPressed ? 1 : 2)
-                .animation(.easeInOut(duration: 0.1), value: loginPressed)
+                .padding(.horizontal, OnboardingTheme.screenPadding)
                 .padding(.top, 32)
-                .padding(.horizontal, 24)
                 
-                // Social Auth Buttons - 24px from Log In button
+                // Divider
+                HStack(spacing: 16) {
+                    Rectangle()
+                        .fill(OnboardingTheme.muted.opacity(0.3))
+                        .frame(height: 1)
+                    Text("or")
+                        .font(OnboardingTheme.caption())
+                        .foregroundColor(OnboardingTheme.muted)
+                    Rectangle()
+                        .fill(OnboardingTheme.muted.opacity(0.3))
+                        .frame(height: 1)
+                }
+                .padding(.horizontal, OnboardingTheme.screenPadding)
+                .padding(.top, 24)
+                
+                // Social Auth Buttons
                 VStack(spacing: 12) {
                     // Apple Sign In
-                    Button(action: {
-                        applePressed = true
-                        handleAppleSignIn()
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                            applePressed = false
-                        }
-                    }) {
-                        HStack {
+                    Button(action: handleAppleSignIn) {
+                        HStack(spacing: 12) {
                             Image(systemName: "applelogo")
-                                .font(.system(size: 16, weight: .medium))
+                                .font(.system(size: 18, weight: .medium))
                             Text("Continue with Apple")
-                                .font(.system(size: 16, weight: .medium))
+                                .font(OnboardingTheme.button())
                         }
-                        .foregroundColor(Color(hex: "#2A2A2A"))
+                        .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
-                        .frame(height: 52)
-                        .background(Color.white)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color(hex: "#E4E4E4"), lineWidth: 1)
+                        .frame(height: OnboardingTheme.buttonHeight)
+                        .background(
+                            RoundedRectangle(cornerRadius: OnboardingTheme.buttonRadius)
+                                .fill(OnboardingTheme.buttonBlack)
                         )
-                        .cornerRadius(12)
                     }
                     .buttonStyle(PlainButtonStyle())
-                    .scaleEffect(applePressed ? 0.97 : 1.0)
-                    .shadow(color: Color.black.opacity(applePressed ? 0.005 : 0.015), radius: applePressed ? 1 : 3, x: 0, y: applePressed ? 0 : 1)
-                    .animation(.easeInOut(duration: 0.1), value: applePressed)
                     
                     // Google Sign In
-                    Button(action: {
-                        googlePressed = true
-                        handleGoogleSignIn()
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                            googlePressed = false
-                        }
-                    }) {
-                        HStack {
-                            Text("G")
-                                .font(.system(size: 16, weight: .bold))
-                                .foregroundColor(.red)
+                    Button(action: handleGoogleSignIn) {
+                        HStack(spacing: 12) {
+                            Image("google-logo")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 18, height: 18)
                             Text("Continue with Google")
-                                .font(.system(size: 16, weight: .medium))
+                                .font(OnboardingTheme.button())
+                                .foregroundColor(OnboardingTheme.foreground)
                         }
-                        .foregroundColor(Color(hex: "#2A2A2A"))
                         .frame(maxWidth: .infinity)
-                        .frame(height: 52)
-                        .background(Color.white)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color(hex: "#E4E4E4"), lineWidth: 1)
+                        .frame(height: OnboardingTheme.buttonHeight)
+                        .background(
+                            RoundedRectangle(cornerRadius: OnboardingTheme.buttonRadius)
+                                .fill(OnboardingTheme.card)
                         )
-                        .cornerRadius(12)
                     }
                     .buttonStyle(PlainButtonStyle())
-                    .scaleEffect(googlePressed ? 0.97 : 1.0)
-                    .shadow(color: Color.black.opacity(googlePressed ? 0.005 : 0.015), radius: googlePressed ? 1 : 3, x: 0, y: googlePressed ? 0 : 1)
-                    .animation(.easeInOut(duration: 0.1), value: googlePressed)
                 }
-                .padding(.top, 24)
-                .padding(.horizontal, 24)
+                .padding(.horizontal, OnboardingTheme.screenPadding)
+                .padding(.top, 16)
                 
-                // Sign Up Link - 32px from last button
-                NavigationLink(destination: SignUpView()) {
-                    HStack(spacing: 4) {
-                        Text("Don't have an account?")
-                            .font(.system(size: 14, weight: .regular))
-                            .foregroundColor(Color(hex: "#2A2A2A"))
+                Spacer()
+                
+                // Sign Up Link
+                HStack(spacing: 4) {
+                    Text("Don't have an account?")
+                        .font(OnboardingTheme.caption())
+                        .foregroundColor(OnboardingTheme.muted)
+                    NavigationLink(destination: SignUpView()) {
                         Text("Sign Up")
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundColor(Color(hex: "#A6B8FA"))
+                            .font(OnboardingTheme.caption())
+                            .fontWeight(.medium)
+                            .foregroundColor(OnboardingTheme.accent)
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 12)
-                    .background(Color.clear)
+                    .buttonStyle(PlainButtonStyle())
                 }
-                .buttonStyle(PlainButtonStyle())
-                .shadow(radius: 0)
-                .padding(.top, 32)
-                .padding(.bottom, 40)
+                .padding(.bottom, 48)
             }
         }
-        .background(Color(hex: "#FFFCF5"))
-        .ignoresSafeArea()
         .navigationBarHidden(true)
         .alert("Error", isPresented: $showingError) {
             Button("OK") { }

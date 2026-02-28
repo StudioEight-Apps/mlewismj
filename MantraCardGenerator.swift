@@ -181,15 +181,6 @@ struct MantraCardGenerator {
     } 
     
     private static func getMoodColor(_ mood: String) -> UIColor {
-        switch mood.lowercased() {
-        case "stressed", "frustrated", "overwhelmed", "anxious":
-            return UIColor(hex: "#F5A5A5")
-        case "angry", "sad", "lonely", "tired", "insecure", "fine":
-            return UIColor(hex: "#C8B5E8")
-        case "calm", "content", "reflective", "happy", "grateful", "excited", "hopeful", "motivated":
-            return UIColor(hex: "#B5D6BA")
-        default:
-            return UIColor(hex: "#C8B5E8")
-        }
+        UIColor(hex: colorForMood(mood))
     }
 }

@@ -29,10 +29,6 @@
 		FB5AC72E2E29835C00F6C9EF /* UIColor+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB5AC72D2E29835800F6C9EF /* UIColor+Hex.swift */; };
 		FB5AC7382E29D2B300F6C9EF /* MantraGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB5AC7372E29D2B300F6C9EF /* MantraGenerator.swift */; };
 		FB5AC74F2E2AEA6300F6C9EF /* SplashScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB5AC74E2E2AEA5D00F6C9EF /* SplashScreenView.swift */; };
-		FB5AC7512E2AEA9300F6C9EF /* OnboardingCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB5AC7502E2AEA9300F6C9EF /* OnboardingCoordinator.swift */; };
-		FB5AC7572E2AEB9C00F6C9EF /* OnboardingPage2.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB5AC7562E2AEB9C00F6C9EF /* OnboardingPage2.swift */; };
-		FB5AC7592E2AEBBD00F6C9EF /* OnboardingPage3.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB5AC7582E2AEBBD00F6C9EF /* OnboardingPage3.swift */; };
-		FB5AC75B2E2AEBD800F6C9EF /* OnboardingPage1.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB5AC75A2E2AEBD800F6C9EF /* OnboardingPage1.swift */; };
 		FB5AC75E2E2AFC5900F6C9EF /* GoogleAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB5AC75D2E2AFC5900F6C9EF /* GoogleAuthManager.swift */; };
 		FB5AC7602E2AFCD400F6C9EF /* AppleAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB5AC75F2E2AFCD400F6C9EF /* AppleAuthManager.swift */; };
 		FB5AC7622E2B090E00F6C9EF /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = FB5AC7612E2B090E00F6C9EF /* GoogleSignIn */; };
@@ -48,13 +44,16 @@
 		FB6D648E2E5A8D060025D416 /* MantraAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6D648D2E5A8D060025D416 /* MantraAPI.swift */; };
 		FB6D64922E5CB70B0025D416 /* FirebaseRemoteConfig in Frameworks */ = {isa = PBXBuildFile; productRef = FB6D64912E5CB70B0025D416 /* FirebaseRemoteConfig */; };
 		FB6D64942E5D126B0025D416 /* SecureAPIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6D64932E5D126B0025D416 /* SecureAPIManager.swift */; };
-		FB7BE8AC2EBBCB65006653DA /* OnboardingPage5.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB7BE8AB2EBBCB65006653DA /* OnboardingPage5.swift */; };
 		FB7FFBCE2DF64503001DEF3D /* ImageShareHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB7FFBCD2DF64503001DEF3D /* ImageShareHelper.swift */; };
 		FB7FFBD02DF64550001DEF3D /* MantraCardGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB7FFBCF2DF64550001DEF3D /* MantraCardGenerator.swift */; };
 		FB7FFBE32DF72047001DEF3D /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB7FFBE22DF72047001DEF3D /* WidgetKit.framework */; };
 		FB7FFBE52DF72047001DEF3D /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB7FFBE42DF72047001DEF3D /* SwiftUI.framework */; };
 		FB7FFBF02DF72048001DEF3D /* MantraWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = FB7FFBE02DF72047001DEF3D /* MantraWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		FB820DBD2E31623300BCEE2F /* HapticHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB820DBC2E31623300BCEE2F /* HapticHelper.swift */; };
+		FB9DA1A22F1D8B3C00A1B2C3 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9DA1A12F1D8B3C00A1B2C3 /* NotificationManager.swift */; };
+		FBC2B0C12F11816A0089F5AD /* JournalEntryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBC2B0C02F11816A0089F5AD /* JournalEntryDetailView.swift */; };
+		FBC2B0D22F1182A10089F5AD /* ThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBC2B0D12F1182A10089F5AD /* ThemeManager.swift */; };
+		FBC2B0D42F1182B20089F5AD /* AppColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBC2B0D32F1182B20089F5AD /* AppColors.swift */; };
 		FBD43C2F2DF0AA5100C100D5 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD43C2E2DF0AA5100C100D5 /* Theme.swift */; };
 		FBD9D1A32EA59927002C681E /* HeartParticle.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD9D1A22EA59927002C681E /* HeartParticle.swift */; };
 		FBD9D1D72EAA67EB002C681E /* BackgroundConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD9D1D62EAA67EB002C681E /* BackgroundConfig.swift */; };
@@ -64,6 +63,15 @@
 		FBDE1DAD2E5DFA1A00AE17A3 /* SubscriptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBDE1DAC2E5DFA1A00AE17A3 /* SubscriptionManager.swift */; };
 		FBDE1DB32E5DFE2B00AE17A3 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBDE1DB22E5DFE2B00AE17A3 /* PaywallView.swift */; };
 		FBE92F112E98529E007F55C0 /* WhisperVoice.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBE92F102E98529E007F55C0 /* WhisperVoice.swift */; };
+		FBF472582EE2151A00021C03 /* Widgetsetuphomescreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBF472572EE2151A00021C03 /* Widgetsetuphomescreen.swift */; };
+		FBF4725A2EE2154600021C03 /* Widgetsetuplockscreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBF472592EE2154600021C03 /* Widgetsetuplockscreen.swift */; };
+		FBF4725C2EE225C000021C03 /* IPhoneMockupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBF4725B2EE225C000021C03 /* IPhoneMockupView.swift */; };
+		FBF4725F2EE737E800021C03 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = FBF4725E2EE737E800021C03 /* RevenueCat */; };
+		FBF472632EE73B5600021C03 /* RevenueCatManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBF472622EE73B5600021C03 /* RevenueCatManager.swift */; };
+		FBF472972EE9E22D00021C03 /* AuthUserInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBF472962EE9E22D00021C03 /* AuthUserInfo.swift */; };
+		FBF472992EE9E24B00021C03 /* PopulateDefaultWhispers.swift .swift in Sources */ = {isa = PBXBuildFile; fileRef = FBF472982EE9E24B00021C03 /* PopulateDefaultWhispers.swift .swift */; };
+		FBF472A12F0E5A0000021C03 /* RevenueCatUI in Frameworks */ = {isa = PBXBuildFile; productRef = FBF472A02F0E5A0000021C03 /* RevenueCatUI */; };
+		FBF472B02F0E6A0000021C03 /* PaywallRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBF472AF2F0E6A0000021C03 /* PaywallRouter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -127,10 +135,6 @@
 		FB5AC72D2E29835800F6C9EF /* UIColor+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Hex.swift"; sourceTree = "<group>"; };
 		FB5AC7372E29D2B300F6C9EF /* MantraGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MantraGenerator.swift; sourceTree = "<group>"; };
 		FB5AC74E2E2AEA5D00F6C9EF /* SplashScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreenView.swift; sourceTree = "<group>"; };
-		FB5AC7502E2AEA9300F6C9EF /* OnboardingCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingCoordinator.swift; sourceTree = "<group>"; };
-		FB5AC7562E2AEB9C00F6C9EF /* OnboardingPage2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingPage2.swift; sourceTree = "<group>"; };
-		FB5AC7582E2AEBBD00F6C9EF /* OnboardingPage3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingPage3.swift; sourceTree = "<group>"; };
-		FB5AC75A2E2AEBD800F6C9EF /* OnboardingPage1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingPage1.swift; sourceTree = "<group>"; };
 		FB5AC75D2E2AFC5900F6C9EF /* GoogleAuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleAuthManager.swift; sourceTree = "<group>"; };
 		FB5AC75F2E2AFCD400F6C9EF /* AppleAuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleAuthManager.swift; sourceTree = "<group>"; };
 		FB5AC7672E2B175B00F6C9EF /* AuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
@@ -142,7 +146,6 @@
 		FB66DB972E8C34C700510B66 /* ShareRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareRenderer.swift; sourceTree = "<group>"; };
 		FB6D648D2E5A8D060025D416 /* MantraAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MantraAPI.swift; sourceTree = "<group>"; };
 		FB6D64932E5D126B0025D416 /* SecureAPIManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureAPIManager.swift; sourceTree = "<group>"; };
-		FB7BE8AB2EBBCB65006653DA /* OnboardingPage5.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingPage5.swift; sourceTree = "<group>"; };
 		FB7FFBCD2DF64503001DEF3D /* ImageShareHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageShareHelper.swift; sourceTree = "<group>"; };
 		FB7FFBCF2DF64550001DEF3D /* MantraCardGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MantraCardGenerator.swift; sourceTree = "<group>"; };
 		FB7FFBE02DF72047001DEF3D /* MantraWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MantraWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -150,6 +153,10 @@
 		FB7FFBE42DF72047001DEF3D /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		FB7FFBF62DF7383C001DEF3D /* MantraWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MantraWidgetExtension.entitlements; sourceTree = "<group>"; };
 		FB820DBC2E31623300BCEE2F /* HapticHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticHelper.swift; sourceTree = "<group>"; };
+		FB9DA1A12F1D8B3C00A1B2C3 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
+		FBC2B0C02F11816A0089F5AD /* JournalEntryDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalEntryDetailView.swift; sourceTree = "<group>"; };
+		FBC2B0D12F1182A10089F5AD /* ThemeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeManager.swift; sourceTree = "<group>"; };
+		FBC2B0D32F1182B20089F5AD /* AppColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppColors.swift; sourceTree = "<group>"; };
 		FBD43C2E2DF0AA5100C100D5 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		FBD9D1A22EA59927002C681E /* HeartParticle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartParticle.swift; sourceTree = "<group>"; };
 		FBD9D1D62EAA67EB002C681E /* BackgroundConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundConfig.swift; sourceTree = "<group>"; };
@@ -160,20 +167,27 @@
 		FBDE1DAE2E5DFCBD00AE17A3 /* StoreKitTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKitTest.framework; path = Platforms/MacOSX.platform/Developer/Library/Frameworks/StoreKitTest.framework; sourceTree = DEVELOPER_DIR; };
 		FBDE1DB22E5DFE2B00AE17A3 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
 		FBE92F102E98529E007F55C0 /* WhisperVoice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhisperVoice.swift; sourceTree = "<group>"; };
+		FBF472572EE2151A00021C03 /* Widgetsetuphomescreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Widgetsetuphomescreen.swift; sourceTree = "<group>"; };
+		FBF472592EE2154600021C03 /* Widgetsetuplockscreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Widgetsetuplockscreen.swift; sourceTree = "<group>"; };
+		FBF4725B2EE225C000021C03 /* IPhoneMockupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPhoneMockupView.swift; sourceTree = "<group>"; };
+		FBF472622EE73B5600021C03 /* RevenueCatManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RevenueCatManager.swift; sourceTree = "<group>"; };
+		FBF472962EE9E22D00021C03 /* AuthUserInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthUserInfo.swift; sourceTree = "<group>"; };
+		FBF472982EE9E24B00021C03 /* PopulateDefaultWhispers.swift .swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PopulateDefaultWhispers.swift .swift"; sourceTree = "<group>"; };
+		FBF472AF2F0E6A0000021C03 /* PaywallRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallRouter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		FB7B3DF32EF4B719005B0A42 /* Exceptions for "MantraWidget" folder in "MantraApp" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Assets.xcassets,
+			);
+			target = FB2CA7612DD3C64E006C687D /* MantraApp */;
+		};
 		FB7FFBF42DF72048001DEF3D /* Exceptions for "MantraWidget" folder in "MantraWidgetExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
-			);
-			target = FB7FFBDF2DF72047001DEF3D /* MantraWidgetExtension */;
-		};
-		FBDB58D72E1454610022B336 /* Exceptions for "MantraApp" folder in "MantraWidgetExtension" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Assets.xcassets,
 			);
 			target = FB7FFBDF2DF72047001DEF3D /* MantraWidgetExtension */;
 		};
@@ -184,6 +198,13 @@
 			);
 			target = FB2CA7612DD3C64E006C687D /* MantraApp */;
 		};
+		FBF4729B2EEE0EE600021C03 /* Exceptions for "MantraApp" folder in "MantraWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Assets.xcassets,
+			);
+			target = FB7FFBDF2DF72047001DEF3D /* MantraWidgetExtension */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -191,7 +212,7 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				FBDE1DDF2E5FF7AB00AE17A3 /* Exceptions for "MantraApp" folder in "MantraApp" target */,
-				FBDB58D72E1454610022B336 /* Exceptions for "MantraApp" folder in "MantraWidgetExtension" target */,
+				FBF4729B2EEE0EE600021C03 /* Exceptions for "MantraApp" folder in "MantraWidgetExtension" target */,
 			);
 			path = MantraApp;
 			sourceTree = "<group>";
@@ -209,9 +230,15 @@
 		FB7FFBE62DF72047001DEF3D /* MantraWidget */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
+				FB7B3DF32EF4B719005B0A42 /* Exceptions for "MantraWidget" folder in "MantraApp" target */,
 				FB7FFBF42DF72048001DEF3D /* Exceptions for "MantraWidget" folder in "MantraWidgetExtension" target */,
 			);
 			path = MantraWidget;
+			sourceTree = "<group>";
+		};
+		FBC2B0B72F1181620089F5AD /* Onboarding */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Onboarding;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -225,6 +252,8 @@
 				FB2CA7AF2DDF8440006C687D /* FirebaseCore in Frameworks */,
 				FB5AC7622E2B090E00F6C9EF /* GoogleSignIn in Frameworks */,
 				FB6D64922E5CB70B0025D416 /* FirebaseRemoteConfig in Frameworks */,
+				FBF4725F2EE737E800021C03 /* RevenueCat in Frameworks */,
+				FBF472A12F0E5A0000021C03 /* RevenueCatUI in Frameworks */,
 				FB6D648C2E5A87D60025D416 /* FirebaseFunctions in Frameworks */,
 				FB2CA7AD2DDF8440006C687D /* FirebaseAuth in Frameworks */,
 				FB2CA7B12DDF8440006C687D /* FirebaseFirestore in Frameworks */,
@@ -260,6 +289,13 @@
 		FB2CA7592DD3C64E006C687D = {
 			isa = PBXGroup;
 			children = (
+				FBC2B0B72F1181620089F5AD /* Onboarding */,
+				FBF472982EE9E24B00021C03 /* PopulateDefaultWhispers.swift .swift */,
+				FBF472962EE9E22D00021C03 /* AuthUserInfo.swift */,
+				FBF472622EE73B5600021C03 /* RevenueCatManager.swift */,
+				FBF4725B2EE225C000021C03 /* IPhoneMockupView.swift */,
+				FBF472592EE2154600021C03 /* Widgetsetuplockscreen.swift */,
+				FBF472572EE2151A00021C03 /* Widgetsetuphomescreen.swift */,
 				FBD9D1FB2EB29F2F002C681E /* FreeJournalPromptView.swift */,
 				FBD9D1F92EB29F0E002C681E /* JournalModeSelectionView.swift */,
 				FBD9D1F12EAD6DF5002C681E /* BackgroundSelectorModal.swift */,
@@ -270,20 +306,17 @@
 				FB66DB952E8C34AF00510B66 /* ShareManager.swift */,
 				FB66DB932E8C349200510B66 /* ShareCardView.swift */,
 				FBDE1DB22E5DFE2B00AE17A3 /* PaywallView.swift */,
+				FBF472AF2F0E6A0000021C03 /* PaywallRouter.swift */,
 				FBDE1DAC2E5DFA1A00AE17A3 /* SubscriptionManager.swift */,
 				FB6D648D2E5A8D060025D416 /* MantraAPI.swift */,
 				FB5AC7672E2B175B00F6C9EF /* AuthManager.swift */,
 				FB2CA7B82DDF9561006C687D /* AuthViewModel.swift .swift */,
 				FB5AC75F2E2AFCD400F6C9EF /* AppleAuthManager.swift */,
 				FB5AC75D2E2AFC5900F6C9EF /* GoogleAuthManager.swift */,
-				FB5AC7502E2AEA9300F6C9EF /* OnboardingCoordinator.swift */,
-				FB5AC75A2E2AEBD800F6C9EF /* OnboardingPage1.swift */,
-				FB5AC7562E2AEB9C00F6C9EF /* OnboardingPage2.swift */,
-				FB5AC7582E2AEBBD00F6C9EF /* OnboardingPage3.swift */,
-				FB7BE8AB2EBBCB65006653DA /* OnboardingPage5.swift */,
 				FB5AC74E2E2AEA5D00F6C9EF /* SplashScreenView.swift */,
 				FB6D64932E5D126B0025D416 /* SecureAPIManager.swift */,
 				FB5AC7372E29D2B300F6C9EF /* MantraGenerator.swift */,
+				FB9DA1A12F1D8B3C00A1B2C3 /* NotificationManager.swift */,
 				FB5AC72D2E29835800F6C9EF /* UIColor+Hex.swift */,
 				FB7FFBCF2DF64550001DEF3D /* MantraCardGenerator.swift */,
 				FB7FFBCD2DF64503001DEF3D /* ImageShareHelper.swift */,
@@ -293,6 +326,8 @@
 				FB2CA7BC2DDFC56F006C687D /* RootView.swift */,
 				FB2CA79A2DDD20A0006C687D /* Color+Hex.swift */,
 				FB820DBC2E31623300BCEE2F /* HapticHelper.swift */,
+				FBC2B0D12F1182A10089F5AD /* ThemeManager.swift */,
+				FBC2B0D32F1182B20089F5AD /* AppColors.swift */,
 				FB2CA7A62DDE9842006C687D /* Data */,
 				FB2CA78D2DD66E64006C687D /* Screens */,
 				FB2CA7642DD3C64E006C687D /* MantraApp */,
@@ -329,6 +364,7 @@
 				FB2CA7A42DDE370F006C687D /* MantraSummaryView .swift */,
 				FB2CA7B42DDF8D40006C687D /* LoginView .swift */,
 				FB2CA7B62DDF8E31006C687D /* SignUpView.swift */,
+				FBC2B0C02F11816A0089F5AD /* JournalEntryDetailView.swift */,
 				FB7FFBF62DF7383C001DEF3D /* MantraWidgetExtension.entitlements */,
 			);
 			path = Screens;
@@ -373,6 +409,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				FB2CA7642DD3C64E006C687D /* MantraApp */,
+				FBC2B0B72F1181620089F5AD /* Onboarding */,
 			);
 			name = MantraApp;
 			packageProductDependencies = (
@@ -383,6 +420,8 @@
 				FB5AC7632E2B090E00F6C9EF /* GoogleSignInSwift */,
 				FB6D648B2E5A87D60025D416 /* FirebaseFunctions */,
 				FB6D64912E5CB70B0025D416 /* FirebaseRemoteConfig */,
+				FBF4725E2EE737E800021C03 /* RevenueCat */,
+				FBF472A02F0E5A0000021C03 /* RevenueCatUI */,
 			);
 			productName = MantraApp;
 			productReference = FB2CA7622DD3C64E006C687D /* Whisper.app */;
@@ -495,6 +534,7 @@
 			packageReferences = (
 				FB2CA7AB2DDF8440006C687D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				FB5AC75C2E2AF4D000F6C9EF /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				FBF4725D2EE7371E00021C03 /* XCRemoteSwiftPackageReference "purchases-ios" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = FB2CA7632DD3C64E006C687D /* Products */;
@@ -547,26 +587,28 @@
 			files = (
 				FBD9D1FC2EB29F2F002C681E /* FreeJournalPromptView.swift in Sources */,
 				FB2CA7B72DDF8E31006C687D /* SignUpView.swift in Sources */,
-				FB5AC75B2E2AEBD800F6C9EF /* OnboardingPage1.swift in Sources */,
 				FB7FFBCE2DF64503001DEF3D /* ImageShareHelper.swift in Sources */,
 				FB63CA252DE7EF5D002EED53 /* MoodColor.swift in Sources */,
 				FBD43C2F2DF0AA5100C100D5 /* Theme.swift in Sources */,
-				FB5AC7572E2AEB9C00F6C9EF /* OnboardingPage2.swift in Sources */,
 				FB5AC7682E2B175B00F6C9EF /* AuthManager.swift in Sources */,
 				FB63CA212DE7BDCD002EED53 /* JournalEntry.swift in Sources */,
 				FB2CA79D2DDD4A62006C687D /* Prompt1View.swift in Sources */,
 				FB2CA7A82DDE988C006C687D /* PromptQuestions .swift in Sources */,
+				FBF472992EE9E24B00021C03 /* PopulateDefaultWhispers.swift .swift in Sources */,
 				FB6D64942E5D126B0025D416 /* SecureAPIManager.swift in Sources */,
+				FBF4725C2EE225C000021C03 /* IPhoneMockupView.swift in Sources */,
 				FB2CA7972DD68C4A006C687D /* HistoryView.swift in Sources */,
 				FBD9D1FA2EB29F0E002C681E /* JournalModeSelectionView.swift in Sources */,
 				FBE92F112E98529E007F55C0 /* WhisperVoice.swift in Sources */,
 				FB66DB962E8C34AF00510B66 /* ShareManager.swift in Sources */,
 				FBDE1DB32E5DFE2B00AE17A3 /* PaywallView.swift in Sources */,
+				FBF472B02F0E6A0000021C03 /* PaywallRouter.swift in Sources */,
 				FB5AC72E2E29835C00F6C9EF /* UIColor+Hex.swift in Sources */,
+				FBF472972EE9E22D00021C03 /* AuthUserInfo.swift in Sources */,
 				FB5AC7602E2AFCD400F6C9EF /* AppleAuthManager.swift in Sources */,
 				FBD9D1D72EAA67EB002C681E /* BackgroundConfig.swift in Sources */,
-				FB5AC7592E2AEBBD00F6C9EF /* OnboardingPage3.swift in Sources */,
 				FB2CA7A32DDE2AD1006C687D /* LoadingView.swift in Sources */,
+				FBF4725A2EE2154600021C03 /* Widgetsetuplockscreen.swift in Sources */,
 				FB6D648E2E5A8D060025D416 /* MantraAPI.swift in Sources */,
 				FB2CA79F2DDD57CC006C687D /* Prompt2View.swift in Sources */,
 				FB2CA7B52DDF8D40006C687D /* LoginView .swift in Sources */,
@@ -576,22 +618,26 @@
 				FB2CA7992DD6970D006C687D /* MantraDetailView.swift in Sources */,
 				FB66DB982E8C34C700510B66 /* ShareRenderer.swift in Sources */,
 				FB2CA78F2DD67067006C687D /* WelcomeView.swift in Sources */,
-				FB5AC7512E2AEA9300F6C9EF /* OnboardingCoordinator.swift in Sources */,
+				FBF472582EE2151A00021C03 /* Widgetsetuphomescreen.swift in Sources */,
 				FB2CA7A12DDD59B2006C687D /* Prompt3View.swift in Sources */,
 				FB2CA7952DD68C29006C687D /* NewMantraView.swift in Sources */,
 				FB2CA7BD2DDFC56F006C687D /* RootView.swift in Sources */,
 				FB66DB942E8C349200510B66 /* ShareCardView.swift in Sources */,
+				FBF472632EE73B5600021C03 /* RevenueCatManager.swift in Sources */,
 				FBD9D1A32EA59927002C681E /* HeartParticle.swift in Sources */,
 				FB5AC74F2E2AEA6300F6C9EF /* SplashScreenView.swift in Sources */,
 				FB2CA7A52DDE370F006C687D /* MantraSummaryView .swift in Sources */,
 				FB2CA7B92DDF9561006C687D /* AuthViewModel.swift .swift in Sources */,
 				FB5AC7382E29D2B300F6C9EF /* MantraGenerator.swift in Sources */,
+				FB9DA1A22F1D8B3C00A1B2C3 /* NotificationManager.swift in Sources */,
 				FB5AC75E2E2AFC5900F6C9EF /* GoogleAuthManager.swift in Sources */,
 				FB2CA79B2DDD20A0006C687D /* Color+Hex.swift in Sources */,
-				FB7BE8AC2EBBCB65006653DA /* OnboardingPage5.swift in Sources */,
 				FB820DBD2E31623300BCEE2F /* HapticHelper.swift in Sources */,
 				FB2CA7BF2DE29503006C687D /* SettingsView.swift in Sources */,
 				FB63CA232DE7BE09002EED53 /* JournalManager.swift in Sources */,
+				FBC2B0C12F11816A0089F5AD /* JournalEntryDetailView.swift in Sources */,
+				FBC2B0D22F1182A10089F5AD /* ThemeManager.swift in Sources */,
+				FBC2B0D42F1182B20089F5AD /* AppColors.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -760,7 +806,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = MantraApp/MantraAppDebug.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 21;
 				DEVELOPMENT_TEAM = 6ZHGPD8274;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -785,7 +831,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.4;
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 2.4;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.studioeight.mantra;
 				PRODUCT_NAME = Whisper;
@@ -812,7 +858,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = MantraApp/MantraApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 21;
 				DEVELOPMENT_TEAM = 6ZHGPD8274;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -837,7 +883,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.4;
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 2.4;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.studioeight.mantra;
 				PRODUCT_NAME = Whisper;
@@ -859,8 +905,8 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 553FMLS63Z;
+				CURRENT_PROJECT_VERSION = 19;
+				DEVELOPMENT_TEAM = 6ZHGPD8274;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
 				MACOSX_DEPLOYMENT_TARGET = 15.4;
@@ -883,7 +929,8 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 19;
+				DEVELOPMENT_TEAM = 6ZHGPD8274;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
 				MACOSX_DEPLOYMENT_TARGET = 15.4;
@@ -904,7 +951,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 19;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
 				MACOSX_DEPLOYMENT_TARGET = 15.4;
@@ -925,7 +972,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 19;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
 				MACOSX_DEPLOYMENT_TARGET = 15.4;
@@ -949,7 +996,7 @@
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CODE_SIGN_ENTITLEMENTS = MantraWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 19;
 				DEVELOPMENT_TEAM = 6ZHGPD8274;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MantraWidget/Info.plist;
@@ -961,7 +1008,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 2.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.studioeight.mantra.MantraWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -979,7 +1026,7 @@
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CODE_SIGN_ENTITLEMENTS = MantraWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 19;
 				DEVELOPMENT_TEAM = 6ZHGPD8274;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MantraWidget/Info.plist;
@@ -991,7 +1038,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 2.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.studioeight.mantra.MantraWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -1070,6 +1117,14 @@
 				minimumVersion = 9.0.0;
 			};
 		};
+		FBF4725D2EE7371E00021C03 /* XCRemoteSwiftPackageReference "purchases-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/RevenueCat/purchases-ios.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.50.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1107,6 +1162,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = FB2CA7AB2DDF8440006C687D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseRemoteConfig;
+		};
+		FBF4725E2EE737E800021C03 /* RevenueCat */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FBF4725D2EE7371E00021C03 /* XCRemoteSwiftPackageReference "purchases-ios" */;
+			productName = RevenueCat;
+		};
+		FBF472A02F0E5A0000021C03 /* RevenueCatUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FBF4725D2EE7371E00021C03 /* XCRemoteSwiftPackageReference "purchases-ios" */;
+			productName = RevenueCatUI;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -5,123 +5,97 @@ struct LoadingView: View {
     var response1: String
     var response2: String
     var response3: String
+    var questions: [String]
     var journalType: JournalType = .guided
 
     @State private var isLoadingComplete = false
     @State private var generatedMantra: String = ""
-    
+
     // Convenience initializer for free journal
     init(mood: String, freeJournalText: String) {
         self.mood = mood
         self.response1 = freeJournalText
         self.response2 = ""
         self.response3 = ""
+        self.questions = ["What's on your mind?"]
         self.journalType = .free
     }
-    
+
     // Original initializer for guided journal
-    init(mood: String, response1: String, response2: String, response3: String) {
+    init(mood: String, response1: String, response2: String, response3: String, questions: [String] = []) {
         self.mood = mood
         self.response1 = response1
         self.response2 = response2
         self.response3 = response3
+        self.questions = questions
         self.journalType = .guided
     }
 
+    @Environment(\.colorScheme) var colorScheme
+    private var colors: AppColors { AppColors(colorScheme) }
+
     var body: some View {
         ZStack {
-            // Clean background matching app
-            Color(hex: "#FFFCF5")
+            colors.secondaryBackground
                 .ignoresSafeArea()
 
-            if isLoadingComplete {
-                MantraSummaryView(
-                    mood: mood,
-                    prompt1: response1,
-                    prompt2: response2,
-                    prompt3: response3,
-                    mantra: generatedMantra,
-                    journalType: journalType
-                )
-            } else {
-                VStack(spacing: 0) {
-                    // Whisper logo at absolute top
-                    Image("whisper-logo")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(height: 24)
-                        .foregroundColor(Color(hex: "#2A2A2A"))
-                        .padding(.top, 60)
-                        .padding(.bottom, 40)
-                    
-                    Spacer()
-                    
-                    // Centered loading content
-                    VStack(spacing: 24) {
-                        // Custom three-dot animation
-                        ThreeDotsLoader()
+            VStack(spacing: 0) {
+                Spacer()
 
-                        Text("Finding the right words...")
-                            .font(.system(size: 15, weight: .regular))
-                            .foregroundColor(Color(hex: "#2A2A2A"))
-                            .opacity(0.7)
-                    }
-                    
-                    Spacer()
+                VStack(spacing: 24) {
+                    ThreeDotsLoader()
+
+                    Text("Finding the right words...")
+                        .font(.system(size: 15, weight: .regular))
+                        .foregroundColor(colors.primaryText)
+                        .opacity(0.7)
                 }
-                .onAppear {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                        MantraGenerator.generateMantra(
-                            mood: mood,
-                            response1: response1,
-                            response2: response2,
-                            response3: response3,
-                            journalType: journalType
-                        ) { result in
-                            generatedMantra = result ?? "Breathe. You are here now."
-                            isLoadingComplete = true
-                        }
-                    }
-                }
+
+                Spacer()
             }
         }
         .navigationBarBackButtonHidden(true)
-        .navigationBarHidden(true)
         .toolbar(.hidden, for: .navigationBar)
+        // Modern NavigationStack API — closure evaluates WHEN isPresented becomes true
+        // so generatedMantra is guaranteed to have the real value, not stale ""
+        .navigationDestination(isPresented: $isLoadingComplete) {
+            MantraSummaryView(
+                mood: mood,
+                prompt1: response1,
+                prompt2: response2,
+                prompt3: response3,
+                mantra: generatedMantra,
+                journalType: journalType,
+                promptQuestions: questions
+            )
+        }
         .onAppear {
-            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-               let window = windowScene.windows.first,
-               let navController = findNavigationController(in: window.rootViewController) {
-                navController.setNavigationBarHidden(true, animated: false)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                MantraGenerator.generateMantra(
+                    mood: mood,
+                    response1: response1,
+                    response2: response2,
+                    response3: response3,
+                    journalType: journalType
+                ) { result in
+                    generatedMantra = result ?? "Breathe. You are here now."
+                    isLoadingComplete = true
+                }
             }
         }
         .ignoresSafeArea(.all)
-    }
-    
-    private func findNavigationController(in viewController: UIViewController?) -> UINavigationController? {
-        guard let viewController = viewController else { return nil }
-        
-        if let navController = viewController as? UINavigationController {
-            return navController
-        }
-        for child in viewController.children {
-            if let navController = findNavigationController(in: child) {
-                return navController
-            }
-        }
-        return nil
     }
 }
 
 // Custom three-dot loading animation
 struct ThreeDotsLoader: View {
     @State private var animationIndex = 0
-    
+
     var body: some View {
         HStack(spacing: 8) {
             ForEach(0..<3) { index in
                 Circle()
-                    .fill(Color(hex: "#A6B4FF"))
+                    .fill(Color(hex: "#C4A574"))
                     .frame(width: 10, height: 10)
                     .scaleEffect(animationIndex == index ? 1.2 : 0.8)
                     .opacity(animationIndex == index ? 1.0 : 0.4)
@@ -132,7 +106,7 @@ struct ThreeDotsLoader: View {
             startAnimation()
         }
     }
-    
+
     private func startAnimation() {
         Timer.scheduledTimer(withTimeInterval: 0.4, repeats: true) { _ in
             withAnimation {

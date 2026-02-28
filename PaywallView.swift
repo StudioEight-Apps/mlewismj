@@ -1,266 +1,401 @@
 import SwiftUI
+import RevenueCat
 
-struct PaywallView: View {
-    @ObservedObject var subscriptionManager = SubscriptionManager.shared
-    @State private var selectedPlan: SubscriptionPlan?
-    @State private var expandedPlan: SubscriptionPlan?
+struct CustomPaywallView: View {
+    @ObservedObject var revenueCatManager = RevenueCatManager.shared
+    @State private var selectedPackage: Package?
+    @State private var navigateToWidgetSetup = false
     @State private var navigateToWelcome = false
+    @State private var isLoading = false
+    @State private var errorMessage: String?
+    @State private var selectedPlan: PlanType = .annual
     @Environment(\.dismiss) var dismiss
-    
+
+    enum PlanType {
+        case annual, weekly
+    }
+
+    private let bg = Color(hex: "#F5F2EE")
+
     var body: some View {
         ZStack {
-            Color(hex: "#FFFCF5").ignoresSafeArea()
-            
-            ScrollView {
-                VStack(spacing: 0) {
-                    Spacer().frame(height: 32)
-                    
-                    // Header
+            // Single unified background
+            bg.ignoresSafeArea()
+
+            VStack(spacing: 0) {
+                ScrollView(showsIndicators: false) {
                     VStack(spacing: 0) {
-                        Text("Start your")
-                            .font(.system(size: 32, weight: .bold, design: .serif))
-                            .foregroundColor(Color(hex: "#2A2A2A"))
-                            .multilineTextAlignment(.center)
-                        Text("journaling journey")
-                            .font(.system(size: 32, weight: .bold, design: .serif))
-                            .foregroundColor(Color(hex: "#2A2A2A"))
-                            .multilineTextAlignment(.center)
-                            .padding(.bottom, 16)
-                    }
-                    .padding(.bottom, 8)
-                    
-                    // Free trial badge
-                    Text("Try it 3 days free.")
-                        .font(.system(size: 16, weight: .regular, design: .default))
-                        .foregroundColor(Color(hex: "#A6B4FF"))
-                        .padding(.bottom, 20)
-                    
-                    // Subscription Cards
-                    VStack(spacing: 14) {
-                        ForEach(SubscriptionPlan.allCases, id: \.self) { plan in
-                            subscriptionCard(for: plan)
+
+                        // MARK: - Header
+                        VStack(spacing: 10) {
+                            Image(systemName: "text.book.closed.fill")
+                                .font(.system(size: 36))
+                                .foregroundColor(Color(hex: "#C4A574"))
+
+                            Text("Your journal is ready")
+                                .font(.system(size: 28, weight: .bold, design: .serif))
+                                .foregroundColor(Color(hex: "#1A1A1A"))
+
+                            Text("Start journaling. It learns as you do.")
+                                .font(.system(size: 15, weight: .regular))
+                                .foregroundColor(Color(hex: "#7A7A7A"))
                         }
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 28)
-                    
-                    // Purchase Button
-                    Button(action: {
-                        if let selectedPlan = selectedPlan {
-                            Task {
-                                await subscriptionManager.purchase(plan: selectedPlan)
-                                if subscriptionManager.hasActiveSubscription {
-                                    navigateToWelcome = true
+                        .padding(.top, 48)
+                        .padding(.bottom, 16)
+                        .frame(maxWidth: .infinity)
+
+                        // MARK: - Social proof
+                        HStack(spacing: 6) {
+                            HStack(spacing: 2) {
+                                ForEach(0..<5, id: \.self) { _ in
+                                    Image(systemName: "star.fill")
+                                        .font(.system(size: 11))
+                                        .foregroundColor(Color(hex: "#D4A853"))
                                 }
                             }
+                            Text("\"Built for people who think too much\"")
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundColor(Color(hex: "#9A9A9A"))
                         }
-                    }) {
-                        Text("Start 3-Day Free Trial")
-                            .font(.system(size: 17, weight: .semibold, design: .default))
-                            .foregroundColor(.white)
-                            .frame(width: UIScreen.main.bounds.width * 0.9)
-                            .frame(height: 54)
-                            .background(selectedPlan != nil ? Color(hex: "#A6B4FF") : Color.gray.opacity(0.4))
-                            .cornerRadius(18)
-                    }
-                    .buttonStyle(PlainButtonStyle())
-                    .disabled(selectedPlan == nil || subscriptionManager.isLoading)
-                    .padding(.bottom, 24)
-                    
-                    // Subscription info - shorter version
-                    if let selectedPlan = selectedPlan {
-                        Text("Your subscription starts after the 3 day free trial and renews automatically at \(selectedPlan.price) per \(billingPeriod(for: selectedPlan)) until canceled.")
-                            .font(.system(size: 12, weight: .regular, design: .default))
-                            .foregroundColor(Color(hex: "#999999"))
-                            .multilineTextAlignment(.center)
-                            .lineSpacing(2)
-                            .padding(.horizontal, 30)
-                            .padding(.bottom, 20)
-                    } else {
-                        Text("Your subscription starts after the 3 day free trial and renews automatically until canceled.")
-                            .font(.system(size: 12, weight: .regular, design: .default))
-                            .foregroundColor(Color(hex: "#999999"))
-                            .multilineTextAlignment(.center)
-                            .lineSpacing(2)
-                            .padding(.horizontal, 30)
-                            .padding(.bottom, 20)
-                    }
-                    
-                    // Restore Purchases
-                    Button(action: {
-                        Task {
-                            await subscriptionManager.restorePurchases()
+                        .padding(.top, 2)
+
+                        // MARK: - Plan toggle
+                        HStack(spacing: 0) {
+                            planTab(title: "Annual", subtitle: "Save 67%", type: .annual)
+                            planTab(title: "Weekly", subtitle: " ", type: .weekly)
                         }
-                    }) {
-                        Text("Restore Purchases")
-                            .font(.system(size: 13, weight: .medium, design: .default))
-                            .foregroundColor(Color(hex: "#7A6EFF"))
-                    }
-                    .buttonStyle(.plain)
-                    .padding(.bottom, 16)
-                    
-                    // Legal Links
-                    HStack(spacing: 16) {
-                        Link("Privacy Policy", destination: URL(string: "https://www.studioeight.app/privacy.html")!)
-                            .font(.system(size: 12, weight: .medium))
-                            .foregroundColor(Color(hex: "#A6B4FF"))
-                        
-                        Link("Terms of Use", destination: URL(string: "https://www.studioeight.app/terms.html")!)
-                            .font(.system(size: 12, weight: .medium))
-                            .foregroundColor(Color(hex: "#A6B4FF"))
-                    }
-                    .buttonStyle(.plain)
-                    .padding(.bottom, 30)
-                    
-                    // Error Message
-                    if let errorMessage = subscriptionManager.errorMessage {
-                        Text(errorMessage)
-                            .font(.system(size: 14, weight: .regular, design: .default))
-                            .foregroundColor(.red)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal, 20)
-                            .padding(.bottom, 20)
+                        .background(Color(hex: "#EBE7E2"))
+                        .cornerRadius(12)
+                        .padding(.horizontal, 24)
+                        .padding(.top, 24)
+
+                        // MARK: - Price display
+                        VStack(spacing: 4) {
+                            if selectedPlan == .annual {
+                                Text("$4.99 Monthly")
+                                    .font(.system(size: 32, weight: .bold))
+                                    .foregroundColor(Color(hex: "#1A1A1A"))
+                                if let annual = revenueCatManager.availablePackages.first(where: { $0.packageType == .annual }) {
+                                    Text("Charged once annually at \(annual.localizedPriceString) after 3 day free trial")
+                                        .font(.system(size: 13, weight: .regular))
+                                        .foregroundColor(Color(hex: "#9A9A9A"))
+                                        .multilineTextAlignment(.center)
+                                } else {
+                                    Text("Charged once annually at $59.99 after 3 day free trial")
+                                        .font(.system(size: 13, weight: .regular))
+                                        .foregroundColor(Color(hex: "#9A9A9A"))
+                                        .multilineTextAlignment(.center)
+                                }
+                            } else {
+                                if let weekly = revenueCatManager.availablePackages.first(where: { $0.packageType == .weekly }) {
+                                    Text("\(weekly.localizedPriceString) Weekly")
+                                        .font(.system(size: 32, weight: .bold))
+                                        .foregroundColor(Color(hex: "#1A1A1A"))
+                                } else {
+                                    Text("$2.99 Weekly")
+                                        .font(.system(size: 32, weight: .bold))
+                                        .foregroundColor(Color(hex: "#1A1A1A"))
+                                }
+                                Text("Billed weekly after 3 day free trial")
+                                    .font(.system(size: 13, weight: .regular))
+                                    .foregroundColor(Color(hex: "#9A9A9A"))
+                            }
+                        }
+                        .padding(.horizontal, 24)
+                        .padding(.top, 18)
+                        .animation(.easeInOut(duration: 0.2), value: selectedPlan)
+
+                        // MARK: - Feature list
+                        VStack(spacing: 0) {
+                            featureRow(
+                                assetIcon: "paywall-icon-brain",
+                                title: "Smart Prompts",
+                                description: "Questions that adapt to your mood and voice"
+                            )
+                            divider
+                            featureRow(
+                                assetIcon: "paywall-icon-repeat",
+                                title: "Responsive Widgets",
+                                description: "Personally tailored reflections delivered to your widgets"
+                            )
+                            divider
+                            featureRow(
+                                assetIcon: "paywall-icon-waveform",
+                                title: "Deeper Journaling",
+                                description: "A journal that learns you the more you vent"
+                            )
+                            divider
+                            featureRow(
+                                assetIcon: "paywall-icon-chat",
+                                title: "Unlimited Entries",
+                                description: "Journal as often as you need, no limits"
+                            )
+                        }
+                        .padding(.vertical, 4)
+                        .background(Color(hex: "#FEFDFB"))
+                        .cornerRadius(16)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(Color(hex: "#E5E0DA"), lineWidth: 1)
+                        )
+                        .padding(.horizontal, 24)
+                        .padding(.top, 20)
+
+                        // MARK: - Error
+                        if let errorMessage = errorMessage {
+                            Text(errorMessage)
+                                .font(.system(size: 13))
+                                .foregroundColor(.red)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal, 24)
+                                .padding(.top, 12)
+                        }
+
                     }
                 }
+                .scrollContentBackground(.hidden)
+                .scrollBounceBehavior(.basedOnSize)
+
+                // MARK: - Sticky CTA
+                VStack(spacing: 8) {
+                    Button(action: handlePurchase) {
+                        if isLoading {
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 54)
+                                .background(Color(hex: "#1A1A1A"))
+                                .cornerRadius(27)
+                        } else {
+                            Text("Start Free Trial")
+                                .font(.system(size: 17, weight: .semibold))
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 54)
+                                .background(Color(hex: "#1A1A1A"))
+                                .cornerRadius(27)
+                        }
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    .disabled(isLoading)
+
+                    Text("No payment now · Cancel anytime")
+                        .font(.system(size: 12, weight: .regular))
+                        .foregroundColor(Color(hex: "#ABABAB"))
+
+                    HStack(spacing: 16) {
+                        Button(action: handleRestore) {
+                            Text("Restore")
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundColor(Color(hex: "#ABABAB"))
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(isLoading)
+
+                        Button(action: handleRedeemCode) {
+                            Text("Promo Code")
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundColor(Color(hex: "#ABABAB"))
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(isLoading)
+
+                        Button(action: {
+                            if let url = URL(string: "https://www.studioeight.app/whisper/terms") {
+                                UIApplication.shared.open(url)
+                            }
+                        }) {
+                            Text("Terms")
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundColor(Color(hex: "#ABABAB"))
+                        }
+                        .buttonStyle(.plain)
+
+                        Button(action: {
+                            if let url = URL(string: "https://www.studioeight.app/whisper/privacy") {
+                                UIApplication.shared.open(url)
+                            }
+                        }) {
+                            Text("Privacy")
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundColor(Color(hex: "#ABABAB"))
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .padding(.top, 8)
+                }
+                .padding(.horizontal, 24)
+                .padding(.top, 12)
+                .padding(.bottom, 28)
+                .background(
+                    bg
+                        .shadow(color: .black.opacity(0.04), radius: 8, x: 0, y: -4)
+                )
             }
+        }
+        .fullScreenCover(isPresented: $navigateToWidgetSetup) {
+            WidgetSetupHomeScreen()
         }
         .fullScreenCover(isPresented: $navigateToWelcome) {
             WelcomeView()
         }
-    }
-    
-    @ViewBuilder
-    private func subscriptionCard(for plan: SubscriptionPlan) -> some View {
-        let isSelected = selectedPlan == plan
-        let isExpanded = expandedPlan == plan
-        
-        VStack(alignment: .leading, spacing: 0) {
-            // Main card content - tappable for selection
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(plan.displayName)
-                        .font(.system(size: 23, weight: .semibold, design: .serif))
-                        .foregroundColor(Color(hex: "#2A2A2A"))
-                    
-                    Text(priceText(for: plan))
-                        .font(.system(size: 16, weight: .regular, design: .default))
-                        .foregroundColor(Color(hex: "#5B5564"))
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-                
-                Spacer()
-                
-                if let badge = plan.badge {
-                    Text(badge)
-                        .font(.system(size: 11, weight: .bold, design: .default))
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 5)
-                        .background(Color(hex: "#A6B4FF"))
-                        .cornerRadius(10)
-                }
-            }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 25)
-            .contentShape(Rectangle())
-            .onTapGesture {
-                selectedPlan = plan
-            }
-            
-            // Expandable feature section
-            if isExpanded {
-                VStack(alignment: .leading, spacing: 18) {
-                    FeatureBullet(text: "Mood-based prompts that help you journal with purpose")
-                    FeatureBullet(text: "Smart widgets that send personalized advice throughout your day")
-                    FeatureBullet(text: "Editable Mantra cards to revisit, save, or share anytime")
-                }
-                .padding(.horizontal, 20)
-                .padding(.top, 16)
-                .padding(.bottom, 18)
-                .transition(.opacity.combined(with: .move(edge: .top)))
-            }
-            
-            // Expand/Collapse button - entire bottom area clickable
-            Button {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                    expandedPlan = isExpanded ? nil : plan
-                }
-            } label: {
-                VStack(spacing: 12) {
-                    // Short centered divider - 50% of card width
-                    Rectangle()
-                        .fill(Color(hex: "#7A7A7A").opacity(0.2))
-                        .frame(width: UIScreen.main.bounds.width * 0.5, height: 1)
-                        .frame(maxWidth: .infinity)
-                    
-                    // Chevron
-                    Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundColor(Color(hex: "#7A7A7A"))
-                        .rotationEffect(.degrees(0))
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 20)
-                .padding(.horizontal, 20)
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
+        .onChange(of: selectedPlan) { _, newPlan in
+            selectPackageForPlan(newPlan)
         }
-        .frame(width: UIScreen.main.bounds.width * 0.9)
-        .background(Color.white)
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(isSelected ? Color(hex: "#A6B4FF") : Color.clear, lineWidth: 2)
-        )
-        .cornerRadius(16)
-        .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 2)
-        .scaleEffect(isSelected ? 1.01 : 1.0)
-        .animation(.easeInOut(duration: 0.2), value: isSelected)
-    }
-    
-    private func priceText(for plan: SubscriptionPlan) -> String {
-        switch plan {
-        case .weekly:
-            return "\(plan.price) per week after free trial"
-        case .monthly:
-            return "\(plan.price) per month after free trial"
-        case .annual:
-            return "\(plan.price) per year after free trial"
+        .onChange(of: revenueCatManager.availablePackages) { _, packages in
+            if selectedPackage == nil {
+                selectPackageForPlan(selectedPlan)
+            }
+        }
+        .onAppear {
+            selectPackageForPlan(.annual)
+            if revenueCatManager.availablePackages.isEmpty {
+                Task {
+                    do {
+                        try await revenueCatManager.fetchOfferings()
+                    } catch {
+                        errorMessage = "Unable to load subscription options"
+                    }
+                }
+            }
         }
     }
-    
-    private func billingPeriod(for plan: SubscriptionPlan) -> String {
-        switch plan {
-        case .weekly:
-            return "week"
-        case .monthly:
-            return "month"
-        case .annual:
-            return "year"
-        }
-    }
-}
 
-// MARK: - Feature Bullet Component
-struct FeatureBullet: View {
-    let text: String
-    
-    var body: some View {
-        HStack(spacing: 10) {
-            Image(systemName: "checkmark.circle.fill")
-                .foregroundColor(Color(hex: "#A6B4FF"))
-                .font(.system(size: 18))
-            
-            Text(text)
-                .font(.system(size: 15, weight: .regular))
-                .foregroundColor(Color(hex: "#5B5564"))
+    // MARK: - Plan Tab
+
+    private func planTab(title: String, subtitle: String, type: PlanType) -> some View {
+        Button(action: {
+            let impact = UIImpactFeedbackGenerator(style: .light)
+            impact.impactOccurred()
+            withAnimation(.easeInOut(duration: 0.2)) {
+                selectedPlan = type
+            }
+        }) {
+            VStack(spacing: 2) {
+                Text(title)
+                    .font(.system(size: 15, weight: selectedPlan == type ? .semibold : .regular))
+                    .foregroundColor(selectedPlan == type ? Color(hex: "#1A1A1A") : Color(hex: "#9A9A9A"))
+                Text(subtitle)
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundColor(selectedPlan == type ? Color(hex: "#C4A574") : Color(hex: "#B5B5B5"))
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 48)
+            .background(
+                selectedPlan == type
+                    ? Color(hex: "#FEFDFB")
+                    : Color.clear
+            )
+            .cornerRadius(10)
+            .shadow(color: selectedPlan == type ? .black.opacity(0.06) : .clear, radius: 4, x: 0, y: 2)
+        }
+        .buttonStyle(PlainButtonStyle())
+        .padding(3)
+    }
+
+    // MARK: - Feature Row
+
+    private func featureRow(assetIcon: String, title: String, description: String) -> some View {
+        HStack(spacing: 14) {
+            Image(assetIcon)
+                .renderingMode(.template)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 22, height: 22)
+                .foregroundColor(Color(hex: "#C4A574"))
+                .frame(width: 32, height: 32)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundColor(Color(hex: "#1A1A1A"))
+                Text(description)
+                    .font(.system(size: 13, weight: .regular))
+                    .foregroundColor(Color(hex: "#8A8A8A"))
+            }
+
+            Spacer()
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 14)
+    }
+
+    private var divider: some View {
+        Rectangle()
+            .fill(Color(hex: "#F2F2F2"))
+            .frame(height: 1)
+            .padding(.leading, 62)
+    }
+
+    // MARK: - Package Selection
+
+    private func selectPackageForPlan(_ plan: PlanType) {
+        let type: PackageType = plan == .annual ? .annual : .weekly
+        if let pkg = revenueCatManager.availablePackages.first(where: { $0.packageType == type }) {
+            selectedPackage = pkg
+        }
+    }
+
+    // MARK: - Actions
+
+    private func handlePurchase() {
+        guard let selectedPackage = selectedPackage else { return }
+
+        Task {
+            isLoading = true
+            errorMessage = nil
+
+            do {
+                try await revenueCatManager.purchase(packageIdentifier: selectedPackage.identifier)
+
+                if revenueCatManager.hasActiveSubscription {
+                    let hasSeenWidgetSetup = UserDefaults.standard.bool(forKey: "hasSeenWidgetSetup")
+                    if hasSeenWidgetSetup {
+                        navigateToWelcome = true
+                    } else {
+                        navigateToWidgetSetup = true
+                    }
+                }
+            } catch {
+                errorMessage = error.localizedDescription
+            }
+
+            isLoading = false
+        }
+    }
+
+    private func handleRedeemCode() {
+        Purchases.shared.presentCodeRedemptionSheet()
+    }
+
+    private func handleRestore() {
+        Task {
+            isLoading = true
+            errorMessage = nil
+
+            do {
+                try await revenueCatManager.restorePurchases()
+
+                if revenueCatManager.hasActiveSubscription {
+                    let hasSeenWidgetSetup = UserDefaults.standard.bool(forKey: "hasSeenWidgetSetup")
+                    if hasSeenWidgetSetup {
+                        navigateToWelcome = true
+                    } else {
+                        navigateToWidgetSetup = true
+                    }
+                }
+            } catch {
+                errorMessage = "No previous purchases found"
+            }
+
+            isLoading = false
         }
     }
 }
 
 // MARK: - Preview
-struct PaywallView_Previews: PreviewProvider {
+struct CustomPaywallView_Previews: PreviewProvider {
     static var previews: some View {
-        PaywallView()
+        CustomPaywallView()
     }
 }

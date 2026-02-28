@@ -1,6 +1,7 @@
 import Foundation
 import FirebaseAuth
 import FirebaseFirestore
+import RevenueCat
 
 class AuthViewModel: ObservableObject {
     static let shared = AuthViewModel()
@@ -18,6 +19,12 @@ class AuthViewModel: ObservableObject {
         self.user = Auth.auth().currentUser
         self.isSignedIn = self.user != nil
         loadUserInfo()
+        
+        if let userId = self.user?.uid {
+            Task { @MainActor in
+                try? await RevenueCatManager.shared.setUser(userId: userId)
+            }
+        }
     }
 
     func signUp(email: String, password: String, firstName: String, lastName: String, completion: @escaping (Result<Void, Error>) -> Void) {
@@ -53,6 +60,10 @@ class AuthViewModel: ObservableObject {
                         print("Failed to save name to Firestore: \(error)")
                     }
                 }
+                
+                Task {
+                    try? await RevenueCatManager.shared.setUser(userId: userId)
+                }
             }
 
             DispatchQueue.main.async {
@@ -61,6 +72,10 @@ class AuthViewModel: ObservableObject {
                 self.firstName = firstName
                 self.lastName = lastName
                 self.saveUserInfo(firstName: firstName, lastName: lastName)
+                
+                // NEW: Populate default whispers for new email signup user
+                JournalManager.shared.populateDefaultWhispersForNewUser()
+                
                 completion(.success(()))
             }
         }
@@ -94,6 +109,12 @@ class AuthViewModel: ObservableObject {
                     completion(.failure(customError))
                 }
                 return
+            }
+
+            if let userId = result?.user.uid {
+                Task {
+                    try? await RevenueCatManager.shared.setUser(userId: userId)
+                }
             }
 
             DispatchQueue.main.async {
@@ -136,10 +157,20 @@ class AuthViewModel: ObservableObject {
         GoogleAuthManager.shared.signInWithGoogle { result in
             DispatchQueue.main.async {
                 switch result {
-                case .success(let user):
-                    self.user = user
+                case .success(let userInfo):
+                    Task {
+                        try? await RevenueCatManager.shared.setUser(userId: userInfo.user.uid)
+                    }
+                    
+                    self.user = userInfo.user
                     self.isSignedIn = true
                     self.loadUserInfo()
+                    
+                    // NEW: Populate default whispers only for new Google users
+                    if userInfo.isNewUser {
+                        JournalManager.shared.populateDefaultWhispersForNewUser()
+                    }
+                    
                     completion(.success(()))
                 case .failure(let error):
                     completion(.failure(error))
@@ -152,10 +183,20 @@ class AuthViewModel: ObservableObject {
         AppleAuthManager.shared.signInWithApple { result in
             DispatchQueue.main.async {
                 switch result {
-                case .success(let user):
-                    self.user = user
+                case .success(let userInfo):
+                    Task {
+                        try? await RevenueCatManager.shared.setUser(userId: userInfo.user.uid)
+                    }
+                    
+                    self.user = userInfo.user
                     self.isSignedIn = true
                     self.loadUserInfo()
+                    
+                    // NEW: Populate default whispers only for new Apple users
+                    if userInfo.isNewUser {
+                        JournalManager.shared.populateDefaultWhispersForNewUser()
+                    }
+                    
                     completion(.success(()))
                 case .failure(let error):
                     completion(.failure(error))

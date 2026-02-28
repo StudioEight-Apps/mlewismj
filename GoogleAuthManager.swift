@@ -8,7 +8,7 @@ class GoogleAuthManager: ObservableObject {
     
     private init() {}
     
-    func signInWithGoogle(completion: @escaping (Result<User, Error>) -> Void) {
+    func signInWithGoogle(completion: @escaping (Result<AuthUserInfo, Error>) -> Void) {
         print("🔍 DEBUG: Starting Google Sign-In")
         print("🔍 DEBUG: FirebaseApp.app() = \(FirebaseApp.app() != nil ? "initialized" : "nil")")
         print("🔍 DEBUG: FirebaseApp.app()?.options = \(FirebaseApp.app()?.options != nil ? "present" : "nil")")
@@ -62,8 +62,12 @@ class GoogleAuthManager: ObservableObject {
                     return
                 }
                 
+                // Capture isNewUser flag from Firebase auth result
+                let isNewUser = authResult?.additionalUserInfo?.isNewUser ?? false
+                print("✅ DEBUG: Google Sign-In complete - isNewUser: \(isNewUser)")
+                
                 // Save user info to Firestore if it's a new user
-                if authResult?.additionalUserInfo?.isNewUser == true {
+                if isNewUser {
                     let displayName = firebaseUser.displayName ?? ""
                     let nameParts = displayName.split(separator: " ")
                     let firstName = nameParts.first.map(String.init) ?? ""
@@ -81,7 +85,9 @@ class GoogleAuthManager: ObservableObject {
                     UserDefaults.standard.set(lastName, forKey: "lastName")
                 }
                 
-                completion(.success(firebaseUser))
+                // Return AuthUserInfo with both user and isNewUser flag
+                let userInfo = AuthUserInfo(user: firebaseUser, isNewUser: isNewUser)
+                completion(.success(userInfo))
             }
         }
     }
