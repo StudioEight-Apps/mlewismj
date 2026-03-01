@@ -240,6 +240,7 @@ struct CustomPaywallView: View {
             WelcomeView()
         }
         .onChange(of: selectedPlan) { _, newPlan in
+            AnalyticsService.shared.trackPaywallPlanSelected(plan: newPlan == .annual ? "annual" : "weekly")
             selectPackageForPlan(newPlan)
         }
         .onChange(of: revenueCatManager.availablePackages) { _, packages in
@@ -248,6 +249,7 @@ struct CustomPaywallView: View {
             }
         }
         .onAppear {
+            AnalyticsService.shared.trackPaywallShown(source: "post_onboarding")
             selectPackageForPlan(.annual)
             if revenueCatManager.availablePackages.isEmpty {
                 Task {
@@ -340,6 +342,8 @@ struct CustomPaywallView: View {
 
     private func handlePurchase() {
         guard let selectedPackage = selectedPackage else { return }
+        let planName = selectedPlan == .annual ? "annual" : "weekly"
+        AnalyticsService.shared.trackPaywallPurchaseStarted(plan: planName)
 
         Task {
             isLoading = true
@@ -349,6 +353,7 @@ struct CustomPaywallView: View {
                 try await revenueCatManager.purchase(packageIdentifier: selectedPackage.identifier)
 
                 if revenueCatManager.hasActiveSubscription {
+                    AnalyticsService.shared.trackPaywallPurchaseCompleted(plan: planName)
                     let hasSeenWidgetSetup = UserDefaults.standard.bool(forKey: "hasSeenWidgetSetup")
                     if hasSeenWidgetSetup {
                         navigateToWelcome = true
@@ -376,6 +381,7 @@ struct CustomPaywallView: View {
             do {
                 try await revenueCatManager.restorePurchases()
 
+                AnalyticsService.shared.trackPaywallRestored(success: revenueCatManager.hasActiveSubscription)
                 if revenueCatManager.hasActiveSubscription {
                     let hasSeenWidgetSetup = UserDefaults.standard.bool(forKey: "hasSeenWidgetSetup")
                     if hasSeenWidgetSetup {
@@ -385,6 +391,7 @@ struct CustomPaywallView: View {
                     }
                 }
             } catch {
+                AnalyticsService.shared.trackPaywallRestored(success: false)
                 errorMessage = "No previous purchases found"
             }
 

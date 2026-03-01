@@ -69,6 +69,7 @@ class OnboardingState: ObservableObject {
         // they're direct voice preference signals vs understanding questions
         let weight = (key == "quote_resonance" || key == "overthinking") ? 2 : 1
         scores[voiceId, default: 0] += weight
+        AnalyticsService.shared.trackOnboardingQuestionAnswered(questionKey: key, selectedVoiceId: voiceId, stepIndex: currentScreen.rawValue)
     }
 
     // MARK: - Navigation
@@ -78,12 +79,17 @@ class OnboardingState: ObservableObject {
         withAnimation(.easeInOut(duration: OnboardingTheme.transitionDuration)) {
             currentScreen = nextScreen
         }
+        // Track funnel step
+        AnalyticsService.shared.trackOnboardingScreenViewed(screen: "\(nextScreen)", stepIndex: nextScreen.rawValue)
+        OnboardingFunnelLogger.shared.logStep(step: "\(nextScreen)", stepIndex: nextScreen.rawValue)
     }
 
     func goTo(_ screen: OnboardingScreen) {
         withAnimation(.easeInOut(duration: OnboardingTheme.transitionDuration)) {
             currentScreen = screen
         }
+        AnalyticsService.shared.trackOnboardingScreenViewed(screen: "\(screen)", stepIndex: screen.rawValue)
+        OnboardingFunnelLogger.shared.logStep(step: "\(screen)", stepIndex: screen.rawValue)
     }
 
     // MARK: - Save to Firebase + UserDefaults
@@ -174,15 +180,26 @@ struct OnboardingCoordinatorNew: View {
             }
             .transition(.opacity)
         }
+        .onAppear {
+            // Track first screen + start funnel session
+            OnboardingFunnelLogger.shared.resetSession()
+            AnalyticsService.shared.trackOnboardingScreenViewed(screen: "intro1", stepIndex: 0)
+            OnboardingFunnelLogger.shared.logStep(step: "intro1", stepIndex: 0)
+        }
     }
 
     private func handleAuthComplete() {
+        // Attach userId to funnel session
+        if let userId = authViewModel.user?.uid {
+            OnboardingFunnelLogger.shared.attachUserId(userId)
+            AnalyticsService.shared.setUserId(userId)
+        }
         state.next()
     }
 
     private func finishOnboarding() {
-        // Onboarding done — RootView detects isSignedIn change
-        // and routes to PaywallView or WelcomeView
+        // Track completion
+        AnalyticsService.shared.trackOnboardingCompleted(voiceId: state.voiceId)
     }
 }
 

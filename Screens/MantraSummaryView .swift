@@ -107,15 +107,12 @@ struct MantraSummaryView: View {
                                 .font(.system(size: 18))
                                 .foregroundColor(colors.continueCircleIcon)
                                 .frame(width: 52, height: 52)
-                                .background(
-                                    Circle()
-                                        .fill(colors.continueCircle)
-                                )
+                                .background(.ultraThinMaterial, in: Circle())
                                 .overlay(
                                     Circle()
-                                        .stroke(colors.continueCircleBorder, lineWidth: 0.5)
+                                        .stroke(Color.white.opacity(0.12), lineWidth: 0.5)
                                 )
-                                .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
+                                .shadow(color: Color.black.opacity(0.15), radius: 12, x: 0, y: 6)
                         }
                         .buttonStyle(.plain)
                         .padding(.trailing, 24)
@@ -144,45 +141,85 @@ struct MantraSummaryView: View {
     @ViewBuilder
     private var summaryPageBackground: some View {
         if colorScheme == .dark {
+            let darkHex = selectedBackground.darkScreenBackgroundHex
             ZStack {
-                // Deep base — slight blue undertone
-                Color(hex: "#08080E")
+                // Deep black base
+                Color.black
 
-                // Vertical gradient — lifted top, darker bottom
-                LinearGradient(
-                    colors: [
-                        Color(hex: "#0E0E16").opacity(0.8),
-                        Color(hex: "#08080E"),
-                        Color(hex: "#050508")
-                    ],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-
-                // Soft radial glow from center — card sits here
+                // Primary hue glow — centered behind the card
                 RadialGradient(
                     colors: [
-                        Color(hex: "#14141E").opacity(0.45),
-                        Color.clear
+                        Color(hex: darkHex),
+                        Color(hex: darkHex).opacity(0.6),
+                        Color.black
                     ],
                     center: .center,
-                    startRadius: 30,
-                    endRadius: UIScreen.main.bounds.height * 0.45
+                    startRadius: 20,
+                    endRadius: UIScreen.main.bounds.height * 0.55
                 )
 
-                // Edge vignette for depth
+                // Top accent bleed — subtle hue at top edge
+                LinearGradient(
+                    colors: [
+                        Color(hex: darkHex).opacity(0.4),
+                        Color.clear
+                    ],
+                    startPoint: .top,
+                    endPoint: .center
+                )
+
+                // Edge vignette — crushes to black at corners
                 RadialGradient(
                     colors: [
                         Color.clear,
-                        Color.black.opacity(0.25)
+                        Color.black.opacity(0.5)
+                    ],
+                    center: .center,
+                    startRadius: UIScreen.main.bounds.width * 0.35,
+                    endRadius: UIScreen.main.bounds.height * 0.65
+                )
+            }
+        } else {
+            let lightHex = selectedBackground.screenBackgroundHex
+            let darkHex = selectedBackground.darkScreenBackgroundHex
+            ZStack {
+                // Desaturated warm base — slightly darker than pure screenBg
+                Color(hex: lightHex)
+
+                // Large hue wash — the screenBackgroundHex saturated further
+                LinearGradient(
+                    colors: [
+                        Color(hex: darkHex).opacity(0.18),
+                        Color(hex: lightHex),
+                        Color(hex: darkHex).opacity(0.12)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+
+                // Bright spotlight behind the card
+                RadialGradient(
+                    colors: [
+                        Color.white.opacity(0.5),
+                        Color.white.opacity(0.1),
+                        Color.clear
+                    ],
+                    center: .center,
+                    startRadius: 40,
+                    endRadius: UIScreen.main.bounds.width * 0.7
+                )
+
+                // Edge vignette — darken edges to push card forward
+                RadialGradient(
+                    colors: [
+                        Color.clear,
+                        Color(hex: darkHex).opacity(0.12)
                     ],
                     center: .center,
                     startRadius: UIScreen.main.bounds.width * 0.4,
                     endRadius: UIScreen.main.bounds.height * 0.7
                 )
             }
-        } else {
-            Color(hex: selectedBackground.screenBackgroundHex)
         }
     }
 
@@ -315,16 +352,17 @@ struct MantraSummaryView: View {
             Spacer()
         }
         .frame(width: cardSize * 0.75, height: 44)
-        .background(colors.actionBarBackground)
+        .background(.ultraThinMaterial, in: Capsule())
         .overlay(
             Capsule()
-                .stroke(colors.actionBarBorder, lineWidth: 0.5)
+                .stroke(Color.white.opacity(0.12), lineWidth: 0.5)
         )
-        .shadow(color: colors.cardShadow, radius: 8, x: 0, y: 4)
+        .shadow(color: Color.black.opacity(0.2), radius: 12, x: 0, y: 6)
     }
 
     // MARK: - Background Update
     private func updateEntryBackground(_ background: BackgroundConfig) {
+        AnalyticsService.shared.trackBackgroundChanged()
         guard let entry = currentEntry,
               let userId = Auth.auth().currentUser?.uid else { return }
 
@@ -371,6 +409,7 @@ struct MantraSummaryView: View {
         guard let entry = currentEntry else { return }
 
         let isPinning = !entry.isPinned
+        AnalyticsService.shared.trackEntryPinned(isPinning: isPinning)
 
         withAnimation(.interpolatingSpring(stiffness: 400, damping: 15)) {
             pinScale = 1.25
@@ -398,6 +437,7 @@ struct MantraSummaryView: View {
         guard let entry = currentEntry else { return }
 
         let isFavoriting = !entry.isFavorited
+        AnalyticsService.shared.trackEntryFavorited(isFavoriting: isFavoriting)
 
         withAnimation(.interpolatingSpring(stiffness: 400, damping: 15)) {
             heartScale = 1.3
@@ -464,6 +504,7 @@ struct MantraSummaryView: View {
     }
 
     private func shareMantra() {
+        AnalyticsService.shared.trackEntryShared()
         withAnimation(.interpolatingSpring(stiffness: 300, damping: 15)) {
             shareScale = 1.2
             shareRotation = 10
@@ -556,8 +597,9 @@ struct MantraSummaryView: View {
                 textColor: selectedBackground.textColor,
                 promptQuestions: promptQuestions
             )
+            AnalyticsService.shared.trackJournalSessionCompleted(mood: mood, journalType: journalType.rawValue)
 
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 currentEntry = journalManager.entries.first { entry in
                     entry.mood == mood &&
                     entry.text == mantra &&

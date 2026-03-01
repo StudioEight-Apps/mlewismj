@@ -97,6 +97,7 @@ struct JournalModeSelectionView: View {
             withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
                 selectedType = type
             }
+            AnalyticsService.shared.trackJournalModeSelected(mode: type == .guided ? "guided" : "free")
 
             // Haptic feedback
             let impactFeedback = UIImpactFeedbackGenerator(style: .light)
@@ -152,13 +153,11 @@ struct JournalModeSelectionView: View {
                                 lineWidth: selectedType == type ? 2 : 1
                             )
                     )
-                    .shadow(
-                        color: colorScheme == .dark ? Color.clear : Color.black.opacity(selectedType == type ? 0.08 : 0.04),
-                        radius: selectedType == type ? 12 : 4,
-                        x: 0,
-                        y: selectedType == type ? 4 : 2
-                    )
             )
+            // Layered shadow — contact + elevation + ambient
+            .shadow(color: Color.black.opacity(colorScheme == .dark ? 0.3 : 0.06), radius: 1, x: 0, y: 1)
+            .shadow(color: Color.black.opacity(colorScheme == .dark ? 0.2 : 0.08), radius: 6, x: 0, y: 3)
+            .shadow(color: Color.black.opacity(colorScheme == .dark ? 0.15 : 0.05), radius: 20, x: 0, y: 8)
         }
         .buttonStyle(JournalModeCardButtonStyle())
         .scaleEffect(cardScale[type] ?? 1.0)

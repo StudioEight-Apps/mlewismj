@@ -72,10 +72,17 @@ class AuthViewModel: ObservableObject {
                 self.firstName = firstName
                 self.lastName = lastName
                 self.saveUserInfo(firstName: firstName, lastName: lastName)
-                
+
+                // Analytics
+                AnalyticsService.shared.trackSignUp(method: "email")
+                if let uid = result?.user.uid {
+                    AnalyticsService.shared.setUserId(uid)
+                    OnboardingFunnelLogger.shared.attachUserId(uid)
+                }
+
                 // NEW: Populate default whispers for new email signup user
                 JournalManager.shared.populateDefaultWhispersForNewUser()
-                
+
                 completion(.success(()))
             }
         }
@@ -161,16 +168,24 @@ class AuthViewModel: ObservableObject {
                     Task {
                         try? await RevenueCatManager.shared.setUser(userId: userInfo.user.uid)
                     }
-                    
+
                     self.user = userInfo.user
                     self.isSignedIn = true
                     self.loadUserInfo()
-                    
+
+                    // Analytics
+                    AnalyticsService.shared.trackSignIn(method: "google")
+                    if userInfo.isNewUser {
+                        AnalyticsService.shared.trackSignUp(method: "google")
+                    }
+                    AnalyticsService.shared.setUserId(userInfo.user.uid)
+                    OnboardingFunnelLogger.shared.attachUserId(userInfo.user.uid)
+
                     // NEW: Populate default whispers only for new Google users
                     if userInfo.isNewUser {
                         JournalManager.shared.populateDefaultWhispersForNewUser()
                     }
-                    
+
                     completion(.success(()))
                 case .failure(let error):
                     completion(.failure(error))
@@ -178,7 +193,7 @@ class AuthViewModel: ObservableObject {
             }
         }
     }
-    
+
     func signInWithApple(completion: @escaping (Result<Void, Error>) -> Void) {
         AppleAuthManager.shared.signInWithApple { result in
             DispatchQueue.main.async {
@@ -187,16 +202,24 @@ class AuthViewModel: ObservableObject {
                     Task {
                         try? await RevenueCatManager.shared.setUser(userId: userInfo.user.uid)
                     }
-                    
+
                     self.user = userInfo.user
                     self.isSignedIn = true
                     self.loadUserInfo()
-                    
+
+                    // Analytics
+                    AnalyticsService.shared.trackSignIn(method: "apple")
+                    if userInfo.isNewUser {
+                        AnalyticsService.shared.trackSignUp(method: "apple")
+                    }
+                    AnalyticsService.shared.setUserId(userInfo.user.uid)
+                    OnboardingFunnelLogger.shared.attachUserId(userInfo.user.uid)
+
                     // NEW: Populate default whispers only for new Apple users
                     if userInfo.isNewUser {
                         JournalManager.shared.populateDefaultWhispersForNewUser()
                     }
-                    
+
                     completion(.success(()))
                 case .failure(let error):
                     completion(.failure(error))

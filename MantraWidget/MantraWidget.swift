@@ -10,38 +10,29 @@ struct WidgetBackground {
     
     // Full set — needed for displaying pinned entries that may use any background
     static let all: [WidgetBackground] = [
-        WidgetBackground(imageName: "sunset_teal_blend", textColor: "#F3EDE0", alignment: .center),
         WidgetBackground(imageName: "forest_green", textColor: "#C5FFB3", alignment: .center),
         WidgetBackground(imageName: "whisper_bg_deepreds", textColor: "#F5EDE5", alignment: .center),
         WidgetBackground(imageName: "sunkissed_whisper", textColor: "#42210B", alignment: .center),
         WidgetBackground(imageName: "whisper_bg_cream", textColor: "#1F2E78", alignment: .center),
         WidgetBackground(imageName: "whisper_bg_goldenblend", textColor: "#3E2A1C", alignment: .center),
-        WidgetBackground(imageName: "whisper_bg_orangebluefade", textColor: "#E4B7A0", alignment: .center),
-        WidgetBackground(imageName: "whisper_bg_amberforest", textColor: "#EEDDB4", alignment: .center),
         WidgetBackground(imageName: "blue_static", textColor: "#F9C99D", alignment: .center),
         WidgetBackground(imageName: "whisper_bg_charcoalgrain", textColor: "#F5E8D8", alignment: .center),
         WidgetBackground(imageName: "whisper_bg_espressofade", textColor: "#EEDFCB", alignment: .center),
         WidgetBackground(imageName: "whisper_color_poeticwine", textColor: "#F4F1EC", alignment: .center),
-        WidgetBackground(imageName: "whisper_texture_cloudydream", textColor: "#D97A3F", alignment: .center),
         WidgetBackground(imageName: "whisper_texture_peeledpaper", textColor: "#1A1A1A", alignment: .top),
         WidgetBackground(imageName: "whisper_texture_bluetexture", textColor: "#2F2F2F", alignment: .center),
-        WidgetBackground(imageName: "whisper_texture_coastal", textColor: "#F3E9D3", alignment: .center),
         WidgetBackground(imageName: "whisper_bg_crinkledbeige", textColor: "#5B3520", alignment: .center),
     ]
 
     // Curated set — dark/rich backgrounds only, for daily auto-rotation
     // Light text on moody backgrounds = premium widget look
     static let rotation: [WidgetBackground] = [
-        WidgetBackground(imageName: "sunset_teal_blend", textColor: "#F3EDE0", alignment: .center),
         WidgetBackground(imageName: "forest_green", textColor: "#C5FFB3", alignment: .center),
         WidgetBackground(imageName: "whisper_bg_deepreds", textColor: "#F5EDE5", alignment: .center),
-        WidgetBackground(imageName: "whisper_bg_orangebluefade", textColor: "#E4B7A0", alignment: .center),
-        WidgetBackground(imageName: "whisper_bg_amberforest", textColor: "#EEDDB4", alignment: .center),
         WidgetBackground(imageName: "blue_static", textColor: "#F9C99D", alignment: .center),
         WidgetBackground(imageName: "whisper_bg_charcoalgrain", textColor: "#F5E8D8", alignment: .center),
         WidgetBackground(imageName: "whisper_bg_espressofade", textColor: "#EEDFCB", alignment: .center),
         WidgetBackground(imageName: "whisper_color_poeticwine", textColor: "#F4F1EC", alignment: .center),
-        WidgetBackground(imageName: "whisper_texture_coastal", textColor: "#F3E9D3", alignment: .center),
     ]
 
     /// Returns a curated background for daily rotation (dark/rich only)

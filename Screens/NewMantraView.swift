@@ -66,7 +66,8 @@ struct NewMantraView: View {
                                     withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                                         selectedMood = mood
                                     }
-                                    let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+                                    AnalyticsService.shared.trackMoodSelected(mood: mood)
+                                    let impactFeedback = UIImpactFeedbackGenerator(style: .soft)
                                     impactFeedback.impactOccurred()
                                 }
                             )

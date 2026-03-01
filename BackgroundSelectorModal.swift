@@ -177,7 +177,30 @@ struct BackgroundSelectorModal: View {
                     endRadius: UIScreen.main.bounds.width * 0.7
                 )
             } else {
-                colors.screenFade
+                // Apple-style toned surface — warm gray so shadows are visible
+                Color(hex: "#EEEAE5")
+
+                // Slightly lighter center behind card area for subtle spotlight
+                RadialGradient(
+                    colors: [
+                        Color(hex: "#F5F2ED"),
+                        Color(hex: "#E8E4DE")
+                    ],
+                    center: .init(x: 0.5, y: 0.55),
+                    startRadius: 20,
+                    endRadius: UIScreen.main.bounds.width * 0.8
+                )
+
+                // Top-to-bottom warmth shift
+                LinearGradient(
+                    colors: [
+                        Color(hex: "#F2EEE8"),
+                        Color(hex: "#E6E2DC")
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .opacity(0.5)
             }
         }
     }
@@ -265,13 +288,31 @@ struct BackgroundSelectorModal: View {
         }
         .frame(width: widgetWidth, height: widgetHeight)
         .clipShape(RoundedRectangle(cornerRadius: widgetCorner, style: .continuous))
+        // Inner highlight — white top edge glow simulating light
         .overlay(
             RoundedRectangle(cornerRadius: widgetCorner, style: .continuous)
-                .stroke(colorScheme == .dark ? Color.white.opacity(0.08) : colors.cardBorder, lineWidth: 0.5)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Color.white.opacity(colorScheme == .dark ? 0.06 : 0.25),
+                            Color.white.opacity(0),
+                            Color.clear
+                        ],
+                        startPoint: .top,
+                        endPoint: .center
+                    )
+                )
+                .allowsHitTesting(false)
         )
-        // Floating shadow — visible against charcoal bg
-        .shadow(color: Color.black.opacity(colorScheme == .dark ? 0.5 : 0.18), radius: 4, x: 0, y: 3)
-        .shadow(color: Color.black.opacity(colorScheme == .dark ? 0.4 : 0.14), radius: 20, x: 0, y: 12)
+        .overlay(
+            RoundedRectangle(cornerRadius: widgetCorner, style: .continuous)
+                .stroke(colorScheme == .dark ? Color.white.opacity(0.08) : Color.white.opacity(0.6), lineWidth: 0.5)
+        )
+        // Apple-style layered shadow — contact + elevation + ambient
+        .shadow(color: Color.black.opacity(colorScheme == .dark ? 0.5 : 0.08), radius: 1, x: 0, y: 1)
+        .shadow(color: Color.black.opacity(colorScheme == .dark ? 0.4 : 0.12), radius: 6, x: 0, y: 4)
+        .shadow(color: Color.black.opacity(colorScheme == .dark ? 0.3 : 0.10), radius: 16, x: 0, y: 10)
+        .shadow(color: Color.black.opacity(colorScheme == .dark ? 0.2 : 0.06), radius: 40, x: 0, y: 20)
         .padding(.horizontal, 24)
     }
 

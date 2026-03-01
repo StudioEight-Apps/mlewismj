@@ -1,4 +1,5 @@
 import SwiftUI
+import StoreKit
 
 struct OnboardingVoiceReveal: View {
     let archetype: VoiceArchetype
@@ -206,6 +207,12 @@ struct OnboardingVoiceReveal: View {
                 timer.invalidate()
 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                    // Track voice reveal
+                    AnalyticsService.shared.trackOnboardingVoiceRevealed(
+                        voiceId: archetype.voiceId,
+                        archetypeName: variation?.name ?? "unknown"
+                    )
+
                     withAnimation(.easeInOut(duration: 0.3)) {
                         phase = .revealed
                     }
@@ -225,6 +232,13 @@ struct OnboardingVoiceReveal: View {
                     }
                     withAnimation(.easeOut(duration: 0.5).delay(1.0)) {
                         showCards = true
+                    }
+
+                    // Request App Store review after reveal animations complete
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+                            SKStoreReviewController.requestReview(in: windowScene)
+                        }
                     }
                 }
             }

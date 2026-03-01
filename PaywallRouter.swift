@@ -28,6 +28,7 @@ struct PaywallRouter: View {
             RevenueCatUI.PaywallView(displayCloseButton: false)
                 .onPurchaseCompleted { _, customerInfo in
                     if customerInfo.entitlements["premium"]?.isActive == true {
+                        AnalyticsService.shared.trackPaywallPurchaseCompleted(plan: "rc_template")
                         Task { @MainActor in
                             revenueCatManager.hasActiveSubscription = true
                             navigateToWelcome = true
@@ -36,6 +37,7 @@ struct PaywallRouter: View {
                 }
                 .onRestoreCompleted { customerInfo in
                     if customerInfo.entitlements["premium"]?.isActive == true {
+                        AnalyticsService.shared.trackPaywallRestored(success: true)
                         Task { @MainActor in
                             revenueCatManager.hasActiveSubscription = true
                             navigateToWelcome = true

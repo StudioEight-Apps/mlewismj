@@ -104,6 +104,16 @@ struct RootView: View {
         await MainActor.run {
             isStoreKitReady = true
             print("RevenueCat ready, hasActiveSubscription: \(revenueCatManager.hasActiveSubscription)")
+
+            // Set analytics user properties
+            let voiceId = UserDefaults.standard.integer(forKey: "voice_id")
+            AnalyticsService.shared.setUserProperties(
+                voiceId: voiceId > 0 ? voiceId : 1,
+                hasSubscription: revenueCatManager.hasActiveSubscription
+            )
+            if let userId = authViewModel.user?.uid {
+                AnalyticsService.shared.setUserId(userId)
+            }
         }
     }
     

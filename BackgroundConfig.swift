@@ -48,7 +48,8 @@ struct BackgroundConfig: Equatable {
     let maxWidthMultiplier: CGFloat
     let widgetImageAlignment: Alignment
     let screenBackgroundHex: String
-    
+    let darkScreenBackgroundHex: String
+
     init(
         imageName: String,
         textColor: String,
@@ -57,7 +58,8 @@ struct BackgroundConfig: Equatable {
         categories: [BackgroundCategory] = [.color],
         maxWidthMultiplier: CGFloat = 0.85,
         widgetImageAlignment: Alignment = .center,
-        screenBackgroundHex: String = "#F5EFE7"
+        screenBackgroundHex: String = "#F5EFE7",
+        darkScreenBackgroundHex: String = "#08080E"
     ) {
         self.imageName = imageName
         self.textColor = textColor
@@ -67,6 +69,7 @@ struct BackgroundConfig: Equatable {
         self.maxWidthMultiplier = maxWidthMultiplier
         self.widgetImageAlignment = widgetImageAlignment
         self.screenBackgroundHex = screenBackgroundHex
+        self.darkScreenBackgroundHex = darkScreenBackgroundHex
     }
     
     // MARK: - All Backgrounds (12 Total)
@@ -82,7 +85,8 @@ struct BackgroundConfig: Equatable {
             textPosition: .center,
             textAlignment: .center,
             categories: [.color],
-            screenBackgroundHex: "#F5EFE7"
+            screenBackgroundHex: "#D4E8D0",  // soft sage
+            darkScreenBackgroundHex: "#122E1C"  // deep forest
         ),
         BackgroundConfig(
             imageName: "whisper_bg_deepreds",
@@ -90,7 +94,8 @@ struct BackgroundConfig: Equatable {
             textPosition: .center,
             textAlignment: .center,
             categories: [.color],
-            screenBackgroundHex: "#F5EFE7"
+            screenBackgroundHex: "#E8D0D0",  // dusty rose
+            darkScreenBackgroundHex: "#351520"  // dark burgundy
         ),
         BackgroundConfig(
             imageName: "sunkissed_whisper",
@@ -98,7 +103,8 @@ struct BackgroundConfig: Equatable {
             textPosition: .center,
             textAlignment: .center,
             categories: [.color],
-            screenBackgroundHex: "#F5EFE7"
+            screenBackgroundHex: "#F5E6D0",  // warm honey
+            darkScreenBackgroundHex: "#302210"  // dark amber
         ),
         BackgroundConfig(
             imageName: "whisper_bg_cream",
@@ -106,7 +112,8 @@ struct BackgroundConfig: Equatable {
             textPosition: .center,
             textAlignment: .center,
             categories: [.color],
-            screenBackgroundHex: "#F5EFE7"
+            screenBackgroundHex: "#EDE8DF",  // soft cream
+            darkScreenBackgroundHex: "#141E38"  // dark navy
         ),
         BackgroundConfig(
             imageName: "whisper_bg_goldenblend",
@@ -114,7 +121,8 @@ struct BackgroundConfig: Equatable {
             textPosition: .center,
             textAlignment: .center,
             categories: [.color],
-            screenBackgroundHex: "#F5EFE7"
+            screenBackgroundHex: "#F0E4D0",  // golden cream
+            darkScreenBackgroundHex: "#302412"  // dark gold
         ),
         BackgroundConfig(
             imageName: "blue_static",
@@ -122,7 +130,8 @@ struct BackgroundConfig: Equatable {
             textPosition: .center,
             textAlignment: .center,
             categories: [.color],
-            screenBackgroundHex: "#F5EFE7"
+            screenBackgroundHex: "#D0D8E8",  // powder blue
+            darkScreenBackgroundHex: "#101E3A"  // deep navy
         ),
         BackgroundConfig(
             imageName: "whisper_bg_espressofade",
@@ -130,7 +139,8 @@ struct BackgroundConfig: Equatable {
             textPosition: .center,
             textAlignment: .center,
             categories: [.color],
-            screenBackgroundHex: "#F5EFE7"
+            screenBackgroundHex: "#E0D4C6",  // warm latte
+            darkScreenBackgroundHex: "#2E2014"  // dark espresso
         ),
         BackgroundConfig(
             imageName: "whisper_color_poeticwine",
@@ -138,20 +148,22 @@ struct BackgroundConfig: Equatable {
             textPosition: .center,
             textAlignment: .center,
             categories: [.color],
-            screenBackgroundHex: "#F5EFE7"
+            screenBackgroundHex: "#E4D4D8",  // soft mauve
+            darkScreenBackgroundHex: "#321420"  // dark wine
         ),
-        
+
         // ============================================
         // TEXTURED TAB (4 backgrounds)
         // ============================================
-        
+
         BackgroundConfig(
             imageName: "whisper_texture_peeledpaper",
             textColor: "#1A1A1A",
             textPosition: .center,
             textAlignment: .center,
             categories: [.textured],
-            screenBackgroundHex: "#F5EFE7"
+            screenBackgroundHex: "#EDE6DA",  // warm paper
+            darkScreenBackgroundHex: "#2A2218"  // dark parchment
         ),
         BackgroundConfig(
             imageName: "whisper_texture_bluetexture",
@@ -159,7 +171,8 @@ struct BackgroundConfig: Equatable {
             textPosition: .center,
             textAlignment: .center,
             categories: [.textured],
-            screenBackgroundHex: "#F5EFE7"
+            screenBackgroundHex: "#D8DDE6",  // soft blue-gray
+            darkScreenBackgroundHex: "#181E2A"  // dark slate
         ),
         BackgroundConfig(
             imageName: "whisper_bg_crinkledbeige",
@@ -167,7 +180,8 @@ struct BackgroundConfig: Equatable {
             textPosition: .center,
             textAlignment: .center,
             categories: [.textured],
-            screenBackgroundHex: "#F5EFE7"
+            screenBackgroundHex: "#E8DCCC",  // warm tan
+            darkScreenBackgroundHex: "#2C2012"  // dark tan
         ),
         BackgroundConfig(
             imageName: "whisper_bg_charcoalgrain",
@@ -175,7 +189,8 @@ struct BackgroundConfig: Equatable {
             textPosition: .center,
             textAlignment: .center,
             categories: [.textured],
-            screenBackgroundHex: "#F5EFE7"
+            screenBackgroundHex: "#D8D4D0",  // warm gray
+            darkScreenBackgroundHex: "#222222"  // deep charcoal
         ),
     ]
     
